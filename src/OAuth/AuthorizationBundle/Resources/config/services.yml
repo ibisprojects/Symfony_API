@@ -1,0 +1,7 @@
+parameters:
+#    o_auth_authorization.example.class: OAuth\AuthorizationBundle\Example
+
+services:
+#    o_auth_authorization.example:
+#        class: %o_auth_authorization.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

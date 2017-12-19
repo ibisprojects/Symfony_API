@@ -1,0 +1,24 @@
+api_authorized_grant_get_userdetails:
+    pattern:  /API/GetProfile
+    defaults: { _controller: APIAuthorizedGrantBundle:User:getUserDataAPI }
+    
+api_authorized_grant_get_project_list:
+    pattern:  /API/GetProjectList
+    defaults: { _controller: APIAuthorizedGrantBundle:Default:getProjectListAPI }
+    
+api_authorized_grant_get_datasheets:
+    pattern:  /API/GetDatasheets
+    defaults: { _controller: APIAuthorizedGrantBundle:Default:getDataSheetsAPI }
+    
+api_authorized_grant_get_combined_list:
+    pattern:  /API/GetProjectsAndDatasheets
+    defaults: { _controller: APIAuthorizedGrantBundle:Default:getProjectsAndDatasheetsAPI }
+    
+api_authorized_grant_upload_data:
+    pattern:  /API/UploadData
+    defaults: { _controller: APIAuthorizedGrantBundle:Upload:uploadDatasheetsAPI }
+    
+api_authorized_grant_min_app_revision:
+    pattern:  /API/GetMinAppRevision
+    defaults: { _controller: APIAuthorizedGrantBundle:Default:getMinAppRevisionAPI }
+    

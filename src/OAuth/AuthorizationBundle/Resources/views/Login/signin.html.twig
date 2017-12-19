@@ -1,0 +1,36 @@
+{% extends "OAuthAuthorizationBundle:Default:base.html.twig" %}
+
+{% block title %}
+    <title>Sign in</title>
+{% endblock %}
+
+{% block container %}
+
+    {% if error_message is defined and error_message is not null and error_message!=""%}
+        <p class="bg-danger">{{error_message}}</p>
+    {%endif%}
+    {% if signin_path is defined and signin_path is not null%} 
+        <form class="form-signin" role="form" method="POST" action="{{ path(signin_path) }}">
+            <h2 class="form-signin-heading">Please sign in</h2>
+
+                <input type="text" name="username" class="form-control" placeholder="Username" required autofocus>
+                <input type="password" name="password" class="form-control" placeholder="Password" required>   
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign In</button>
+			{# Comment out for now
+				{% if register_path is defined and register_path is not null%} 
+					<br>New to CitSci.org?<br>
+				<a class="btn btn-lg btn-primary btn-block" style="width:120px;" href="{{ path(register_path) }}" >Sign Up</a>
+				{% else %}
+					<p class="bg-warning">Register path not found</p>
+				{%endif%}
+			#}
+        </form>
+    {% else %}
+        <p class="bg-warning">Path not found</p>
+    {%endif%}
+
+	
+
+{% endblock %}
+

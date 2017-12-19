@@ -1,0 +1,63 @@
+{% extends "OAuthAuthorizationBundle:Default:base.html.twig" %}
+
+{% block title %}
+    <title>Access Token Test</title>
+{% endblock %}
+
+{% block container %}    
+    <div class="row">
+        <div class="col-md-6">
+            <form class="form-signin" role="form" id="autorizeForm" method="POST" action="{{ path('o_auth_authorization_access_token') }}">
+                <h3 class="form-signin-heading">Test Auth Code</h3>      
+                <div class="form-group">
+                    <label for="grantType">Grant Type</label>
+                    <input type="text" class="form-control" name="grant_type" id="grant_type" value="authorization_code">
+                </div>
+                <div class="form-group">
+                    <label for="client_id">Client ID</label>
+                    <input type="text" class="form-control" id="client_id" name ="client_id" value="T0VGqm9H9X">
+                </div>
+                <div class="form-group">
+                    <label for="client_secret">Client Secret</label>
+                    <input type="text" class="form-control" id="client_secret" name ="client_secret" value="pd3ah5tQU8">
+                </div>
+                <div class="form-group">
+                    <label for="redirect_uri">Redirect URI</label>
+                    <input type="text" class="form-control" id="redirect_uri" name ="redirect_uri" value="https://ibis-test1s.nrel.colostate.edu/app.php/oAuth/testRedirectURL">
+                </div>
+                <div class="form-group">
+                    <label for="code">Auth Code</label>
+                    <input type="text" class="form-control" id="code" name ="code" value="">
+                </div>
+                <button type="submit" class="btn btn-success" id="allowaccess">Get Access Token</button>           
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form class="form-signin" role="form" id="autorizeForm" method="POST" action="{{ path('o_auth_authorization_access_token_refresh') }}">
+                <h3 class="form-signin-heading">Test Refresh Code</h3>      
+                <div class="form-group">
+                    <label for="grantType">Grant Type</label>
+                    <input type="text" class="form-control" name="grant_type" id="grant_type" value="refresh_token">
+                </div>
+                <div class="form-group">
+                    <label for="client_id">Client ID</label>
+                    <input type="text" class="form-control" id="client_id" name ="client_id" value="T0VGqm9H9X">
+                </div>
+                <div class="form-group">
+                    <label for="client_secret">Client Secret</label>
+                    <input type="text" class="form-control" id="client_secret" name ="client_secret" value="pd3ah5tQU8">
+                </div>
+                <div class="form-group">
+                    <label for="redirect_uri">Redirect URI</label>
+                    <input type="text" class="form-control" id="redirect_uri" name ="redirect_uri" value="http://ibis-apis.nrel.colostate.edu/app.php/oAuth/testRedirectURL">
+                </div>
+                <div class="form-group">
+                    <label for="code">Refresh Token</label>
+                    <input type="text" class="form-control" id="code" name ="refresh_token" value="">
+                </div>
+                <button type="submit" class="btn btn-success" id="refreshaccess">Refresh Access Token</button>           
+            </form>
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,49 @@
+{% extends "OAuthAuthorizationBundle:Default:base.html.twig" %}
+
+{% block title %}
+    <title>Authorize</title>
+{% endblock %}
+{% block container %}    
+    {% if client_details.name is defined and client_details.name is not null%}
+        {% if authorize_path is defined and authorize_path is not null%} 
+            
+            {% if user_id is defined and user_id is not null and user_id!=""%}
+            
+            {%endif%}
+                <form class="form-signin" role="form" id="autorizeForm" method="POST" action="{{ path(authorize_path) }}">
+                    <h3 class="form-signin-heading">Authorize Access</h3>
+                    {% if scopes is defined and scopes is iterable  and scopes is not empty%}
+                        <dl>
+                            {% for scope in scopes%}
+                                <dt>{{scope.name}}</dt> 
+                                <dd>{{scope.description}}</dd> 
+                            {% endfor %}
+                        </dl>
+                    {% endif %}          
+                    <button type="button" class="btn btn-lg btn-success" id="allowaccess">Allow</button>
+                    <button type="button" class="btn btn-lg btn-danger" id="denyaccess">Deny</button>
+					<br>
+                    <div class="row">
+                         <div class="col-md-10" style="margin-top:20px;">
+                             {% set grant_parts = authorize_path|split('_') %}
+                             {%  set grant = grant_parts[2]|default('error')%}
+                             <a href="{{path('o_auth_logout',{'grant': grant})}}" id="logout">Sign in as a different user?</a>
+                         </div>
+                    </div>
+                </form>
+
+        {% else %}
+            <p class="bg-warning">Grant type not found</p>
+        {%endif%}
+    {% else %}
+        <p class="bg-warning">Client not found</p>
+    {%endif%}
+
+    {% if error_message is defined and error_message is not null and error_message!=""%}
+        <p class="bg-danger">{{error_message}}</p>
+    {%endif%}
+
+{% endblock %}
+{% block javascripts %}  
+    <script src="{{ asset('bundles/oauthauthorization/js/authorize.js') }}"></script>
+{% endblock %}

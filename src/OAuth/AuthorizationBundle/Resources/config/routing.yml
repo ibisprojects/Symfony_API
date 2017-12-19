@@ -1,0 +1,71 @@
+o_auth_logout:
+    pattern:  /oAuth/logout
+    defaults: { _controller: OAuthAuthorizationBundle:Default:logout }
+
+#Authorization Grant Routes
+
+o_auth_authorization_homepage:
+    pattern:  /oAuth/Auth
+    defaults: { _controller: OAuthAuthorizationBundle:Auth:index }    
+    
+o_auth_authorization_signin:
+    pattern:  /oAuth/Auth/login
+    defaults: { _controller: OAuthAuthorizationBundle:Auth:signin }
+    
+o_auth_authorization_register:
+    pattern:  /oAuth/Auth/signup
+    defaults: { _controller: OAuthAuthorizationBundle:Auth:register }    
+
+o_auth_authorization_authorize:
+    pattern:  /oAuth/Auth/authorize
+    defaults: { _controller: OAuthAuthorizationBundle:Auth:authorize }
+    
+o_auth_authorization_access_token:
+    pattern:  /oAuth/getAccessToken
+    defaults: { _controller: OAuthAuthorizationBundle:Auth:accessToken }
+    
+o_auth_authorization_access_token_refresh:
+    pattern:  /oAuth/refreshAccessToken
+    defaults: { _controller: OAuthAuthorizationBundle:Auth:refreshAccessToken }
+
+#Implicit Grant Routes
+
+o_auth_implicit_homepage:
+    pattern:  /oAuth/i
+    defaults: { _controller: OAuthAuthorizationBundle:Implicit:index } 
+    
+o_auth_implicit_signin:
+    pattern:  /oAuth/i/login
+    defaults: { _controller: OAuthAuthorizationBundle:Implicit:signin }
+    
+o_auth_implicit_register:
+    pattern:  /oAuth/i/signup
+    defaults: { _controller: OAuthAuthorizationBundle:Implicit:register }
+
+o_auth_implicit_authorize:
+    pattern:  /oAuth/i/authorize
+    defaults: { _controller: OAuthAuthorizationBundle:Implicit:authorize }
+
+#Client Grant Routes
+
+o_auth_client_homepage:
+    pattern:  /oAuth/client
+    defaults: { _controller: OAuthAuthorizationBundle:ClientCredential:index } 
+    
+#Test Routes
+
+o_auth_client_test:
+    pattern:  /oAuth/testClientGrant
+    defaults: { _controller: OAuthAuthorizationBundle:Default:testClient }
+    
+o_auth_authorization_test:
+    pattern:  /oAuth/testRedirectURL
+    defaults: { _controller: OAuthAuthorizationBundle:Default:test }
+    
+o_auth_authorization_client:
+    pattern:  /oAuth/ClientRedirectURL
+    defaults: { _controller: OAuthAuthorizationBundle:Default:test }
+    
+o_auth_authorization_access_token_test:
+    pattern:  /oAuth/getAccesTokenTest
+    defaults: { _controller: OAuthAuthorizationBundle:Default:testAccessToken }

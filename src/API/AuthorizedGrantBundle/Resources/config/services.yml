@@ -1,0 +1,7 @@
+parameters:
+#    api_authorized_grant.example.class: API\AuthorizedGrantBundle\Example
+
+services:
+#    api_authorized_grant.example:
+#        class: %api_authorized_grant.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
