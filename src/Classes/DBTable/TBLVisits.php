@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: TBL_Visits.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -27,6 +27,9 @@ namespace Classes\DBTable;
 //**************************************************************************************
 
 use Classes\TBLDBTables;
+use Classes\DBTable\Date;
+use Classes\Utilities\SQL;
+
 //*********************************************************************************
 //	Definitions
 //*********************************************************************************
@@ -44,13 +47,13 @@ $VisitStatusStrings = array("--- Select A Status ---", "New", "Under Review", "A
 class TBLVisits {
 
     //******************************************************************************
-    // Private functions 
+    // Private functions
     //******************************************************************************
     public static function AddSearchWhereClause($Database, &$SelectString, $ProjectID = NOT_SPECIFIED, $AreaID = NOT_SPECIFIED, $OrganismInfoID = NOT_SPECIFIED, $InsertLogID = NOT_SPECIFIED, $RefX = NOT_SPECIFIED, $RefY = NOT_SPECIFIED, $RefWidth = NOT_SPECIFIED, $RefHeight = NOT_SPECIFIED, $NumPresent = NOT_SPECIFIED, $NumAbsent = NOT_SPECIFIED) {
     //
     // Adds the appropriate search criteria to the provided search string.
     // This public static function will only return select strings for non-survey areas.//
-  	
+
 //		DebugWriteln("NumPresent=$NumPresent");
 //		DebugWriteln("NumAbsent=$NumAbsent");
 
@@ -117,8 +120,8 @@ class TBLVisits {
     //**********************************************************************************
     // TBL_DBTables functions
     //**********************************************************************************
-    public static function GetFieldValue($Database, $FieldName, $ID, $Default = 0) {
-        $Result = TBLDBTables::GetFieldValue($Database, "TBL_Visits", $FieldName, $ID, $Default);
+    public static function GetFieldValue($dbConn, $FieldName, $ID, $Default = 0) {
+        $Result = TBLDBTables::GetFieldValue($dbConn, "TBL_Visits", $FieldName, $ID, $Default);
 
         return($Result);
     }
@@ -133,43 +136,45 @@ class TBLVisits {
 
     public static function GetSet($dbConn, $ProjectID = null, $OrderBy = null, $Desending = null, $AreaID = null, $VisitDate = null) {
         $SelectString = "SELECT * " .
-                "FROM TBL_Visits ";
+                "FROM \"TBL_Visits\" ";
 
         if ($ProjectID !== null)
-            TBLDBTables::AddWhereClause($SelectString, "ProjectID=$ProjectID");
+            TBLDBTables::AddWhereClause($SelectString, "\"ProjectID\"=$ProjectID");
         if ($AreaID !== null)
-            TBLDBTables::AddWhereClause($SelectString, "AreaID=$AreaID");
-        //if ($VisitDate!==null) TBL_DBTables::AddWhereClause($SelectString,"VisitDate='$VisitDate'");
+            TBLDBTables::AddWhereClause($SelectString, "\"AreaID\"=$AreaID");
         if ($VisitDate !== null)
-            TBLDBTables::AddWhereClause($SelectString, "VisitDate=CONVERT(char(10),'".$VisitDate->format('m-d-Y')."',101)");
-
+            TBLDBTables::AddWhereClause($SelectString, "\"VisitDate\"=CAST('$VisitDate' AS date)");
 
         if ($OrderBy !== null) {
             $SelectString.=" ORDER BY ";
-            $SelectString.="$OrderBy ";
+            $SelectString.="\"$OrderBy\" ";
             if ($Desending)
                 $SelectString.="DESC ";
         }
+
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
+
         $visit = $stmt->fetch();
+
         if (!$visit) {
             return false;
         }
+
         return $visit;
     }
 
-    public static function GetSetFromID($Database, $VisitID) {
-        $VisitID = SafeInt($VisitID);
+    public static function GetSetFromID($dbConn, $VisitID) {
+        $VisitID = SQL::SafeInt($VisitID);
 
-        $SelectString = "SELECT * " .
-                "FROM TBL_Visits " .
-                "WHERE ID=" . $VisitID; //"WHERE ID='".$VisitID."'";
-//		DebugWriteln("SelectString=".$SelectString);
-//		
-        $VisitSet = $Database->Execute($SelectString);
+        $SelectString = "SELECT * ".
+                "FROM \"TBL_Visits\" ".
+                "WHERE \"ID\"=" . $VisitID;
 
-        return($VisitSet);
+        $stmt = $dbConn->prepare($SelectString);
+        $stmt->execute();
+
+        return $stmt->fetch();
     }
 
     public static function GetTotalRows($Database, $ProjectID = NOT_SPECIFIED, $AreaID = NOT_SPECIFIED, $OrganismInfoID = NOT_SPECIFIED, $InsertLogID = NOT_SPECIFIED, $RefX = NOT_SPECIFIED, $RefY = NOT_SPECIFIED, $RefWidth = NOT_SPECIFIED, $RefHeight = NOT_SPECIFIED, $NumPresent = NOT_SPECIFIED, $NumAbsent = NOT_SPECIFIED) {
@@ -181,7 +186,7 @@ class TBLVisits {
     //
 	// Class specific fields:
     //	$OrganismInfoID - just return projects containing visits with this taxon//
-     
+
         // get the query for $CurrentRow+$NumRows rows in reversed order
 
         $SelectString = "SELECT COUNT(*) " .
@@ -213,7 +218,7 @@ class TBLVisits {
     //	$ProjectID
     //	$AreaID
     //	$InsertLogID//
-    
+
         $NumRows = (int) $NumRows;
         $TotalRows = (int) $TotalRows;
         $CurrentRow = (int) $CurrentRow;
@@ -251,52 +256,49 @@ class TBLVisits {
     }
 
     public static function Insert($dbConn, $ProjectID, $AreaID = 0, $VisitDate = null, $InsertLogID = 0, $VolunteerCollected = 0, $VisitComments = null, $RecorderID = 0) {
-//		DebugWriteln("ProjectID=$ProjectID");
-        // get the parameters
-
+        $ProjectID = SQL::SafeInt($ProjectID);
+        $AreaID = SQL::SafeInt($AreaID);
+        $InsertLogID = SQL::SafeInt($InsertLogID);
+        $VolunteerCollected = SQL::SafeInt($VolunteerCollected);
 
         if ($VisitDate == null) {
-           
-            $VisitDate =  date("m-d-Y");
+            $Date = new Date();
+
+            $VisitDate = $Date->GetSQLString();
+        } else {
+            $VisitDate = SQL::SafeDate($VisitDate);
         }
-        $VisitID = 1;
 
         // insert the visit
 
-        $ExecString = "EXEC insert_TBL_Visits " . $ProjectID;
-         $stmt = $dbConn->prepare($ExecString);
+        $ExecString = "INSERT INTO \"TBL_Visits\" (\"ProjectID\") VALUES ($ProjectID)";
+
+        $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
-        $VisitID = $dbConn->lastInsertId();
+
+        $VisitID = $dbConn->lastInsertId('TBL_Visits_ID_seq');
+        $stmt = null;
 
         // update the rest of the fields
 
-        $Temp = $AreaID;
-        if ($AreaID == 0)
-            $Temp = "NULL";
+        $String = "UPDATE \"TBL_Visits\" " .
+                "SET \"AreaID\"=$AreaID, " .
+                "\"Status\"='" . VISITSTATUS_NEW . "' "; // gjn - always make a new visit have a status of new, this can be edited by reviewers later
 
-        $String = "UPDATE TBL_Visits " .
-                "SET AreaID=$AreaID, " .
-                "Status='" . VISITSTATUS_NEW . "' "; // gjn - always make a new visit have a status of new, this can be edited by reviewers later
         if ($VisitDate != null)
-            $String = $String . ",VisitDate=CONVERT(char(10),'".$VisitDate->format('m-d-Y')."',101) ";
-
-        if ($InsertLogID == 0) {
-           // $UserSessionID = TBL_UserSessions::GetID($Database, GetUserID());
-
-            //$InsertLogID = TBL_InsertLogs::GetInsertLogIDFromUserSessionID($Database, INSERT_LOG_SURVEY_ADD, $UserSessionID);
-        }
+            $String = $String . ",\"VisitDate\"=CAST('$VisitDate' AS date) ";
 
         if ($InsertLogID != 0)
-            $String = $String . ",InsertLogID='$InsertLogID' ";
+            $String = $String . ",\"InsertLogID\"='$InsertLogID' ";
 
         if ($RecorderID != 0)
-            $String = $String . ",RecorderID='$RecorderID' ";
+            $String = $String . ",\"RecorderID\"='$RecorderID' ";
 
-        $String = $String . ",VolunteerCollected='$VolunteerCollected' ";
+        $String = $String . ",\"VolunteerCollected\"=$VolunteerCollected ";
 
-        $String = $String . ",Comments='$VisitComments' ";
+        $String = $String . ",\"Comments\"='$VisitComments' ";
 
-        $String = $String . "WHERE ID=$VisitID";
+        $String = $String . "WHERE \"ID\"=$VisitID";
 
         $stmt = $dbConn->prepare($String);
         $stmt->execute();
@@ -304,79 +306,51 @@ class TBLVisits {
         return($VisitID);
     }
 
-    public static function Delete($Database, $VisitID) {
-//		DebugWriteln("TBL_Visits::Delete VisitID=$VisitID");
+    public static function Delete($dbConn, $VisitID) {
         // save the AreaID before we delete the visit
-//DebugWriteln("1");
 
-        $VisitSet = TBL_Visits::GetSetFromID($Database, $VisitID);
-//DebugWriteln("1");
+        $VisitSet = TBLVisits::GetSetFromID($dbConn, $VisitID);
 
-        $AreaID = $VisitSet->Field("AreaID");
+        if (!$VisitSet)
+            return;
+
+        $AreaID = $VisitSet["AreaID"];
 
         // delete the visit
-//		DebugWriteln("TBL_Visits::Delete Deleting the visit");
-
-        TBL_DBTables::Delete($Database, "TBL_Visits", $VisitID);
-//DebugWriteln("1");
+        TBLDBTables::Delete($dbConn, "TBL_Visits", $VisitID);
 
         if ($AreaID != 0) {
             // delete the area that was associated with the visit if it only has one visit
 
-            $AreaSet = TBL_Areas::GetSetFromID($Database, $AreaID);
+            $AreaSet = TBLAreas::GetSetFromID($dbConn, $AreaID);
 
-            if ($AreaSet->Field("UniqueToVisit") == 1) { // delete the area
-                $VisitSet = TBL_Visits::GetSet($Database, null, null, null, $AreaID);
+            if ($AreaSet["UniqueToVisit"] == 1) { // delete the area
+                $VisitSet = TBLVisits::GetSet($dbConn, null, null, null, $AreaID);
 
-                if ($VisitSet->FetchRow() == false) { // no more visits attached to this area
-                    //			DebugWriteln("TBL_Visits::Delete AreaID=$AreaID");
-                    TBL_Areas::Delete($Database, $AreaID);
+                if (!$VisitSet) { // no more visits attached to this area
+                    TBLAreas::Delete($dbConn, $AreaID);
                 }
             }
         }
-//DebugWriteln("1");
     }
 
-    public static function InsertVisitOnly($Database, $UserID, $VisitDate, $X, $Y, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, $Accuracy, $FormID = NOT_SPECIFIED, $InsertLogType = INSERT_LOG_FORM, $VisitComments = null, $InsertLogID = NOT_SPECIFIED, $SelectedAreaID = NOT_SPECIFIED) {
+    public static function InsertVisitOnly($dbConn, $UserID, $VisitDate, $X, $Y, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, $Accuracy, $FormID = NOT_SPECIFIED, $InsertLogType = INSERT_LOG_FORM, $VisitComments = null, $InsertLogID = NOT_SPECIFIED, $SelectedAreaID = NOT_SPECIFIED) {
         // add an area and a visit because we do not have any organism form entries
 
-        $GeometryString = null;
-        $AreaSubTypeID = null;
-        $AreaComments = null;
-        //DebugWriteln("InsertLogID=$InsertLogID");
-        if ($InsertLogID == NOT_SPECIFIED) {
-            //DebugWriteln("------------------------------");
-            $InsertLogID = TBL_InsertLogs::GetInsertLogIDFromUserSessionID($Database, $InsertLogType, NOT_SPECIFIED, $FormID);
-        }
-
-        TBL_InsertLogs::SetFieldValue($Database, "UploaderID", $InsertLogID, $UserID); // specified as current user for web pages but can be specified otherwise with PDA and Map Web Service
+        TBLInsertLogs::SetFieldValue($dbConn, "UploaderID", $InsertLogID, $UserID); // specified as current user for web pages but can be specified otherwise with PDA and Map Web Service
         // see if the point already exists
 
-        $AreaID = 0;
-        
         if ($SelectedAreaID != NOT_SPECIFIED)  // if user selected predefined location, use it as AreaID (R.S. 8/4/12)
         {
             $AreaID=$SelectedAreaID;
         }
-        else if ($GeometryString == null) { // see if the point exists (jjg - can make this check for geometries that match in the future)
-            $AreaID = TBL_Areas::GetIDFromCoordinate($Database, $X, $Y, COORDINATE_SYSTEM_WGS84_GEOGRAPHIC, 1, $ProjectID); // $CoordinateSystemID was hard coded to was STPROJECTION_GEOGRAPHIC
+        else
+        {
+            $AreaID = TBLAreas::GetIDFromCoordinate($dbConn, $X, $Y, COORDINATE_SYSTEM_WGS84_GEOGRAPHIC, 1, $ProjectID); // $CoordinateSystemID was hard coded to was STPROJECTION_GEOGRAPHIC
         }
-
-        //DebugWriteln("------------------------------");
-
-        if ($AreaSubTypeID === null) {
-            $AreaSubTypeID = AREA_SUBTYPE_POINT; // default to point?
-        }
-
-        //DebugWriteln("AreaID=$AreaID-----SubplotID=$SubplotID");
 
         if ($AreaID <= 0) { // add a new point area
-            if ($GeometryString == null) {
-                $AreaID = TBL_Areas::InsertPoint($Database, $ProjectID, $InsertLogID, $AreaName, $SubplotID, $X, $Y, $CoordinateSystemID, $Accuracy, $AreaSubTypeID, "", $AreaComments); // we need to modify AddPoint to be able to add survey types for plot types other than point
-                //DebugWriteln("**********************");
-            } else {
-                $AreaID = TBL_Areas::InsertShape($Database, $ProjectID, $InsertLogID, $AreaName, $SubplotID, $GeometryString, $CoordinateSystemID, $Accuracy, $AreaSubTypeID); // we need to modify AddPoint to be able to add survey types for plot types other than point
-            }
+            $AreaID = TBLAreas::InsertPoint($dbConn, $ProjectID, $InsertLogID, $AreaName, $SubplotID, $X, $Y, $CoordinateSystemID, $Accuracy, AREA_SUBTYPE_POINT); // we need to modify AddPoint to be able to add survey types for plot types other than point
         }
 
         if ($VisitDate == null) { // not specified)
@@ -385,21 +359,19 @@ class TBLVisits {
 
         $VisitDateString = $VisitDate->GetSQLString();
 
-        $Set = TBL_Visits::GetSet($Database, null, "VisitDate", null, $AreaID, $VisitDateString); // $VisitDate->GetSQLString()
+        $Set = TBLVisits::GetSet($$dbConn, null, "VisitDate", null, $AreaID, $VisitDateString); // $VisitDate->GetSQLString()
 
         $VisitID = 0;
 
-        if ($Set->FetchRow()) {
-            $VisitID = $Set->Field("ID"); // get the ID for the existing visit
+        if ($Set) {
+            $VisitID = $Set["ID"]; // get the ID for the existing visit
         }
+
         if ($VisitID == 0) { // insert a new visit
-            $VisitID = TBL_Visits::Insert($Database, $ProjectID, $AreaID, $VisitDateString, $InsertLogID, 1, $VisitComments, $UserID); // $VisitDate->GetSQLString()
+            $VisitID = TBLVisits::Insert($dbConn, $ProjectID, $AreaID, $VisitDateString, $InsertLogID, 1, $VisitComments, $UserID);
         }
 
-        // update the InsertLogID.Date field accordingly
-        //TBL_InsertLogs::SetFieldValue($Database,"DateUploaded",$InsertLogID,$VisitDateString);
-
-        return($VisitID);
+        return $VisitID;
     }
 
     //*******************************************************************
@@ -567,7 +539,6 @@ class TBLVisits {
 
         return($VisitSet);
     }
-
 }
 
 ?>

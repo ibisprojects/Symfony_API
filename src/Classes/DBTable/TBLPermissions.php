@@ -55,7 +55,7 @@ class TBLPermissions {
     }
 
     public static function GetSetFromID($Database, $PermissionID) {
-        $PermissionID = SafeInt($PermissionID);
+        $PermissionID = SQL::SafeInt($PermissionID);
 
         $SelectString = "SELECT * " .
                 "FROM TBL_Permissions " .

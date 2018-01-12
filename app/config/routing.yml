@@ -1,0 +1,5 @@
+o_auth_authorization:
+  resource: "@OAuthAuthorizationBundle/Resources/config/routing.yml"
+
+api_authorized_grant:
+  resource: "@APIAuthorizedGrantBundle/Resources/config/routing.yml"

@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: REL_SpatialLayerGridToData.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -48,7 +48,7 @@ class RELSpatialLayerGridToData {
     }
 
     public static function GetSetFromID($Database, $ID) {
-        $ID = SafeInt($ID);
+        $ID = SQL::SafeInt($ID);
 
         $SelectString = "SELECT * " .
                 "FROM REL_SpatialLayerGridToData " .
@@ -89,7 +89,7 @@ class RELSpatialLayerGridToData {
         if ($DescendingFlag)
             $SelectString.="DESC "; // can't use order by function, finds previous order by
 
-            
+
 //		DebugWriteln("SelectString=$SelectString");
 
         $Set = $Database->Execute($SelectString);
@@ -116,12 +116,24 @@ class RELSpatialLayerGridToData {
     }
 
     public static function Insert($dbConn, $SpatialLayerGridID, $SpatialLayerDataID, $LayerRow, $LayerColumn, $AreaID) {
-        $ExecString = "EXEC insert_REL_SpatialLayerGridToData $SpatialLayerGridID,$LayerRow," .
-                "$LayerColumn,$SpatialLayerDataID,$AreaID";
+        $ExecString="INSERT INTO \"REL_SpatialLayerGridToData\" (
+				\"SpatialLayerGridID\",
+				\"LayerRow\",
+				\"LayerColumn\",
+				\"SpatialLayerDataID\",
+				\"AreaID\"
+			) VALUES (
+				$SpatialLayerGridID,
+				$LayerRow,
+				$LayerColumn,
+				$SpatialLayerDataID,
+				$AreaID
+			)";
+
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
-        $ID = $dbConn->lastInsertId();
-        return($ID);
+
+        return $dbConn->lastInsertId('REL_SpatialLayerGridToData_ID_seq');
     }
 
     public static function Delete($Database, $ID) {

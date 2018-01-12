@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: LKU_SubplotTypes.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -48,11 +48,11 @@ class LKUSubplotTypes {
     }
 
     public static function GetSetFromID($dbConn, $SubplotTypeID) {
-        $SelectString = "SELECT * " .
-                "FROM LKU_SubplotTypes " .
-                "WHERE ID='$SubplotTypeID'";
+        $SelectString = "SELECT * ".
+                "FROM \"LKU_SubplotTypes\" ".
+                "WHERE \"ID\"='$SubplotTypeID'";
 
-       $stmt = $dbConn->prepare($SelectString);
+        $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
         $Set= $stmt->fetch();
         if (!$Set) {

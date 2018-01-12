@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: TBL_SpatialLayerData.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -74,6 +74,9 @@ class TBLSpatialLayerData {
         // Either a CoordinateSystemID or a SpatialLayerGridID is required//
         // Make sure we have a SpatialLayerGridID and a CoordinateSystemID
 
+        $CoordinateSystemID = (int)$CoordinateSystemID;
+        $AreaID = SafeInt($AreaID);
+
         if ($SpatialLayerGridID == 0) { // get a SpatialLayerGridID
             $AreaSet = TBLAreas::GetSetFromID($dbConn, $AreaID);
             if (!$AreaSet)
@@ -90,64 +93,63 @@ class TBLSpatialLayerData {
             $CoordinateSystemID = $SpatialLayerGridSet["CoordinateSystemID"];
         }
 
-        if ($CoordinateSystemID != 1) { // make sure the coorindate is in geographic
-            //Skipped since involved with Bluespray
-            //$ErrorString = LKUCoordinateSystems::CoordinateToGeographic($dbConn, $RefX, $RefY, $CoordinateSystemID);
-            if ($GeometryString != null) {
-                //Skipped since involved with Bluespray
-                //$ErrorString = LKUCoordinateSystems::GeometryToGeographic($dbConn, $GeometryString, $CoordinateSystemID);
-            }
-            $CoordinateSystemID = 1;
+        if ($CoordinateSystemID != COORDINATE_SYSTEM_WGS84_GEOGRAPHIC) { // make sure the coorindate is in geographic
+            $CoordinateSystemID = COORDINATE_SYSTEM_WGS84_GEOGRAPHIC;
         }
-        /*
-          if ($AreaID > 0) {
-          $SelectString = "SELECT * " .
-          "FROM TBL_SpatialLayerData " .
-          "WHERE AreaID=$AreaID";
-          $stmt = $dbConn->prepare($SelectString);
-          $stmt->execute();
-          while ($Set = $stmt->fetch()) {
-          TBLSpatialLayerData::Delete($dbConn, $Set["ID"]);
-          }
-          } */
+
+        if ($AreaID > 0) {
+            $SelectString="SELECT * ".
+                "FROM \"TBL_SpatialLayerData\" ".
+                "WHERE \"AreaID\"=$AreaID";
+
+            $stmt = $dbConn->prepare($SelectString);
+            $stmt->execute();
+
+            while ($row = $stmt->fetch()) {
+                TBLSpatialLayerData::Delete($dbConn, $row["ID"]);
+            }
+
+            $stmt = null;
+        }
+
         // insert the SpatialLayerData record
-        $ExecString = "EXEC insert_TBL_SpatialLayerData " . $AreaID;
+        $ExecString = "INSERT INTO \"TBL_SpatialLayerData\" (\"AreaID\") VALUES ($AreaID)";
+
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
-        $SpatialLayerDataID = $dbConn->lastInsertId();
 
-        if ($GeometryString != null) {
-            //BlueSpray::GetBoundsFromGeometry($GeometryString,$RefX,$RefY,$RefWidth,$RefHeight);			
-        }
-        $Temp = $AreaID;
-        if ($AreaID == 0)
-            $Temp = "NULL";
+        $SpatialLayerDataID = $dbConn->lastInsertId('TBL_SpatialLayerData_ID_seq');
 
-        $UpdateString = "UPDATE TBL_SpatialLayerData " .
-                "SET AreaID=$AreaID, " .
-                "RefX=$RefX, " .
-                "RefY=$RefY, " .
-                "RefWidth=$RefWidth, " .
-                "RefHeight=$RefHeight, " .
-                "CoordinateSystemID=$CoordinateSystemID, " .
-                "SpatialLayerGridID=$SpatialLayerGridID " .
-                "WHERE ID=$SpatialLayerDataID";
+        $UpdateString = "UPDATE \"TBL_SpatialLayerData\" ".
+                "SET \"AreaID\"=$AreaID, ".
+                "\"RefX\"=$RefX, ".
+                "\"RefY\"=$RefY, ".
+                "\"RefWidth\"=$RefWidth, ".
+                "\"RefHeight\"=$RefHeight, ".
+                "\"CoordinateSystemID\"=$CoordinateSystemID, ".
+                "\"SpatialLayerGridID\"=$SpatialLayerGridID ".
+                "WHERE \"ID\"=$SpatialLayerDataID";
+
         $stmt = $dbConn->prepare($UpdateString);
         $stmt->execute();
+
         // insert the GeometryData
 
         if ($GeometryString == null) { // get a geometry string for a point
-            //$GeometryString = BlueSpray::GetWKTPoint($RefX, $RefY);
-        } else {
-            $UpdateString = "UPDATE TBL_SpatialLayerData " .
-                    "SET GeometryData=geometry::STGeomFromText('" . $GeometryString . "', 0) " .
-                    "WHERE ID=$SpatialLayerDataID";
-            $stmt = $dbConn->prepare($UpdateString);
-            $stmt->execute();
+            $GeometryString = "POINT(".($RefX)." ".($RefY).")";
         }
+
+        $UpdateString = "UPDATE \"TBL_SpatialLayerData\" ".
+                "SET \"GeometryData\"=ST_GeomFromText('".$GeometryString."', 0) ".
+                "WHERE \"ID\"=$SpatialLayerDataID";
+
+        $stmt = $dbConn->prepare($UpdateString);
+        $stmt->execute();
+
         // insert the data to grid relationship (also relates to area)
         RELSpatialLayerGridToData::Insert($dbConn, $SpatialLayerGridID, $SpatialLayerDataID, 0, 0, $AreaID);
-        return($SpatialLayerDataID);
+
+        return $SpatialLayerDataID;
     }
 
     public static function Delete($dbConn, $SpatialLayerDataID) {
@@ -157,31 +159,32 @@ class TBLSpatialLayerData {
     //******************************************************************************
     // Additional functions
     //******************************************************************************
-    public static function GetSetFromAreaID($Database, $AreaID, $CoordinateSystemID = 0) {
-        $SelectString = "SELECT * " .
-                "FROM TBL_SpatialLayerData " .
-                "WHERE AreaID='" . $AreaID . "' ";
+    public static function GetSetFromAreaID($dbConn, $AreaID, $CoordinateSystemID = 0) {
+        $SelectString = "SELECT * ".
+                "FROM \"TBL_SpatialLayerData\" ".
+                "WHERE \"AreaID\"='".$AreaID."' ";
 
         if ($CoordinateSystemID > 0)
-            $SelectString.="AND CoordinateSystemID=$CoordinateSystemID ";
+            $SelectString.="AND \"CoordinateSystemID\"=$CoordinateSystemID ";
 
-        $SelectString.="ORDER BY CoordinateSystemID";
+        $SelectString.="ORDER BY \"CoordinateSystemID\"";
 
-//		DebugWriteln("SelectString=$SelectString");
+        $stmt = $dbConn->prepare($SelectString);
+        $stmt->execute();
 
-        $Set = $Database->Execute($SelectString);
-
-        return($Set);
+        return $stmt;
     }
 
-    public static function DeleteFromAreaID($Database, $AreaID) {
+    public static function DeleteFromAreaID($dbConn, $AreaID) {
         //
         //	Delete all the spatial data associated with an area
-        $Set = TBL_SpatialLayerData::GetSetFromAreaID($Database, $AreaID);
+        $stmt = TBLSpatialLayerData::GetSetFromAreaID($dbConn, $AreaID);
 
-        while ($Set->FetchRow()) {
-            TBL_SpatialLayerData::Delete($Database, $Set->Field("ID"));
+        while ($row = $stmt->fetch()) {
+            TBLSpatialLayerData::Delete($dbConn, $row["ID"]);
         }
+
+        $stmt = null;
     }
 
     //******************************************************************************

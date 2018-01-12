@@ -8,7 +8,8 @@ class DBConnection {
 
     private static $dsn = 'mysql:dbname=oauth_db;host=127.0.0.1';
     private static $user = 'root';
-    private static $password = 'cheatgrass';
+//    private static $password = 'cheatgrass';
+    private static $password = '@linr33@!';
 
     public static function connect() {
         try {

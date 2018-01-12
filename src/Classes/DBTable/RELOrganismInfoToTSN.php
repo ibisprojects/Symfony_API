@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: REL_OrganismInfoToTSN.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -46,12 +46,12 @@ class RELOrganismInfoToTSN {
         $OrganismInfoID = $OrganismInfoID;
 
         $SelectString = "SELECT * " .
-                "FROM REL_OrganismInfoToTSN ";
+                "FROM \"REL_OrganismInfoToTSN\" ";
 
         if ($OrganismInfoID !== null)
-            TBLDBTables::AddWhereClause($SelectString, "OrganismInfoID=:OrganismInfoID");
+            TBLDBTables::AddWhereClause($SelectString, "\"OrganismInfoID\"=:OrganismInfoID");
         if ($TSN !== null)
-            TBLDBTables::AddWhereClause($SelectString, "TSN=:TSN");
+            TBLDBTables::AddWhereClause($SelectString, "\"TSN\"=:TSN");
 
 //		DebugWriteln("SelectString=$SelectString");
 
@@ -60,30 +60,10 @@ class RELOrganismInfoToTSN {
             $stmt->bindValue("OrganismInfoID", $OrganismInfoID);
         if ($TSN !== null)
             $stmt->bindValue("TSN", $TSN);
-        $stmt->execute();       
+        $stmt->execute();
 
         return($stmt);
     }
-
-    public static function Insert($Database, $OrganismInfoID, $TSN) {
-        $ID = -1;
-
-        $Set = REL_OrganismInfoToTSN::GetSet($Database, $OrganismInfoID, $TSN);
-
-        if ($Set->FetchRow()) {
-            $ID = $Set->Field("ID");
-        } else {
-            $ExecString = "EXEC insert_REL_OrganismInfoToTSN '$OrganismInfoID','$TSN'";
-
-            $ID = $Database->DoInsert($ExecString);
-        }
-        return($ID);
-    }
-
-    public static function Delete($Database, $OrganismInfoToTSNID) {
-        TBL_DBTables::Delete($Database, "REL_OrganismInfoToTSN", $OrganismInfoToTSNID);
-    }
-
 }
 
 ?>

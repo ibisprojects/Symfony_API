@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: TBL_SpatialLayerTypeType.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -32,6 +32,10 @@ namespace Classes\DBTable;
 // Class Definition
 //**************************************************************************************
 
+use Classes\Utilities\SQL;
+use Classes\Utilities\FileUtil;
+use Classes\TBLDBTables;
+
 class TBLSpatialLayerTypes {
 
     //******************************************************************************
@@ -39,15 +43,21 @@ class TBLSpatialLayerTypes {
     //******************************************************************************
 
     public static function GetSetFromID($dbConn, $ID) {
-        $SelectString = "SELECT * " .
-                "FROM TBL_SpatialLayerTypes " .
-                "WHERE ID='" . $ID . "'";
+        $ID = SQL::SafeInt($ID);
+
+        $SelectString = "SELECT * ".
+                "FROM \"TBL_SpatialLayerTypes\" ".
+                "WHERE \"ID\"='".$ID."'";
+
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
+
         $SpatialLayerType = $stmt->fetch();
+
         if (!$SpatialLayerType) {
             return false;
         }
+
         return($SpatialLayerType);
     }
 
@@ -81,7 +91,7 @@ class TBLSpatialLayerTypes {
             TBL_DBTables::AddOrderByClause($SelectString, $OrderByField, $DescendingFlag); // query the rows in the opposite order of what the user wants
 
 
-            
+
 //		DebugWriteln("SelectString=$SelectString");
 
         $Set = $Database->Execute($SelectString);
@@ -113,7 +123,7 @@ class TBLSpatialLayerTypes {
             $SelectString.="DESC "; // can't use order by function, finds previous order by
 
 
-            
+
 //		DebugWriteln("SelectString=$SelectString");
 
         $Set = $Database->Execute($SelectString);
@@ -135,86 +145,83 @@ class TBLSpatialLayerTypes {
     }
 
     public static function Insert($dbConn, $Name) {
-        $ExecString = "EXEC insert_TBL_SpatialLayerTypes '$Name'";
+        $ExecString = "INSERT INTO \"TBL_SpatialLayerTypes\" (\"Name\", \"AreaSubtypeID\") VALUES ('$Name', 0)";
+
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
-        $ID = $dbConn->lastInsertId();
-        // make sure the areasubtypeid is set to something valid
-        $UpdateString = "UPDATE TBL_SpatialLayerTypes " .
-                "SET AreaSubtypeID=0 " .
-                "WHERE ID=$ID";
 
-        $stmt = $dbConn->prepare($UpdateString);
-        $stmt->execute();
-        return($ID);
+        return $dbConn->lastInsertId('TBL_SpatialLayerTypes_ID_seq');
     }
 
     public static function Update($dbConn, $ID, $Name, $RefX, $RefY, $RefWidth, $RefHeight, $AreaSubtypeID = null, $PersonID = NOT_SPECIFIED, $StartDate = null, $EndDate = null, $AnalysisFlag = null, $MappingFlag = null, $Description = null) {
-        $UpdateString = "UPDATE TBL_SpatialLayerTypes " .
-                "SET Name='$Name', " .
-                "RefX=$RefX, " .
-                "RefY=$RefY, " .
-                "RefWidth=$RefWidth, " .
-                "RefHeight=$RefHeight ";
+        $UpdateString = "UPDATE \"TBL_SpatialLayerTypes\" ".
+                "SET \"Name\"='$Name', ".
+                "\"RefX\"=$RefX, ".
+                "\"RefY\"=$RefY, ".
+                "\"RefWidth\"=$RefWidth, ".
+                "\"RefHeight\"=$RefHeight ";
 
         if ($PersonID !== NOT_SPECIFIED)
-            TBLDBTables::AddStringUpdate($UpdateString, "PersonID", $PersonID);
+            TBLDBTables::AddStringUpdate($UpdateString, '"PersonID"', $PersonID);
         if ($AreaSubtypeID !== null)
-            $UpdateString.=",AreaSubtypeID=$AreaSubtypeID ";
+            $UpdateString.=",\"AreaSubtypeID\"=$AreaSubtypeID ";
         if ($StartDate !== null)
-            $UpdateString.=",StartDate='" . $StartDate . "' ";
+            $UpdateString.=",\"StartDate\"='".$StartDate->GetSQLString()."' ";
         if ($EndDate !== null)
-            $UpdateString.=",EndDate='" . $EndDate . "' ";
+            $UpdateString.=",\"EndDate\"='".$EndDate->GetSQLString()."' ";
         if ($AnalysisFlag !== null)
-            $UpdateString.=",AnalysisFlag='$AnalysisFlag' ";
+            $UpdateString.=",\"AnalysisFlag\"='$AnalysisFlag' ";
         if ($MappingFlag !== null)
-            $UpdateString.=",MappingFlag='$MappingFlag' ";
+            $UpdateString.=",\"MappingFlag\"='$MappingFlag' ";
         if ($Description !== null)
-            $UpdateString.=",Description='$Description' ";
+            $UpdateString.=",\"Description\"='$Description' ";
 
-        $UpdateString.="WHERE ID=$ID";
+        $UpdateString.="WHERE \"ID\"=$ID";
+
         $stmt = $dbConn->prepare($UpdateString);
         $stmt->execute();
 
         return($ID);
     }
 
-    public static function Delete($Database, $SpatialLayerTypeID) {
-        $SpatialLayerTypeID = SafeInt($SpatialLayerTypeID);
+    public static function Delete($dbConn, $SpatialLayerTypeID) {
+        $SpatialLayerTypeID = SQL::SafeInt($SpatialLayerTypeID);
 
         // get the sets
 
-        $SpatialLayerTypeSet = TBL_SpatialLayerTypes::GetSetFromID($Database, $SpatialLayerTypeID);
+        $SpatialLayerTypeSet = TBLSpatialLayerTypes::GetSetFromID($dbConn, $SpatialLayerTypeID);
+
+        if (!$SpatialLayerTypeSet)
+            return;
 
         // delete the type folder
 
-        $UserID = $SpatialLayerTypeSet->Field("PersonID");
+        $UserID = $SpatialLayerTypeSet["PersonID"];
 
         if ($UserID > 0) {
-            $DestinPath = "D:/Inetpub/UserUploads/$UserID/GeoRasters/$SpatialLayerTypeID";
+            $DestinPath = "/var/www/citsci/inetpub/UserUploads/$UserID/GeoRasters/$SpatialLayerTypeID";
 
-//			DebugWriteln("DestinPath=$DestinPath");
-
-            DeleteFolder($DestinPath);
+            FileUtil::DeleteFolder($DestinPath);
         }
 
         // needs DatabaseRepair, User, Admin
         // Checked by:User
-        TBL_DBTables::Delete($Database, "TBL_SpatialLayerTypes", $SpatialLayerTypeID);
+        TBLDBTables::Delete($dbConn, "TBL_SpatialLayerTypes", $SpatialLayerTypeID);
     }
 
     //******************************************************************************
     // Standard entry functions
     //******************************************************************************
     public static function GetStandardID($dbConn, $AreaSubtypeID) {
-        $SelectString = "SELECT TBL_SpatialLayerTypes.ID " .
-                "FROM TBL_SpatialLayerTypes " .
-                "WHERE AreaSubtypeID=$AreaSubtypeID " .
-                "AND PersonID IS NULL";
+        $SelectString = "SELECT \"TBL_SpatialLayerTypes\".\"ID\" ".
+                "FROM \"TBL_SpatialLayerTypes\" ".
+                "WHERE \"AreaSubtypeID\"=$AreaSubtypeID ".
+                "AND \"PersonID\" IS NULL";
 
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
         $SpatialLayerTypeSet = $stmt->fetch();
+
         if ($SpatialLayerTypeSet) { // get it from the set
             $SpatialLayerTypeID = $SpatialLayerTypeSet["ID"];
         } else { // find a layer and insert a new grid
@@ -222,6 +229,7 @@ class TBLSpatialLayerTypes {
             $SpatialLayerTypeID = TBLSpatialLayerTypes::Insert($dbConn, "Untitled");
             TBLSpatialLayerTypes::Update($dbConn, $SpatialLayerTypeID, $Name, -180, 90, 360, -180, $AreaSubtypeID);
         }
+
         return($SpatialLayerTypeID);
     }
 

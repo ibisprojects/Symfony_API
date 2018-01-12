@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: REL_PersonToProject.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -46,7 +46,7 @@ define("PROJECT_ADMIN", "6");
 class RELPersonToProject {
 
     //******************************************************************************
-    // Private functions 
+    // Private functions
     //******************************************************************************
 
     public static function AddSearchWhereClause($Database, &$SelectString, $PersonID = null, $ProjectID = null, $WebsiteID = null) {
@@ -93,7 +93,7 @@ class RELPersonToProject {
     }
 
     public static function GetSetFromID($Database, $ID) {
-        $ID = SafeInt($ID);
+        $ID = SQL::SafeInt($ID);
 
         $SelectString = "SELECT * " .
                 "FROM REL_PersonToProject " .
@@ -166,7 +166,7 @@ class RELPersonToProject {
         RELPersonToProject::Update($dbConn, $ID, $PersonID, $ProjectID, $Role, $RequestedRole);
 
         return($ID);
-    }  
+    }
 
     public static function Update($dbConn, $ID, $PersonID, $ProjectID, $Role = null, $RequestedRole = null) {
         $UpdateString = "UPDATE REL_PersonToProject " .
@@ -185,7 +185,7 @@ class RELPersonToProject {
         $stmt->bindValue("PersonID", $PersonID);
         $stmt->bindValue("ProjectID", $ProjectID);
         $stmt->bindValue("ID", $ID);
-        $stmt->execute(); 
+        $stmt->execute();
 
         return($ID);
     }

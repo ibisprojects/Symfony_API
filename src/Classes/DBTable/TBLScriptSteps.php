@@ -1,9 +1,7 @@
 <?php
 
-namespace Classes\DBTable;
-
 //**************************************************************************************
-// FileName: LKU_Units.php
+// FileName: ScriptStep.php
 //
 // Copyright (c) 2006,
 //
@@ -26,28 +24,46 @@ namespace Classes\DBTable;
 // DEALINGS IN THE SOFTWARE.
 //**************************************************************************************
 
+namespace Classes\DBTable;
+
 use Classes\TBLDBTables;
 
 //**************************************************************************************
 // Class Definition
 //**************************************************************************************
 
-class LKUUnits {
-    //******************************************************************************
-    // Basic database functions
-    //******************************************************************************
-
-    public static function GetSetFromID($dbConn, $ID) {
-        $SelectString = "SELECT * " .
-                "FROM \"LKU_Units\" " .
-                "WHERE \"ID\"=:ID";
+class TBLScriptSteps
+{
+    public static function GetSetFromID($dbConn, $ID)
+    {
+        $SelectString = "SELECT * ".
+            "FROM \"TBL_ScriptSteps\" ".
+            "WHERE \"ID\"='$ID'";
 
         $stmt = $dbConn->prepare($SelectString);
-        $stmt->bindValue("ID", $ID);
         $stmt->execute();
-        $Set = $stmt->Fetch();
 
-        return($Set);
+        return $stmt->fetch();
+    }
+
+    public static function Delete($dbConn, $ID)
+    {
+        $Set = TBLScriptSteps::GetSetFromID($dbConn, $ID);
+
+        if (!$Set) {
+            return;
+        }
+
+        $StepSequence = $Set["StepSequence"];
+
+        TBLDBTables::Delete($dbConn, "TBL_ScriptSteps", $ID);
+
+        $UpdateString="UPDATE \"TBL_ScriptSteps\" ".
+            "SET \"StepSequence\"=\"StepSequence\"-1 ".
+            "WHERE \"StepSequence\">$StepSequence";
+
+        $stmt = $dbConn->prepare($UpdateString);
+        $stmt->execute();
     }
 }
 

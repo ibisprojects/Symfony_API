@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: LKU_UnitTypes.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -46,8 +46,8 @@ define("UNIT_TYPE_PH", 17);
 define("UNIT_TYPE_COUNT", 18);
 define("UNIT_TYPE_COUNT_PER_METER_SQUARED", 19); // gjn; same as count per area, delete?
 
-define("UNIT_TYPE_CENTIMETERS", 27); // gjn; this is used by SurveyAdd2_EcoNab.php but 
-// there is no corresponding record in the database 
+define("UNIT_TYPE_CENTIMETERS", 27); // gjn; this is used by SurveyAdd2_EcoNab.php but
+// there is no corresponding record in the database
 // for centimeters as a unit type.
 
 $UnitTypeStrings = array(
@@ -77,53 +77,20 @@ $UnitTypeStrings = array(
 //**************************************************************************************
 
 class LKUUnitTypes {
-
-    //**********************************************************************************
-    // TBL_DBTables functions
-    //**********************************************************************************
-
-    public static function GetFieldValue($Database, $FieldName, $ID, $Default = 0) {
-        $Result = TBL_DBTables::GetFieldValue($Database, "LKU_UnitTypes", $FieldName, $ID, $Default);
-
-        return($Result);
-    }
-
-    public static function SetFieldValue($Database, $FieldName, $ID, $Value) {
-        TBL_DBTables::SetFieldValue($Database, "LKU_UnitTypes", $FieldName, $ID, $Value);
-    }
-
     //******************************************************************************
     // Basic database functions
     //******************************************************************************
 
     public static function GetSetFromID($dbConn, $ID) {
         $SelectString = "SELECT * " .
-                "FROM LKU_UnitTypes " .
-                "WHERE ID='$ID'";
+                "FROM \"LKU_UnitTypes\" " .
+                "WHERE \"ID\"=:ID";
         $stmt = $dbConn->prepare($SelectString);
         $stmt->bindValue("ID", $ID);
         $stmt->execute();
         $Set = $stmt->Fetch();
         return($Set);
     }
-
-    public static function GetSet($Database) {
-        $SelectString = "SELECT * " .
-                "FROM LKU_UnitTypes " .
-                "ORDER BY Name ";
-
-        $Set = $Database->Execute($SelectString);
-
-        return($Set);
-    }
-
-    public static function Delete($Database, $UnitTypeID) {
-        TBL_DBTables::Delete($Database, "LKU_UnitTypes", $UnitTypeID);
-    }
-
-    //*******************************************************************
-    // Additional functions
-    //*******************************************************************
 }
 
 ?>

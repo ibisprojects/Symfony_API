@@ -20,11 +20,7 @@ class ClientModel implements ClientInterface {
     }
 
     public function getClient($clientId, $clientSecret = null, $redirectUri = null, $grantType = null) {
-
-
-
         if (!is_null($redirectUri) && !is_null($clientSecret)) {
-             
             $sql = "SELECT oauth_clients.id, oauth_clients.secret, oauth_client_endpoints.redirect_uri, oauth_clients.name,
                     oauth_clients.auto_approve FROM oauth_clients LEFT JOIN oauth_client_endpoints 
                     ON oauth_client_endpoints.client_id = oauth_clients.id
@@ -38,12 +34,11 @@ class ClientModel implements ClientInterface {
             $client=$stmt->fetch();
         }
         if (!is_null($redirectUri) && is_null($clientSecret)) {
-             
             $sql = "SELECT oauth_clients.id, oauth_clients.secret, oauth_client_endpoints.redirect_uri, oauth_clients.name, oauth_clients.auto_approve
                      FROM oauth_clients LEFT JOIN oauth_client_endpoints ON oauth_client_endpoints.client_id = oauth_clients.id
                      WHERE oauth_clients.id = :clientId AND oauth_client_endpoints.redirect_uri = :redirectUri";
             $stmt = $this->dbConn->prepare($sql);
-            $stmt->bindValue("clientId", $clientId); 
+            $stmt->bindValue("clientId", $clientId);
             $stmt->bindValue("redirectUri", $redirectUri);
             $stmt->execute();
             $client=$stmt->fetch();
@@ -52,13 +47,13 @@ class ClientModel implements ClientInterface {
              $sql = "SELECT oauth_clients.id, oauth_clients.secret, oauth_clients.name, oauth_clients.auto_approve FROM oauth_clients 
                       WHERE oauth_clients.id = :clientId AND oauth_clients.secret = :clientSecret";
             $stmt = $this->dbConn->prepare($sql);
-            $stmt->bindValue("clientId", $clientId); 
+            $stmt->bindValue("clientId", $clientId);
             $stmt->bindValue("clientSecret", $clientSecret);
             $stmt->execute();
             $client=$stmt->fetch();
         }
 
-        if (!$client) {          
+        if (!$client) {
             return false;
         }
         //Authorization sucess

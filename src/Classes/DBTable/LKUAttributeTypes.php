@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: LKU_AttributeTypes.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -65,7 +65,7 @@ class LKUAttributeTypes {
     public static function GetSet($Database, $AttributeCategoryID = null, $OrderByField = null) {
     //
     // type is required (we never put up types from different categories//
-    
+
         $SelectString = "SELECT * " .
                 "FROM LKU_AttributeTypes ";
 
@@ -85,15 +85,16 @@ class LKUAttributeTypes {
     }
 
     public static function GetSetFromID($dbConn, $ID) {
-        $SelectString = "SELECT * " .
-                "FROM LKU_AttributeTypes " .
-                "WHERE ID=:ID";		
+        $SelectString = "SELECT * ".
+                "FROM \"LKU_AttributeTypes\" ".
+                "WHERE \"ID\"=:ID";
+
         $stmt = $dbConn->prepare($SelectString);
+
         $stmt->bindValue("ID", $ID);
         $stmt->execute();
-        $Set = $stmt->Fetch();
 
-        return($Set);
+        return $stmt->Fetch();
     }
 
     public static function GetNameForID($Database, $ID) {
@@ -133,7 +134,7 @@ class LKUAttributeTypes {
     // Insert, Update, Delete
     //**********************************************************************************
 
-    public static function Insert($Database, $AttributeCategoryID = 1) { // default to organism data attributes ???? 
+    public static function Insert($Database, $AttributeCategoryID = 1) { // default to organism data attributes ????
         $AttributeTypeID = -1;
 
         $ExecString = "EXEC insert_LKU_AttributeTypes '$AttributeCategoryID'";

@@ -15,8 +15,6 @@ use API\Classes\CommonFunctions;
 use Classes\DBTable\RELPersonToProject;
 use SimpleXMLElement;
 
-require_once("C:/inetpub/wwwroot/cwis438/Classes/LogFile.php");
-
 class DefaultController extends Controller {
 
     private $grantType = "authorization_code";
@@ -32,7 +30,7 @@ class DefaultController extends Controller {
                 if ($accessDetails && $accessDetails["owner_type"] == 'user') {
                     $login = $accessDetails["owner_id"];
                     $projectID = $request->get("ProjectID", "");
-                    $citScitDB = new LiveDBConnection();					
+                    $citScitDB = new LiveDBConnection();
                     $dbConn = $citScitDB->connect();
                     $peopleSet = TBLPeople::GetSetFromLogin($dbConn, $login);
                     if ($peopleSet) {
@@ -42,9 +40,9 @@ class DefaultController extends Controller {
                         $data = array();
                         //$Role = PROJECT_CONTRIBUTOR;
                         $Role = "2";
-                        foreach ($projectSets as $projectSet) 
+                        foreach ($projectSets as $projectSet)
 						{
-                            $datasheetsData = TBLForms::GetSetFormEntriesProjectID($dbConn, $projectSet["ProjectID"]);							
+                            $datasheetsData = TBLForms::GetSetFormEntriesProjectID($dbConn, $projectSet["ProjectID"]);
                             $PersonSet = TBLPeople::GetPersonSetFromProjectID($dbConn, $projectSet["ProjectID"],$Role );
                             $data[] = array("ProjectID" => $projectSet["ProjectID"], "ProjectName" => $projectSet["ProjName"], "Status" => $projectSet["Status"],
                             "Description" => $projectSet["Description"], "PinLatitude" => $projectSet["PinLatitude"], "PinLongitude" => $projectSet["PinLongitude"]
@@ -95,12 +93,12 @@ class DefaultController extends Controller {
                         if (is_numeric($projectID) && RELPersonToProject::HasRole($dbConn, $projectID, PERMISSION_CONTRIB, $userID)) {
 
                             $FormData = TBLForms::GetSetFormEntriesProjectID($dbConn, $projectID);
-                            $PersonSet = TBLPeople::GetPersonSetFromProjectID($dbConn, $projectID, PROJECT_CONTRIBUTOR);  
+                            $PersonSet = TBLPeople::GetPersonSetFromProjectID($dbConn, $projectID, PROJECT_CONTRIBUTOR);
                             for ($index=0;$index<count($FormData);$index++) {
                                 $FormData[$index]["Authority"]=$PersonSet;
                             }
                             $returnArray = array('status' => Constants::SUCCESS_STATUS, 'message' => "");
-                            $returnArray["data"] = $FormData;                            
+                            $returnArray["data"] = $FormData;
                         } else {
                             $returnArray = array('status' => Constants::FAILURE_STATUS, 'message' => "Not a project member");
                         }
@@ -179,31 +177,31 @@ class DefaultController extends Controller {
         }
         return $return;
     }
-	
+
 	public function getMinAppRevisionAPIAction(Request $request) {
         $returnArray = array('status' => Constants::FAILURE_STATUS, 'message' => "");
-        if ($request->getMethod() == 'POST') 
-		{			
+        if ($request->getMethod() == 'POST')
+		{
 			// confirmation to app that API request was a success
 			$returnArray = array('status' => Constants::SUCCESS_STATUS, 'message' => "2.1");
-		} 
-		else 
+		}
+		else
 		{
             $returnArray = array('status' => Constants::FAILURE_STATUS, 'message' => "");
         }
-		
-		if ($request->getMethod() == 'GET') 
-		{			
+
+		if ($request->getMethod() == 'GET')
+		{
 			// confirmation to app that API request was a success
 			$returnArray = array('status' => Constants::SUCCESS_STATUS, 'message' => "2.1");
-		} 
-		else 
+		}
+		else
 		{
 			$returnArray = array('status' => Constants::SUCCESS_STATUS, 'message' => "2.1");
-        } 
-		
+        }
+
         $mode = $request->get("Mode", "JSON");
-        switch ($mode) 
+        switch ($mode)
 		{
             case "XML":
                 $xmlRoot = new SimpleXMLElement("<?xml version=\"1.0\"?><SearchHotels></SearchHotels>");

@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: REL_SpatialGriddedToArea.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -77,7 +77,7 @@ class RELSpatialGriddedToOrganismInfo {
     private static function GetSetFromID($Database_SpatialData, $ID, $ZoomLevel) {
         $REL_SpatialGriddedToOrganismInfo = "REL_SpatialGriddedToOrganismInfo_" . $ZoomLevel;
 
-        $ID = SafeInt($ID);
+        $ID = SQL::SafeInt($ID);
 
         $SelectString = "SELECT * " .
                 "FROM $REL_SpatialGriddedToOrganismInfo " .
@@ -250,7 +250,7 @@ class RELSpatialGriddedToOrganismInfo {
     public static function RemoveSpatialGridRelationship($Database, $OrganismDataID) {
     //
     // Called by TBL_OrganismData//
-   	
+
         $Database_SpatialData = new DB_Connection();
         $Database_SpatialData->Connect("SpatialData_GoogleMaps", "sa", "cheatgrass");
 
@@ -309,7 +309,7 @@ class RELSpatialGriddedToOrganismInfo {
                         $Database_SpatialData->Execute($UpdateString);
                     }
 //DebugWriteln("4");
-                } else { // 
+                } else { //
                     Writeln("*********** Error: Missing REL_SpatialGriddedToOrganismInfo: AreaID=$AreaID, OrganismInfoID=$OrganismInfoID, ZoomLevel=$ZoomLevel");
                 }
             }
@@ -413,7 +413,7 @@ class RELSpatialGriddedToOrganismInfo {
                             if (DURATIONS)
                                 DebugWriteln("UpdateAttributeData::DeleteTiles Duration=" . (GetMicrotime() - $StartTime));
                         }
-                        //			    	else // 
+                        //			    	else //
                         //			    	{
                         //		    			Writeln("*********** Error: Missing REL_SpatialGriddedToArea: AreaID=$AreaID, ZoomLevel=$ZoomLevel");
                         //		    		}

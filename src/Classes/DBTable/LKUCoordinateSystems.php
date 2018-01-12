@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: LKU_CoordinateSystems.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -69,24 +69,28 @@ class LKUCoordinateSystems {
     }
 
     public static function GetSetFromID($dbConn, $ID) {
-        $SelectString = "SELECT * " .
-                "FROM LKU_CoordinateSystems " .
-                "WHERE ID='$ID'";
+        $SelectString = "SELECT * ".
+                "FROM \"LKU_CoordinateSystems\" ".
+                "WHERE \"ID\"='$ID'";
 
-//		DebugWriteln("SelectString=$SelectString");
+        $stmt = $dbConn->prepare($SelectString);
+        $stmt->execute();
 
-        $Set = $dbConn->Execute($SelectString);
+        $set = $stmt->fetch();
 
-        return($Set);
+        if (!$set)
+            return false;
+
+        return($set);
     }
 
     public static function GetNameForID($dbConn, $ID) {
         $Name = "Untitled";
 
-        $Set = LKU_CoordinateSystems::GetSetFromID($dbConn, $ID);
+        $Set = LKUCoordinateSystems::GetSetFromID($dbConn, $ID);
 
-        if ($Set->FetchRow())
-            $Name = $Set->Field("Name");
+        if (isset($Set["Name"]))
+            $Name = $Set["Name"];
 
         return($Name);
     }
@@ -242,20 +246,6 @@ class LKUCoordinateSystems {
         }
         return($ErrorString);
     }
-
-    public static function CoordinateToGeographic($dbConn, &$X, &$Y, $SourceCoordinateSystemID) {
-        $ErrorString = null;
-        $Set = LKUCoordinateSystems::GetSetFromID($dbConn, $SourceCoordinateSystemID);
-        if ($Set) {
-            $EPSG = $Set["EPSG"];
-            Projector::ProjectPointFromEPSGToGeographic($EPSG, $X, $Y);
-        } else {
-            $ErrorString = "Unsupported CoordinateSystemID";
-        }
-        return($ErrorString);
-    }
-
-    //
 
     public static function GeometryToGeographic($dbConn, &$GeometryString, $SourceCoordinateSystemID) {
         $ErrorString = null;

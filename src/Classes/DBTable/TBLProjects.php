@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: TBL_Projects.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -36,7 +36,7 @@ define("TBL_PROJECTS_SEARCH_IN_NAME_ONLY", 1);
 define("TBL_PROJECTS_MATCH_START", 1);
 
 //******************************************************************************
-// Class 
+// Class
 //******************************************************************************
 
 class TBLProjects  {
@@ -56,7 +56,7 @@ class TBLProjects  {
     }
 
     //******************************************************************************
-    // Private functions 
+    // Private functions
     //******************************************************************************
 
     public static function AddSearchWhereClause($Database, $SelectString, $SearchString = null, $SearchIn = null, $MatchTo = null, $FirstLetter = null, $OrganizationID = null, $OrganismInfoID = null, $WebsiteID = null, $Active = null, $ProjectMemberID = null) {
@@ -124,12 +124,12 @@ class TBLProjects  {
 
     public static function GetSet($Database, $Code = NOT_SPECIFIED) {
         $SelectString = "SELECT * " .
-                "FROM TBL_Projects ";
+                "FROM \"TBL_Projects\" ";
 
         if ($Code != NOT_SPECIFIED)
-            TBL_DBTables::AddWhereClause($SelectString, "Code='$Code'");
+            TBL_DBTables::AddWhereClause($SelectString, "\"Code\"='$Code'");
 
-        $SelectString.=" ORDER BY ProjName";
+        $SelectString.=" ORDER BY \"ProjName\"";
 
 //		DebugWriteln("SelectString=$SelectString");
 
@@ -142,11 +142,11 @@ class TBLProjects  {
         $ProjectID = (int)($ProjectID);
 
         $SelectString = "SELECT * " .
-                "FROM TBL_Projects " .
-                "WHERE ID= :ProjectID";
+                "FROM \"TBL_Projects\" " .
+                "WHERE \"ID\"= :ProjectID";
 
         $stmt = $dbConn->prepare($SelectString);
-        $stmt->bindValue("ProjectID", $ProjectID);       
+        $stmt->bindValue("ProjectID", $ProjectID);
         $stmt->execute();
         $project = $stmt->fetch();
         if (!$project) {
@@ -161,18 +161,18 @@ class TBLProjects  {
     //
 	// Parameters for all classes:
     //	SearchString - a string to search in text associted with the project
-    //	
+    //
     // Class specific fields:
     //	SearchIn - definition for which fields to search in (see definitions at top of the file)
     //	OrganizationID - just return this organizations projects
     // 	$WebsiteID - filter projects for the specified web site
     //	Active - just return projects with the specified active value//
-     
+
         //    	DebugWriteln("WebsiteID=$WebsiteID");
         // get the query for $CurrentRow+$NumRows rows in reversed order
 
         $SelectString = "SELECT COUNT(*) " .
-                "FROM TBL_Projects ";
+                "FROM \"TBL_Projects\" ";
 
         TBL_Projects::AddSearchWhereClause($Database, $SelectString, $SearchString, $SearchIn, $MatchTo, $FirstLetter, $OrganizationID, $OrganismInfoID, $WebsiteID, $Active, $ProjectMemberID);
 
@@ -198,11 +198,11 @@ class TBLProjects  {
     //
 	// Class specific search fields:
     //	SearchIn - definition for which fields to search in (see definitions at top of the file)
-    //	MatchTo - 
+    //	MatchTo -
     //	OrganizationID - just return this organizations projects
     // 	$WebsiteID - just return Citizen Science projects
     //	Active - just return projects with the specified active value//
-    
+
         $NumRows = (int) $NumRows;
         $TotalRows = (int) $TotalRows;
         $CurrentRow = (int) $CurrentRow;
@@ -218,8 +218,8 @@ class TBLProjects  {
 //    	DebugWriteln("CurrentRow3=$CurrentRow");
         // get the query for $CurrentRow+$NumRows rows in reversed order
 
-        $SelectString1 = "SELECT TOP " . ($TotalRows - $CurrentRow) . " ID " .
-                "FROM TBL_Projects ";
+        $SelectString1 = "SELECT TOP " . ($TotalRows - $CurrentRow) . " \"ID\" " .
+                "FROM \"TBL_Projects\" ";
 
         TBL_Projects::AddSearchWhereClause($Database, $SelectString1, $SearchString, $SearchIn, $MatchTo, $FirstLetter, $OrganizationID, $OrganismInfoID, $WebsiteID, $Active, $ProjectMemberID);
 
@@ -231,11 +231,11 @@ class TBLProjects  {
 
         $SelectString = TBL_DBTables::GetSelectClause(0, $NumRows, $Fields);
 
-        $SelectString.="FROM TBL_Projects " .
-                "WHERE ID IN ($SelectString1) ";
+        $SelectString.="FROM \"TBL_Projects\" " .
+                "WHERE \"ID\" IN ($SelectString1) ";
 
         if ($OrderByField != null) {
-            $SelectString.="ORDER BY $OrderByField ";
+            $SelectString.="ORDER BY \"$OrderByField\" ";
 
             if ($DescendingFlag)
                 $SelectString.="DESC "; // can't use order by function, finds previous order by
@@ -312,7 +312,7 @@ class TBLProjects  {
 
             array_walk($IBISConceptNames, "AlterArrayElement");
 
-            // print_r($IBISConceptNames); 
+            // print_r($IBISConceptNames);
             // get the conceptname indexes
 
             $ScientificNameIndex = null;  // not required, if not in file, added as visit only
@@ -327,8 +327,8 @@ class TBLProjects  {
 
             $URLIndex = null; //not required
             $RightsIndex = null; //not required
-            $OrganizationIndex = null; //not required  
-            $GUIDIndex = null; //not required 
+            $OrganizationIndex = null; //not required
+            $GUIDIndex = null; //not required
 
             $ScientificNameIndex = array_search('ScientificName', $IBISConceptNames);
             $RefYIndex = array_search('Latitude', $IBISConceptNames);
@@ -552,7 +552,7 @@ class TBLProjects  {
                                 $OrganismInfoID = TBL_OrganismInfos::Insert($Database, $TSN, $TempSciName);
                                 //DebugWriteln("Add new OrgInfoID");
                             }
-                            // Set STATUS 
+                            // Set STATUS
 
                             $Status = 0;
 
@@ -610,7 +610,7 @@ class TBLProjects  {
                                             TBL_OrganismData::SetFieldValue($Database, "Organization", $OrganismDataID, $OrganizationID);
                                         }
                                     }
-                                }  // end inserting metadata  
+                                }  // end inserting metadata
 
                                 $NumRecordsInserted++;
 
@@ -646,7 +646,7 @@ class TBLProjects  {
 
                             $AttributeTypeIndex = $AttributeTypeNameTrimmed . "Index";
 
-                            if ($$AttributeTypeIndex !== false) {  // if ($$AttributeTypeIndex)  !!!! Before this edit, attribute in first column is not matched index of [0] 
+                            if ($$AttributeTypeIndex !== false) {  // if ($$AttributeTypeIndex)  !!!! Before this edit, attribute in first column is not matched index of [0]
                                 // set variable value to the value in the nth column for this row
                                 $Value = trim($IBISValues[$$AttributeTypeIndex]);
 
@@ -763,7 +763,7 @@ class TBLProjects  {
     //
 	//	$DeleteProjectRecord - true, deletes the entire project record
     //		false, only deletes the visit data associated with the project//
-	
+
         TBL_DBTables::Delete($Database, "TBL_Projects", $ProjectID);
 
         // we may also need to email all people who had their CurrentProjectID set to the project being deleted to notify them that the project they were working on has been deleted. - gjn
@@ -777,7 +777,7 @@ class TBLProjects  {
     //
     //	returns a record set containing the users that have at least one
     //	role on the specified project.//
-	
+
         /*
           $SelectString="SELECT DISTINCT REL_PersonToProject.PersonID, REL_PersonToProject.Role, TBL_People.FirstName, TBL_People.LastName ".
           "FROM TBL_Projects INNER JOIN ".
@@ -804,7 +804,7 @@ class TBLProjects  {
     public static function GetProjectPersonnelSetFromID($Database, $ProjectID, $Role) {
     //
     // Returns a record set with the project members with a speciific role//
-	
+
         $ProjectID = (int) SafeInt($ProjectID);
 
         $SelectString = "SELECT *, TBL_Projects.ProjName AS ProjectName, TBL_Projects.ID AS ProjectID, " .
@@ -837,35 +837,35 @@ class TBLProjects  {
     public static function GetSetForPersonID($dbConn, $PersonID, $ProjectID = null, $Role = null) {
     //
     // Return the set of projects this person has the specified role for or is a member of//
-	
-        $SelectString = "SELECT DISTINCT ProjName,TBL_Projects.ID as ProjectID,TBL_Projects.Status,TBL_Projects.Description,TBL_Projects.PinLatitude,TBL_Projects.PinLongitude " .
-                "FROM TBL_Projects ".
-                "INNER JOIN REL_PersonToProject ".
-                "ON TBL_Projects.ID = REL_PersonToProject.ProjectID ".
-                "INNER JOIN REL_WebsiteToProject ".
-                "ON TBL_Projects.ID = REL_WebsiteToProject.ProjectID ".
-                "WHERE (REL_PersonToProject.PersonID= :PersonID ".
-                "AND REL_PersonToProject.ProjectID=TBL_Projects.ID)";
-		
-	/*	SELECT DISTINCT ProjName,TBL_Projects.ID as ProjectID,TBL_Projects.Status,TBL_Projects.Description,TBL_Projects.PinLatitude,TBL_Projects.PinLongitude 
-                FROM TBL_Projects 
-                INNER JOIN REL_PersonToProject 
-                ON TBL_Projects.ID = REL_PersonToProject.ProjectID 
-                INNER JOIN REL_WebsiteToProject 
-               ON TBL_Projects.ID = REL_WebsiteToProject.ProjectID 
+
+        $SelectString = "SELECT DISTINCT \"ProjName\",\"TBL_Projects\".\"ID\" as \"ProjectID\",\"TBL_Projects\".\"Status\",\"TBL_Projects\".\"Description\",\"TBL_Projects\".\"PinLatitude\",\"TBL_Projects\".\"PinLongitude\" " .
+                "FROM \"TBL_Projects\" ".
+                "INNER JOIN \"REL_PersonToProject\" ".
+                "ON \"TBL_Projects\".\"ID\" = \"REL_PersonToProject\".\"ProjectID\" ".
+                "INNER JOIN \"REL_WebsiteToProject\" ".
+                "ON \"TBL_Projects\".\"ID\" = \"REL_WebsiteToProject\".\"ProjectID\" ".
+                "WHERE (\"REL_PersonToProject\".\"PersonID\"= :PersonID ".
+                "AND \"REL_PersonToProject\".\"ProjectID\"=\"TBL_Projects\".\"ID\")";
+
+	/*	SELECT DISTINCT ProjName,TBL_Projects.ID as ProjectID,TBL_Projects.Status,TBL_Projects.Description,TBL_Projects.PinLatitude,TBL_Projects.PinLongitude
+                FROM TBL_Projects
+                INNER JOIN REL_PersonToProject
+                ON TBL_Projects.ID = REL_PersonToProject.ProjectID
+                INNER JOIN REL_WebsiteToProject
+               ON TBL_Projects.ID = REL_WebsiteToProject.ProjectID
                 WHERE (REL_PersonToProject.PersonID=  8387
                 AND REL_PersonToProject.ProjectID=TBL_Projects.ID) OR TBL_Projects.OpenAccess=1*/
-        
+
         if ($ProjectID != null && is_numeric($ProjectID))
-            $SelectString.="AND TBL_Projects.ID =:ProjectID ";
-        
+            $SelectString.="AND \"TBL_Projects\".\"ID\" =:ProjectID ";
+
         if ($Role != null)
-            $SelectString.="AND Role=:Role ";
+            $SelectString.="AND \"Role\"=:Role ";
         else
-            $SelectString.="AND Role IS NOT NULL ";
-        
-        $SelectString.="AND REL_WebsiteToProject.WebsiteID =7 ";
-        $SelectString.="ORDER BY ProjName";
+            $SelectString.="AND \"Role\" IS NOT NULL ";
+
+        $SelectString.="AND \"REL_WebsiteToProject\".\"WebsiteID\" =7 ";
+        $SelectString.="ORDER BY \"ProjName\"";
         //print_r($SelectString);
          $stmt = $dbConn->prepare($SelectString);
         $stmt->bindValue("PersonID", $PersonID);
@@ -883,10 +883,10 @@ class TBLProjects  {
         return $projects;
 
     }
-    
+
 
     public static function CanEditData($Database, $PersonID, $ProjectID = -1, $VisitID = -1, $ErrorString = null) {
-    // 
+    //
     //	Returns true if the user can edit the specified Visit or visits within the specified project
     //
 	// This follows the following logic:
@@ -895,11 +895,11 @@ class TBLProjects  {
     //	Otherwise, if the user uploaded the data then they can edit it.
     //
 	// Inputs:
-    //	Database 
+    //	Database
     //	PersonID - person wishing to edit project data
     //	ProjectID - optional (either this or a VisitID must be specified) project to edit data in
     //	VisitID - optional specific visit to try and edit//
-	
+
         //DebugWriteln("PersonID=$PersonID");
         //DebugWriteln("ProjectID=$ProjectID");
         //DebugWriteln("VisitID=$VisitID");
@@ -1074,9 +1074,9 @@ class TBLProjects  {
     }
 
     public static function GetBounds($Database, $ProjectID, $RefX, $RefY, $RefWidth, $RefHeight) {
-    // 
+    //
     // get the bounding box for the specified project for zooming purposes//
-    
+
         $SelectString = "SELECT MIN(TBL_SpatialLayerData.RefX) AS MinRefX, " .
                 "MAX(TBL_SpatialLayerData.RefX + TBL_SpatialLayerData.RefWidth) AS MaxRefX, " .
                 "MIN(TBL_SpatialLayerData.RefY + TBL_SpatialLayerData.RefHeight) AS MinRefY, " .
@@ -1120,8 +1120,8 @@ class TBLProjects  {
 
     public static function GetAll($Database) { // should use GetSet() - jjg
         $SelectString = "SELECT * " .
-                "FROM TBL_Projects " .
-                "ORDER BY ProjName";
+                "FROM \"TBL_Projects\" " .
+                "ORDER BY \"ProjName\"";
 
         $ProjectSet = $Database->Execute($SelectString);
 
@@ -1195,7 +1195,7 @@ class TBLProjects  {
         if ($DescendingFlag)
             $SelectString.="DESC "; // can't use order by function, finds previous order by
 
-            
+
 //DebugWriteln("$SelectString");
 
         $Set = $Database->Execute($SelectString);
@@ -1222,6 +1222,56 @@ class TBLProjects  {
         return($count);
     }
 
+    public static function IncrementNumMeasurements($dbConn, $AttributeDataID)
+    {
+        $VisitID = TBLAttributeData::GetFieldValue($dbConn, "VisitID", $AttributeDataID, $Default = 0);
+        $OrganismDataID = TBLAttributeData::GetFieldValue($dbConn, "OrganismDataID", $AttributeDataID, $Default = 0);
+
+        if ($OrganismDataID > 0) { // get projectID from organismdata
+            $SelectString="SELECT \"TBL_Visits\".\"ProjectID\" AS \"ProjectID\"
+					FROM \"TBL_Visits\"
+					INNER JOIN \"TBL_OrganismData\" ON \"TBL_Visits\".\"ID\" = \"TBL_OrganismData\".\"VisitID\"
+					INNER JOIN \"TBL_AttributeData\" ON \"TBL_OrganismData\".\"ID\" = \"TBL_AttributeData\".\"OrganismDataID\"
+                    WHERE \"TBL_AttributeData\".\"ID\"=$AttributeDataID";
+
+            $stmt = $dbConn->prepare($SelectString);
+            $stmt->execute();
+
+            $ProjectID = $stmt->fetchColumn();
+            $stmt = null;
+        }
+
+        if ($VisitID > 0) { // get projectID from visit
+            $SelectString="SELECT \"TBL_Visits\".\"ProjectID\" AS \"ProjectID\"
+					FROM \"TBL_Visits\"
+					INNER JOIN \"TBL_AttributeData\" ON \"TBL_Visits\".\"ID\" = \"TBL_AttributeData\".\"VisitID\"
+                    WHERE \"TBL_AttributeData\".\"ID\"=$AttributeDataID";
+
+            $stmt = $dbConn->prepare($SelectString);
+            $stmt->execute();
+
+            $ProjectID = $stmt->fetchColumn();
+            $stmt = null;
+        }
+
+        $SelectString = "SELECT \"NumMeasurements\" FROM \"TBL_Projects\" WHERE \"ID\"=$ProjectID";
+
+        $stmt = $dbConn->prepare($SelectString);
+        $stmt->execute();
+
+        $Measurements = $stmt->fetchColumn();
+        $stmt = null;
+
+        if (!is_numeric($Measurements)) {
+            $Measurements = 0;
+        }
+
+        $NumMeasurements = (int) $Measurements + 1;
+
+        TBLDBTables::SetFieldValue($dbConn, "TBL_Projects", "NumMeasurements", $ProjectID, $NumMeasurements);
+
+        return $NumMeasurements;
+    }
 }
 
 ?>

@@ -173,11 +173,9 @@ class SessionModel implements SessionInterface {
         } else {
             return $accessTokenRes;
         }
-    }   
-    
-    
-    public function validateAuthCode($clientId, $redirectUri, $authCode) {
+    }
 
+    public function validateAuthCode($clientId, $redirectUri, $authCode) {
         $sql = " SELECT oauth_sessions.id AS session_id, oauth_session_authcodes.id AS authcode_id FROM oauth_sessions
        JOIN oauth_session_authcodes ON oauth_session_authcodes.`session_id` = oauth_sessions.id
        JOIN oauth_session_redirects ON oauth_session_redirects.`session_id` = oauth_sessions.id WHERE   
@@ -188,7 +186,7 @@ class SessionModel implements SessionInterface {
        $stmt = $this->dbConn->prepare($sql);
         $stmt->bindValue("clientId", $clientId);
         $stmt->bindValue("redirectUri", $redirectUri);
-        $dateTime = new DateTime();        
+        $dateTime = new DateTime();
         $stmt->bindValue("time", $dateTime->getTimestamp());
        $stmt->bindValue("authCode", $authCode);
         $stmt->execute();

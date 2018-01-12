@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: LKU_AreaSubtypes.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -88,15 +88,15 @@ class LKUAreaSubtypes {
     }
 
     public static function GetSetFromID($dbConn, $ID) {
-        $SelectString = "SELECT * " .
-                "FROM LKU_AreaSubtypes " .
-                "WHERE ID='" . $ID . "' " .
-                "ORDER BY Name";
+        $SelectString = "SELECT * ".
+                "FROM \"LKU_AreaSubtypes\" ".
+                "WHERE \"ID\"='".$ID."' ".
+                "ORDER BY \"Name\"";
 
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
-        $Set = $stmt->fetch();
-        return($Set);
+
+        return $stmt->fetch();
     }
 
     public static function Delete($Database, $AreaSubtypeID) {
@@ -108,6 +108,10 @@ class LKUAreaSubtypes {
     //******************************************************************************
     public static function GetNameFromID($dbConn, $ID) {
         $Set = LKUAreaSubtypes::GetSetFromID($dbConn, $ID);
+
+        if ($Set) {
+            return "";
+        }
 
         return($Set["Name"]);
     }

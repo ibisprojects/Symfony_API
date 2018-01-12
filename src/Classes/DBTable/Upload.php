@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: Upload.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -33,11 +33,10 @@ namespace Classes\DBTable;
 use Classes\TBLDBTables;
 
 //******************************************************************************
-// Class 
+// Class
 //******************************************************************************
 
 class Upload  {
-
     function FileOKToUpload($Index,$NumFiles,$MaxSize)
     //
     // This function is only called by MoveUploadedFiles() below.
@@ -54,7 +53,7 @@ class Upload  {
 				$FileName = str_replace(' ', '', $FileName);
                 $FileSize=$_FILES['userfile']['size'];
         }
-        else 
+        else
         {
                 $FileName=$_FILES['userfile']['name'][$Index];
 				$FileName = str_replace(' ', '', $FileName);
@@ -62,10 +61,10 @@ class Upload  {
         }
 
         if ($FileSize==0) $Result="File too large"; // jjg - PHP does this, RESULT_FILE_ZERO_SIZE;
-        else 
+        else
         {
-            if ($FileSize>$MaxSize) $Result="File too large";		
-            else 
+            if ($FileSize>$MaxSize) $Result="File too large";
+            else
             {
                 $Extension=strrchr($FileName,".");
 
@@ -78,10 +77,10 @@ class Upload  {
                         ($Extension=='jpeg')||
                         ($Extension=='gif')||
                         ($Extension=='tif'))
-                {				
+                {
                     $Result="RESULT_OKAY";
                 }
-                else 
+                else
                 {
                     $Result="RESULT_FILE_UNSAFE";
                 }
@@ -95,20 +94,21 @@ class Upload  {
     function MoveUploadedFiles($NumFiles,$DestinPath,$MaxSize,$FileArray=null)
     //
     //	Moves files from the upload temporary folder to the specified destination
-    //	folder.  
+    //	folder.
     //		$NumFiles - Number of files being uploaded (only checked against 1)
     //		$DestinPath - Where the file goes after we do a quick security check
-    //		
+    //
     //	Returns the first error that occurred.
     //
     {
         $Count=0;
         $Result="RESULT_OKAY";
-		
+
 		// Set up log file for debugging
-		$LogFile="C:/Logs/_ImageUploadLog.log";
-		file_put_contents($LogFile,"--- Upload File Image Processing Start (N=$NumFiles) ---\r\n");
-		
+        $logger = $this->get('monolog.logger.fileupload');
+
+        $logger->info("--- Upload File Image Processing Start (N=$NumFiles) ---");
+
 		//$Image1=$_FILES['userfile']['name'][0];
 		//$Image2=$_FILES['userfile']['name'][1];
 		//file_put_contents($LogFile,"ImageName1=$Image1,ImageName2=$Image2\r\n",FILE_APPEND);
@@ -123,36 +123,36 @@ class Upload  {
 
                 if (gettype($_FILES['userfile']['name'])!="array")
                 {
-						file_put_contents($LogFile,"Image sent as single image - not array\r\n",FILE_APPEND);
-					
-                        $FileName=$_FILES['userfile']['name'];
-						$FileName = str_replace(' ', '', $FileName);
-                        $MimeType=$_FILES['userfile']['type'];
-                        $FileSize=$_FILES['userfile']['size'];
-                        $Error=$_FILES['userfile']['error'];
-                        $TempFileName=$_FILES['userfile']['tmp_name'];
-						$TempFileName = str_replace(' ', '', $TempFileName);
-						
-						file_put_contents($LogFile,"Processing Image (FileName=$FileName)\r\n",FILE_APPEND);
+                    $logger->info("Image sent as single image - not array");
+
+                    $FileName=$_FILES['userfile']['name'];
+                    $FileName = str_replace(' ', '', $FileName);
+                    $MimeType=$_FILES['userfile']['type'];
+                    $FileSize=$_FILES['userfile']['size'];
+                    $Error=$_FILES['userfile']['error'];
+                    $TempFileName=$_FILES['userfile']['tmp_name'];
+                    $TempFileName = str_replace(' ', '', $TempFileName);
+
+                    $logger->info("Processing Image (FileName=$FileName)");
                 }
-                else 
+                else
                 {
-						file_put_contents($LogFile,"Image sent as array\r\n",FILE_APPEND);
-						
-                        $FileName=$_FILES['userfile']['name'][$Count];
-						$FileName = str_replace(' ', '', $FileName);
-                        $MimeType=$_FILES['userfile']['type'][$Count];
-                        $FileSize=$_FILES['userfile']['size'][$Count];
-                        $Error=$_FILES['userfile']['error'][$Count];
-                        $TempFileName=$_FILES['userfile']['tmp_name'][$Count];
-						$TempFileName = str_replace(' ', '', $TempFileName);
-						
-						file_put_contents($LogFile,"***Processing Image (n=$Count, FileName=$FileName, TempFileName=$TempFileName, Error=$Error)***\r\n",FILE_APPEND);
+                    $logger->info("Image sent as array");
+
+                    $FileName=$_FILES['userfile']['name'][$Count];
+                    $FileName = str_replace(' ', '', $FileName);
+                    $MimeType=$_FILES['userfile']['type'][$Count];
+                    $FileSize=$_FILES['userfile']['size'][$Count];
+                    $Error=$_FILES['userfile']['error'][$Count];
+                    $TempFileName=$_FILES['userfile']['tmp_name'][$Count];
+                    $TempFileName = str_replace(' ', '', $TempFileName);
+
+                    $logger->info("***Processing Image (n=$Count, FileName=$FileName, TempFileName=$TempFileName, Error=$Error)***");
                 }
 
                 if (($FileName!="")&&($Count<$NumFiles))
                 {
-                   Upload::FileOKToUpload($Count,$NumFiles,$MaxSize);
+                    Upload::FileOKToUpload($Count,$NumFiles,$MaxSize);
 
                     //DebugWriteln("Result2=".$Result);
 
@@ -161,14 +161,14 @@ class Upload  {
                         // move the file to the projects directory
 
                         $FullDestinPath = $DestinPath . $FileName;
-						
-						file_put_contents($LogFile,"Image Full DestinPath = $FullDestinPath\r\n",FILE_APPEND);
+
+                        $logger->info("Image Full DestinPath = $FullDestinPath");
 
                         if (move_uploaded_file($TempFileName, $FullDestinPath))  // file successfully moved
                         {
-							file_put_contents($LogFile,"Image (Name=$FileName) was moved successfully to: $FullDestinPath\r\n",FILE_APPEND);
-							
-                            if (is_array($FileArray)) 
+                            $logger->info("Image (Name=$FileName) was moved successfully to: $FullDestinPath");
+
+                            if (is_array($FileArray))
                             {
                                     $FileArray[$Count]=$FileName;
                             }
@@ -176,8 +176,8 @@ class Upload  {
                         }
                         else
                         {
-							file_put_contents($LogFile,"Image (Name=$FileName) was not moved successfully.",FILE_APPEND);
-							
+                            $logger->info("Image (Name=$FileName) was not moved successfully.");
+
                             $FileName=""; // causes us to exit
                         }
                     }
@@ -187,7 +187,6 @@ class Upload  {
         }
         return($Result);
     }
-
 }
 
 ?>

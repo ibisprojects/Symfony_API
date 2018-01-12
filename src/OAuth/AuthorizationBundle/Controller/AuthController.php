@@ -61,7 +61,6 @@ class AuthController extends Controller {
     }
     //Asks user for credentials and redirects to authorizeAction on success
     public function signinAction(Request $request) {
-
         $session = new Session();
         $session->start();
         $params = array();
@@ -79,8 +78,6 @@ class AuthController extends Controller {
             }
 
             if ($request->getMethod() == 'POST') {
-
-
                 // Get username
                 $username = $request->get('username');
                 if ($username === null || trim($username) === '') {
@@ -120,31 +117,31 @@ class AuthController extends Controller {
         $params["signin_path"] = 'o_auth_authorization_signin';
 		$params["register_path"] = 'o_auth_authorization_register';
         return $this->render('OAuthAuthorizationBundle:Login:signin.html.twig', $params);
-    } 
- 
-	//Asks user for registration credentials 
+    }
+
+	//Asks user for registration credentials
     public function registerAction(Request $request) {
 		try {
 			$params = array();
 			$params['error_message'] = "";
 
 			if ($request->getMethod() == 'POST') {
-				
+
 				try {
 					$citSciDB = new CitSciDB();
 					$citSciDBconn = $citSciDB->connect();
 				} catch (Exception $e) {
 					throw new Exception('There is a problem connecting to the CitSci.org database.');
 				}
-				
+
 				// Error Checking
-				
+
 				// FirstName
 				$firstName = $request->get('firstname');
 				if (strlen($firstName)<2) throw new Exception('First name must be at least 2 characters.');
 
 				// LastName
-				$lastName = $request->get('lastname');	
+				$lastName = $request->get('lastname');
 				if (strlen($lastName)<2) throw new Exception('Last name must be at least 2 characters.');
 
 				// Email
@@ -163,33 +160,32 @@ class AuthController extends Controller {
 				$HasSingleQuotes=strpos($password, '\'');
 				$HasDoubleQuotes=preg_match('/"/', $password);
 				if (($HasSingleQuotes)||($HasDoubleQuotes)) throw new Exception('Password cannot contain quotation marks.');
-												
+
 				// Check if account already exists
 				$ValidEmailPassword=TBLPeople::validateUsernamePassword($citSciDBconn, $username, $password);
 				if ($ValidEmailPassword !== false) throw new Exception('This account (username, password combination) already exists.');
-																																		
+
 				$PersonID = TBLPeople::Register($citSciDBconn, $firstName, $lastName, $email, $username, $password);
-				
+
 				if ($PersonID>0) {
 					return $this->redirect($this->generateUrl('o_auth_authorization_signin'));
-				}	
+				}
 				else {
                     throw new Exception('There was an error in registration.');
                 }
-			}	
-		
+			}
+
 		} catch (Exception $e) {
             $params['error_message'] = $e->getMessage();
         }
-						
+
 		$params["signin_path"] = 'o_auth_authorization_signin';
 
 		return $this->render('OAuthAuthorizationBundle:Login:register.html.twig',$params);
     }
-	
+
     //Issues authorization code for the logged in user.
     public function authorizeAction(Request $request) {
-
         $session = new Session();
         $session->start();
         $params = array();
@@ -220,7 +216,7 @@ class AuthController extends Controller {
                 $deny = $request->get('deny');
             }
 
-            if ($approve !== null || $autoApprove === true) {
+            if (!empty($approve) || $autoApprove === true) {
                 // Generate an authorization code
                 $code = $this->authserver->getGrantType('authorization_code')->newAuthoriseRequest('user', $params['user_id'], $params);
 
@@ -229,11 +225,11 @@ class AuthController extends Controller {
                     'code' => $code,
                     'state' => isset($params['state']) ? $params['state'] : ''
                 );
+
                 return $this->redirect($params['client_details']['redirect_uri'] . "?" . http_build_query($returnArray));
             }
 
-            if ($deny !== null) {
-
+            if (!empty($deny)) {
                 // Redirect the user back to the client with error
                 $returnArray = array(
                     'error' => 'access_denied',
@@ -252,12 +248,10 @@ class AuthController extends Controller {
     //Client start point to get access token and refresh tokens using authorization code. Server side call with client_secret.
     //http://ibis-apis.nrel.colostate.edu/app_dev.php/oAuth/getAccesToken
     public function accessTokenAction(Request $request) {
-       
         try {
             // Tell the auth server to issue an access token
             $response = $this->authserver->issueAccessToken();
         } catch (League\OAuth2\Server\Exception\ClientException $e) {
-
             // Throw an exception because there was a problem with the client's request
             $response = array(
                 'error' => $this->authserver->getExceptionType($e->getCode()),
@@ -276,7 +270,6 @@ class AuthController extends Controller {
     //Client start point to refresh access token using refresh code. Server side call with client_secret.
     //http://ibis-apis.nrel.colostate.edu/app_dev.php/oAuth/refreshAccesToken
     public function refreshAccessTokenAction(Request $request) {
-
         $this->authserver->addGrantType(new oAuthRefreshToken());
         try {
             // Tell the auth server to issue an access token
@@ -298,5 +291,4 @@ class AuthController extends Controller {
         $returnJSON->headers->set('Content-Type', 'application/json');
         return $returnJSON;
     }
-
 }
