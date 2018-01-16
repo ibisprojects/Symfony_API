@@ -1,11 +1,11 @@
 api_client_grant_UserRegistrationAPI:
-    pattern:  /API/UserRegister
-    defaults: { _controller: APIClientGrantBundle:Default:UserRegistrationAPI }
-    
+  pattern:  /API/UserRegister
+  defaults: { _controller: APIClientGrantBundle:Default:UserRegistrationAPI }
+
 api_client_grant_UserVerificationAPI:
-    pattern:  /API/UserVerify
-    defaults: { _controller: APIClientGrantBundle:Default:UserVerificationAPI }
-    
+  pattern:  /API/UserVerify
+  defaults: { _controller: APIClientGrantBundle:Default:UserVerificationAPI }
+
 api_client_grant_TreeDataAPI:
-    pattern:  /API/TreeData
-    defaults: { _controller: APIClientGrantBundle:Default:TreeDataAPI }
+  pattern:  /API/TreeData
+  defaults: { _controller: APIClientGrantBundle:Default:TreeDataAPI }

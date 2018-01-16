@@ -21,6 +21,17 @@ class DefaultController extends Controller {
     private $scope = "1"; //user scope
     private $ownerType = "user";
 
+    public function indexAction(Request $request) {
+        $returnJSON = new Response(json_encode(array(
+            'status' => Constants::SUCCESS_STATUS,
+            'message' => 'CitSci official API'
+        )));
+
+        $returnJSON->headers->set('Content-Type', 'application/json');
+
+        return $returnJSON;
+    }
+
     public function getProjectsAndDatasheetsAPIAction(Request $request) {
         $returnArray = array('status' => Constants::FAILURE_STATUS, 'message' => "");
         if ($request->getMethod() == 'POST') {
