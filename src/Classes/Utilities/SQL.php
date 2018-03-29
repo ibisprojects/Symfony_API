@@ -76,7 +76,7 @@ class SQL
     {
       	if ($Value!==Constants::NOT_SPECIFIED)
     	{
-	    	$Value=SafeString($Value);
+	    	$Value=SQL::SafeString($Value);
 
 	     	if ($Value===null) $Value="NULL";
 	    	else $Value="'".$Value."'";
@@ -147,7 +147,7 @@ class SQL
 
             $Value=str_replace("\"","'",$Value);
 
-            $Value=UnsafeString($Value); // first make sure all occurances of N quotes are reduced to 1
+            $Value=SQL::UnsafeString($Value); // first make sure all occurances of N quotes are reduced to 1
             //	DebugWriteln("Value2=$Value");
 
             //	if (get_magic_quotes_gpc())

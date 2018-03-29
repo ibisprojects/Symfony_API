@@ -32,6 +32,7 @@ namespace Classes\DBTable;
 // "Search For" options
 use Classes\TBLDBTables;
 use API\Classes\Constants;
+use Classes\Utilities\SQL;
 
 define("TBL_PROJECTS_SEARCH_IN_NAME_ONLY", 1);
 define("TBL_PROJECTS_MATCH_START", 1);
@@ -249,7 +250,7 @@ class TBLProjects  {
     }
 
     public static function Insert($Database, $Name = "Untitled", $InstigatorID = 0) {
-        $Name = SafeString($Name);
+        $Name = SQL::SafeString($Name);
 
         $ProjectID = -1;
 
