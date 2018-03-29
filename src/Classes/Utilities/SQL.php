@@ -26,7 +26,7 @@
 
 namespace Classes\Utilities;
 
-define("NOT_SPECIFIED"," --- @@ Not Specified @@ --- ");
+use API\Classes\Constants;
 
 class SQL
 {
@@ -37,7 +37,7 @@ class SQL
 	//**************************************************************************************
    	public static function GetBit($Value)
     {
-    	if ($Value!==NOT_SPECIFIED)
+    	if ($Value!==Constants::NOT_SPECIFIED)
     	{
 	    	if ($Value) $Value=1;
 	    	else $Value=0;
@@ -50,7 +50,7 @@ class SQL
 
    	public static function GetInt($Value)
     {
-     	if ($Value!==NOT_SPECIFIED)
+     	if ($Value!==Constants::NOT_SPECIFIED)
     	{
 		   	$Value=SQL::SafeInt($Value);
 
@@ -62,7 +62,7 @@ class SQL
 
     public static function GetFloat($Value)
     {
-      	if ($Value!==NOT_SPECIFIED)
+      	if ($Value!==Constants::NOT_SPECIFIED)
     	{
 		   	$Value=SafeFloat($Value);
 
@@ -74,7 +74,7 @@ class SQL
 
     public static function GetString($Value)
     {
-      	if ($Value!==NOT_SPECIFIED)
+      	if ($Value!==Constants::NOT_SPECIFIED)
     	{
 	    	$Value=SafeString($Value);
 
@@ -86,7 +86,7 @@ class SQL
 
     public static function GetDate($Value)
     {
-      	if ($Value!==NOT_SPECIFIED)
+      	if ($Value!==Constants::NOT_SPECIFIED)
     	{
 	    	$Value=SafeDate($Value);
 

@@ -42,6 +42,7 @@ use Classes\DBTable\TBLScriptSteps;
 use Classes\DBTable\TBLVisits;
 use Classes\DBTable\TBLSpatialLayerTypes;
 use Classes\DBTable\TBLGISINSpeciesStatuses;
+use API\Classes\Constants;
 
 define("VALUE_TYPE_UNKNOWN", 0);
 define("VALUE_TYPE_LOOKUP", 1);
@@ -74,7 +75,6 @@ define("TBL_TREATMENTS", 14);
 define("DEBUGGING_DBTABLE", false);
 define("TIMING_DBTABLE", false);
 
-//define("NOT_SPECIFIED","");
 //**************************************************************************************
 // Class Definition
 //**************************************************************************************
@@ -456,7 +456,7 @@ class TBLDBTables {
     }
 
     public static function AddUpdateClause(&$SelectString, $Field, $Value) {
-        if ($Value !== NOT_SPECIFIED) {
+        if ($Value !== Constants::NOT_SPECIFIED) {
             $EqualIndex = strpos($SelectString, "UPDATE");
 
             if ($EqualIndex !== FALSE) { // if we are not building a middle string (there is an UPDATE), make sure there is a SET

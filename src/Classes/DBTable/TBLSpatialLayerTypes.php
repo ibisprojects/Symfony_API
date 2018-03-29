@@ -35,6 +35,7 @@ namespace Classes\DBTable;
 use Classes\Utilities\SQL;
 use Classes\Utilities\FileUtil;
 use Classes\TBLDBTables;
+use API\Classes\Constants;
 
 class TBLSpatialLayerTypes {
 
@@ -72,22 +73,22 @@ class TBLSpatialLayerTypes {
         return($Name);
     }
 
-    public static function GetSet($Database, $AnalysisFlag = NOT_SPECIFIED, $PersonID = NOT_SPECIFIED, $OrderByField = NOT_SPECIFIED, $DescendingFlag = NOT_SPECIFIED, $MappingFlag = NOT_SPECIFIED) {
+    public static function GetSet($Database, $AnalysisFlag = Constants::NOT_SPECIFIED, $PersonID = Constants::NOT_SPECIFIED, $OrderByField = Constants::NOT_SPECIFIED, $DescendingFlag = Constants::NOT_SPECIFIED, $MappingFlag = Constants::NOT_SPECIFIED) {
         $SelectString = "SELECT * " .
                 "FROM TBL_SpatialLayerTypes ";
 
-        if ($AnalysisFlag !== NOT_SPECIFIED)
+        if ($AnalysisFlag !== Constants::NOT_SPECIFIED)
             TBL_DBTables::AddWhereClause($SelectString, "AnalysisFlag=$AnalysisFlag");
-        if ($PersonID !== NOT_SPECIFIED) {
+        if ($PersonID !== Constants::NOT_SPECIFIED) {
             if ($PersonID !== null)
                 TBL_DBTables::AddWhereClause($SelectString, "PersonID=$PersonID");
             else
                 TBL_DBTables::AddWhereClause($SelectString, "PersonID IS NULL");
         }
-        if ($MappingFlag !== NOT_SPECIFIED)
+        if ($MappingFlag !== Constants::NOT_SPECIFIED)
             TBL_DBTables::AddWhereClause($SelectString, "MappingFlag=$MappingFlag");
 
-        if ($OrderByField != NOT_SPECIFIED)
+        if ($OrderByField != Constants::NOT_SPECIFIED)
             TBL_DBTables::AddOrderByClause($SelectString, $OrderByField, $DescendingFlag); // query the rows in the opposite order of what the user wants
 
 
@@ -153,7 +154,7 @@ class TBLSpatialLayerTypes {
         return $dbConn->lastInsertId('TBL_SpatialLayerTypes_ID_seq');
     }
 
-    public static function Update($dbConn, $ID, $Name, $RefX, $RefY, $RefWidth, $RefHeight, $AreaSubtypeID = null, $PersonID = NOT_SPECIFIED, $StartDate = null, $EndDate = null, $AnalysisFlag = null, $MappingFlag = null, $Description = null) {
+    public static function Update($dbConn, $ID, $Name, $RefX, $RefY, $RefWidth, $RefHeight, $AreaSubtypeID = null, $PersonID = Constants::NOT_SPECIFIED, $StartDate = null, $EndDate = null, $AnalysisFlag = null, $MappingFlag = null, $Description = null) {
         $UpdateString = "UPDATE \"TBL_SpatialLayerTypes\" ".
                 "SET \"Name\"='$Name', ".
                 "\"RefX\"=$RefX, ".
@@ -161,7 +162,7 @@ class TBLSpatialLayerTypes {
                 "\"RefWidth\"=$RefWidth, ".
                 "\"RefHeight\"=$RefHeight ";
 
-        if ($PersonID !== NOT_SPECIFIED)
+        if ($PersonID !== Constants::NOT_SPECIFIED)
             TBLDBTables::AddStringUpdate($UpdateString, '"PersonID"', $PersonID);
         if ($AreaSubtypeID !== null)
             $UpdateString.=",\"AreaSubtypeID\"=$AreaSubtypeID ";

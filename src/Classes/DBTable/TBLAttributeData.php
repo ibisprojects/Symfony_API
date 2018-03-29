@@ -28,6 +28,7 @@ namespace Classes\DBTable;
 
 use Classes\TBLDBTables;
 use Classes\Utilities\SQL;
+use API\Classes\Constants;
 
 define("ATTRIBUTE_UNKNOWN", 0);
 define("ATTRIBUTE_LOOKUP", 1);
@@ -97,9 +98,9 @@ class TBLAttributeData {
                 break;
         }
 
-        if ($SubplotID !== NOT_SPECIFIED)
+        if ($SubplotID !== Constants::NOT_SPECIFIED)
             $UpdateString.=",\"SubplotID\"=" . SQL::GetInt($SubplotID);
-        if ($Uncertainty !== NOT_SPECIFIED)
+        if ($Uncertainty !== Constants::NOT_SPECIFIED)
             $UpdateString.=",\"Uncertainty\"=" . SQL::GetFloat($Uncertainty);
 
         $UpdateString.=" WHERE \"ID\"=$ID";
@@ -215,7 +216,7 @@ class TBLAttributeData {
         return($ID);
     }
 
-    public static function Update($Database, $ID, $AttributeValue, $AttributeTypeID = NOT_SPECIFIED, $SubplotID = NOT_SPECIFIED, $Uncertainty = NOT_SPECIFIED) {
+    public static function Update($Database, $ID, $AttributeValue, $AttributeTypeID = Constants::NOT_SPECIFIED, $SubplotID = Constants::NOT_SPECIFIED, $Uncertainty = Constants::NOT_SPECIFIED) {
 //		DebugWriteln("TBL_AttributeData: Update");
         REL_SpatialGriddedToOrganismInfo::UpdateAttributeData($Database, null, $ID, false);
 
@@ -224,7 +225,7 @@ class TBLAttributeData {
         if ($SubplotID === 0)
             $SubplotID = null;
 
-        if ($AttributeTypeID === NOT_SPECIFIED) { // then do SQL::GetInt()
+        if ($AttributeTypeID === Constants::NOT_SPECIFIED) { // then do SQL::GetInt()
             $Set = TBL_AttributeData::GetSetFromID($Database, $ID);
 
             $AttributeTypeID = $Set->Field("AttributeTypeID");

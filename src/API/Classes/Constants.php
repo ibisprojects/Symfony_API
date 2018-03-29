@@ -21,7 +21,7 @@ class Constants {
     const PASSWORD_MAX_LENGTH = 15;
     const LOGIN_MIN_LENGTH = 5;
     const LOGIN_MAX_LENGTH = 15;
-    
+    const NOT_SPECIFIED = " --- @@ Not Specified @@ --- ";
     
 
 }

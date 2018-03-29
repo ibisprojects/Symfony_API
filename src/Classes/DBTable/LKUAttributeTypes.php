@@ -27,6 +27,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 //require_once("C:/Inetpub/wwwroot/cwis438/Classes/DBTable/TBL_OrganismInfos.php");
 use Classes\TBLDBTables;
+use API\Classes\Constants;
 
 //**************************************************************************************
 // Class Definition
@@ -156,7 +157,7 @@ class LKUAttributeTypes {
         return($AttributeTypeID);
     }
 
-    public static function Update($Database, $AttributeCategoryID, $AttributeTypeID, $Name, $Description, $AppliesTo, $ValueType, $UnitTypeID, $MinimumValue = NOT_SPECIFIED, $MaximumValue = NOT_SPECIFIED, $ZeroIndicatesAbsent = NOT_SPECIFIED) {
+    public static function Update($Database, $AttributeCategoryID, $AttributeTypeID, $Name, $Description, $AppliesTo, $ValueType, $UnitTypeID, $MinimumValue = Constants::NOT_SPECIFIED, $MaximumValue = Constants::NOT_SPECIFIED, $ZeroIndicatesAbsent = Constants::NOT_SPECIFIED) {
         $UpdateString = "UPDATE LKU_AttributeTypes " .
                 "SET AttributeCategoryID='$AttributeCategoryID', " .
                 "Name='$Name', " .
@@ -209,8 +210,8 @@ class LKUAttributeTypes {
         return($Set);
     }
 
-    public static function GetSetFromOrganismType($Database, $OrganismType, $ParentFormEntryID = NOT_SPECIFIED) {
-        if ($ParentFormEntryID !== NOT_SPECIFIED) {
+    public static function GetSetFromOrganismType($Database, $OrganismType, $ParentFormEntryID = Constants::NOT_SPECIFIED) {
+        if ($ParentFormEntryID !== Constants::NOT_SPECIFIED) {
             // DebugWriteln("ParentFormEntryID=$ParentFormEntryID");
             // loop through all form entries with this parentformentryid
             // check for existing entries with attributetypeid in unique set of sttribute types for this organism group

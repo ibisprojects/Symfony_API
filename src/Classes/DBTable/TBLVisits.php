@@ -29,6 +29,7 @@ namespace Classes\DBTable;
 use Classes\TBLDBTables;
 use Classes\DBTable\Date;
 use Classes\Utilities\SQL;
+use API\Classes\Constants;
 
 //*********************************************************************************
 //	Definitions
@@ -49,7 +50,7 @@ class TBLVisits {
     //******************************************************************************
     // Private functions
     //******************************************************************************
-    public static function AddSearchWhereClause($Database, &$SelectString, $ProjectID = NOT_SPECIFIED, $AreaID = NOT_SPECIFIED, $OrganismInfoID = NOT_SPECIFIED, $InsertLogID = NOT_SPECIFIED, $RefX = NOT_SPECIFIED, $RefY = NOT_SPECIFIED, $RefWidth = NOT_SPECIFIED, $RefHeight = NOT_SPECIFIED, $NumPresent = NOT_SPECIFIED, $NumAbsent = NOT_SPECIFIED) {
+    public static function AddSearchWhereClause($Database, &$SelectString, $ProjectID = Constants::NOT_SPECIFIED, $AreaID = Constants::NOT_SPECIFIED, $OrganismInfoID = Constants::NOT_SPECIFIED, $InsertLogID = Constants::NOT_SPECIFIED, $RefX = Constants::NOT_SPECIFIED, $RefY = Constants::NOT_SPECIFIED, $RefWidth = Constants::NOT_SPECIFIED, $RefHeight = Constants::NOT_SPECIFIED, $NumPresent = Constants::NOT_SPECIFIED, $NumAbsent = Constants::NOT_SPECIFIED) {
     //
     // Adds the appropriate search criteria to the provided search string.
     // This public static function will only return select strings for non-survey areas.//
@@ -57,7 +58,7 @@ class TBLVisits {
 //		DebugWriteln("NumPresent=$NumPresent");
 //		DebugWriteln("NumAbsent=$NumAbsent");
 
-        if (($OrganismInfoID != NOT_SPECIFIED) && ($OrganismInfoID > 0)) {
+        if (($OrganismInfoID != Constants::NOT_SPECIFIED) && ($OrganismInfoID > 0)) {
             if ((($NumPresent > 0) && ($NumAbsent == 0)) ||
                     (($NumPresent == 0) && ($NumAbsent > 0))) { // if they are both 1's or both 0's we do not care about the attributes
                 $TempString = "SELECT TBL_OrganismData.VisitID " .
@@ -80,19 +81,19 @@ class TBLVisits {
             TBL_DBTables::AddWhereClause($SelectString, "TBL_Visits.ID IN ($TempString)");
         }
 
-        if (($AreaID != NOT_SPECIFIED) && ($AreaID > 0)) {
+        if (($AreaID != Constants::NOT_SPECIFIED) && ($AreaID > 0)) {
             TBL_DBTables::AddWhereClause($SelectString, "TBL_Visits.AreaID=$AreaID");
         }
 
-        if (($InsertLogID != NOT_SPECIFIED) && ($InsertLogID > 0)) {
+        if (($InsertLogID != Constants::NOT_SPECIFIED) && ($InsertLogID > 0)) {
             TBL_DBTables::AddWhereClause($SelectString, "TBL_Visits.InsertLogID=$InsertLogID");
         }
 
-        if (($ProjectID != NOT_SPECIFIED) && ($ProjectID > 0)) {
+        if (($ProjectID != Constants::NOT_SPECIFIED) && ($ProjectID > 0)) {
             TBL_DBTables::AddWhereClause($SelectString, "TBL_Visits.ProjectID=$ProjectID");
         }
 
-        if (($RefX != NOT_SPECIFIED) && ($RefX != 0)) {
+        if (($RefX != Constants::NOT_SPECIFIED) && ($RefX != 0)) {
             $RefRight = $RefX + $RefWidth;
             $RefBottom = $RefY + $RefHeight;
 
@@ -177,7 +178,7 @@ class TBLVisits {
         return $stmt->fetch();
     }
 
-    public static function GetTotalRows($Database, $ProjectID = NOT_SPECIFIED, $AreaID = NOT_SPECIFIED, $OrganismInfoID = NOT_SPECIFIED, $InsertLogID = NOT_SPECIFIED, $RefX = NOT_SPECIFIED, $RefY = NOT_SPECIFIED, $RefWidth = NOT_SPECIFIED, $RefHeight = NOT_SPECIFIED, $NumPresent = NOT_SPECIFIED, $NumAbsent = NOT_SPECIFIED) {
+    public static function GetTotalRows($Database, $ProjectID = Constants::NOT_SPECIFIED, $AreaID = Constants::NOT_SPECIFIED, $OrganismInfoID = Constants::NOT_SPECIFIED, $InsertLogID = Constants::NOT_SPECIFIED, $RefX = Constants::NOT_SPECIFIED, $RefY = Constants::NOT_SPECIFIED, $RefWidth = Constants::NOT_SPECIFIED, $RefHeight = Constants::NOT_SPECIFIED, $NumPresent = Constants::NOT_SPECIFIED, $NumAbsent = Constants::NOT_SPECIFIED) {
     //
     // Returns thenumber of rows in the desired query
     //
@@ -201,7 +202,7 @@ class TBLVisits {
         return($Set->Field(1));
     }
 
-    public static function GetRows($Database, &$CurrentRow, $NumRows, $TotalRows, $OrderByField, $DescendingFlag, $Fields = null, $ProjectID = NOT_SPECIFIED, $AreaID = NOT_SPECIFIED, $OrganismInfoID = NOT_SPECIFIED, $InsertLogID = NOT_SPECIFIED, $RefX = NOT_SPECIFIED, $RefY = NOT_SPECIFIED, $RefWidth = NOT_SPECIFIED, $RefHeight = NOT_SPECIFIED, $NumPresent = NOT_SPECIFIED, $NumAbsent = NOT_SPECIFIED) {
+    public static function GetRows($Database, &$CurrentRow, $NumRows, $TotalRows, $OrderByField, $DescendingFlag, $Fields = null, $ProjectID = Constants::NOT_SPECIFIED, $AreaID = Constants::NOT_SPECIFIED, $OrganismInfoID = Constants::NOT_SPECIFIED, $InsertLogID = Constants::NOT_SPECIFIED, $RefX = Constants::NOT_SPECIFIED, $RefY = Constants::NOT_SPECIFIED, $RefWidth = Constants::NOT_SPECIFIED, $RefHeight = Constants::NOT_SPECIFIED, $NumPresent = Constants::NOT_SPECIFIED, $NumAbsent = Constants::NOT_SPECIFIED) {
     //
     // Returns a record set that matches the desired query
     //
@@ -334,13 +335,13 @@ class TBLVisits {
         }
     }
 
-    public static function InsertVisitOnly($dbConn, $UserID, $VisitDate, $X, $Y, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, $Accuracy, $FormID = NOT_SPECIFIED, $InsertLogType = INSERT_LOG_FORM, $VisitComments = null, $InsertLogID = NOT_SPECIFIED, $SelectedAreaID = NOT_SPECIFIED) {
+    public static function InsertVisitOnly($dbConn, $UserID, $VisitDate, $X, $Y, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, $Accuracy, $FormID = Constants::NOT_SPECIFIED, $InsertLogType = INSERT_LOG_FORM, $VisitComments = null, $InsertLogID = Constants::NOT_SPECIFIED, $SelectedAreaID = Constants::NOT_SPECIFIED) {
         // add an area and a visit because we do not have any organism form entries
 
         TBLInsertLogs::SetFieldValue($dbConn, "UploaderID", $InsertLogID, $UserID); // specified as current user for web pages but can be specified otherwise with PDA and Map Web Service
         // see if the point already exists
 
-        if ($SelectedAreaID != NOT_SPECIFIED)  // if user selected predefined location, use it as AreaID (R.S. 8/4/12)
+        if ($SelectedAreaID != Constants::NOT_SPECIFIED)  // if user selected predefined location, use it as AreaID (R.S. 8/4/12)
         {
             $AreaID=$SelectedAreaID;
         }

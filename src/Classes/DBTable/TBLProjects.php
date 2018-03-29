@@ -31,6 +31,7 @@ namespace Classes\DBTable;
 //******************************************************************************
 // "Search For" options
 use Classes\TBLDBTables;
+use API\Classes\Constants;
 
 define("TBL_PROJECTS_SEARCH_IN_NAME_ONLY", 1);
 define("TBL_PROJECTS_MATCH_START", 1);
@@ -122,11 +123,11 @@ class TBLProjects  {
     // Basic database functions
     //******************************************************************************
 
-    public static function GetSet($Database, $Code = NOT_SPECIFIED) {
+    public static function GetSet($Database, $Code = Constants::NOT_SPECIFIED) {
         $SelectString = "SELECT * " .
                 "FROM \"TBL_Projects\" ";
 
-        if ($Code != NOT_SPECIFIED)
+        if ($Code != Constants::NOT_SPECIFIED)
             TBL_DBTables::AddWhereClause($SelectString, "\"Code\"='$Code'");
 
         $SelectString.=" ORDER BY \"ProjName\"";
@@ -265,7 +266,7 @@ class TBLProjects  {
         return($ProjectID);
     }
 
-    public static function AddData($Database, $UploadedFilePath, $ProjectID, $PersonID, $InsertLogType, $JobID = NOT_SPECIFIED, $InsertLogID = NOT_SPECIFIED) {
+    public static function AddData($Database, $UploadedFilePath, $ProjectID, $PersonID, $InsertLogType, $JobID = Constants::NOT_SPECIFIED, $InsertLogID = Constants::NOT_SPECIFIED) {
         if (file_exists($UploadedFilePath)) {
             //DebugWriteln("InsertLOgID=$InsertLogID");
             $UserSessionID = null;
@@ -279,11 +280,11 @@ class TBLProjects  {
 
             $Name = GetFileNameFromFilePath($UploadedFilePath);
 
-            if ($InsertLogID == NOT_SPECIFIED) {
-                $InsertLogID = TBL_InsertLogs::Insert($Database, $InsertLogType, $UserSessionID, $Name, $UploadedFilePath, NOT_SPECIFIED, $PersonID, NOT_SPECIFIED, $ProjectID);
+            if ($InsertLogID == Constants::NOT_SPECIFIED) {
+                $InsertLogID = TBL_InsertLogs::Insert($Database, $InsertLogType, $UserSessionID, $Name, $UploadedFilePath, Constants::NOT_SPECIFIED, $PersonID, Constants::NOT_SPECIFIED, $ProjectID);
             }
 
-            if ($JobID != NOT_SPECIFIED) {
+            if ($JobID != Constants::NOT_SPECIFIED) {
                 TBL_Jobs::SetFieldValue($Database, "InsertLogID", $JobID, $InsertLogID);
             }
 
@@ -491,13 +492,13 @@ class TBLProjects  {
                     if ($ScientificNameIndex === false) { // if we did not find a scientificname column
                         // add areaid and visitid via InsertVisitOnly function (TBL_Visits::InsertVisitOnly)
 
-                        $VisitID = TBL_Visits::InsertVisitOnly($Database, $PersonID, $VisitDate, $RefX, $RefY, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, null, NOT_SPECIFIED, $InsertLogType, $VisitComments, $InsertLogID); // accuracy is null
+                        $VisitID = TBL_Visits::InsertVisitOnly($Database, $PersonID, $VisitDate, $RefX, $RefY, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, null, Constants::NOT_SPECIFIED, $InsertLogType, $VisitComments, $InsertLogID); // accuracy is null
                         //InsertVisitOnly($Database,$UserID,$Date,$X,$Y,$ProjectID,
                         //$AreaName,$SubplotID,$CoordinateSystemID,$Accuracy,$FormID=NOT_SPECIFIED,$InsertLogType=INSERT_LOG_FORM,$VisitComments=null,$InsertLogID=NOT_SPECIFIED)
 
                         $NumRecordsInserted++;
 
-                        if ($JobID != NOT_SPECIFIED) {
+                        if ($JobID != Constants::NOT_SPECIFIED) {
                             TBL_Jobs::UpdateProgress($Database, $JobID, $NumRecordsInserted);
                         }
                     } else { // use AddPoint to add AreaID, VisitID, and asasociated OrganismdataID
@@ -614,7 +615,7 @@ class TBLProjects  {
 
                                 $NumRecordsInserted++;
 
-                                if ($JobID != NOT_SPECIFIED) {
+                                if ($JobID != Constants::NOT_SPECIFIED) {
                                     TBL_Jobs::UpdateProgress($Database, $JobID, $NumRecordsInserted);
                                 }
                             }
@@ -668,7 +669,7 @@ class TBLProjects  {
                                     } else {  // Have a SciName value, couldn't get the TSN (ex. Unknown forb) so OrganismDataID=null
                                         // interesting problem here: if we have an organism only file, and a row cannot get the TSN ("unknown forb") the visit gets entered, with no organism info...What to do?
 
-                                        $VisitID = TBL_Visits::InsertVisitOnly($Database, $PersonID, $VisitDate, $RefX, $RefY, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, null, NOT_SPECIFIED, INSERT_LOG_FORM, $VisitComments);
+                                        $VisitID = TBL_Visits::InsertVisitOnly($Database, $PersonID, $VisitDate, $RefX, $RefY, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, null, Constants::NOT_SPECIFIED, INSERT_LOG_FORM, $VisitComments);
                                         //InsertVisitOnly($Database,$UserID,$Date,$X,$Y,$ProjectID,$AreaName,$SubplotID,$CoordinateSystemID,$Accuracy,$FormID=NOT_SPECIFIED,$InsertLogType=INSERT_LOG_FORM,$VisitComments=null)
                                     }
                                 }

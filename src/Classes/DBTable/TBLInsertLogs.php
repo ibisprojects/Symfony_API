@@ -4,6 +4,7 @@ namespace Classes\DBTable;
 
 use Classes\TBLDBTables;
 use Classes\Utilities\SQL;
+use API\Classes\Constants;
 
 define("INSERT_LOG_UNKNOWN", 0);
 define("INSERT_LOG_CLASSIFICATION", 1);
@@ -41,15 +42,15 @@ class TBLInsertLogs {
         $Type,
         $UserSessionID = null,
         $Name = null,
-        $FilePath = NOT_SPECIFIED,
-        $MetadataID = NOT_SPECIFIED,
-        $UserID = NOT_SPECIFIED,
-        $FormID = NOT_SPECIFIED,
-        $ProjectID = NOT_SPECIFIED,
-        $WebsiteID = NOT_SPECIFIED
+        $FilePath = Constants::NOT_SPECIFIED,
+        $MetadataID = Constants::NOT_SPECIFIED,
+        $UserID = Constants::NOT_SPECIFIED,
+        $FormID = Constants::NOT_SPECIFIED,
+        $ProjectID = Constants::NOT_SPECIFIED,
+        $WebsiteID = Constants::NOT_SPECIFIED
     )
     {
-        if (($UserID === NOT_SPECIFIED) ||  empty($UserID))
+        if (($UserID === Constants::NOT_SPECIFIED) ||  empty($UserID))
             return -1;
 
         //
@@ -59,13 +60,13 @@ class TBLInsertLogs {
         //
         $UserSessionID = null;
 
-        if ($WebsiteID===NOT_SPECIFIED || empty($WebsiteID)) $WebsiteID = null;
+        if ($WebsiteID===Constants::NOT_SPECIFIED || empty($WebsiteID)) $WebsiteID = null;
 
-        if ($FilePath===NOT_SPECIFIED || empty($FilePath)) $FilePath = null;
+        if ($FilePath===Constants::NOT_SPECIFIED || empty($FilePath)) $FilePath = null;
 
-        if ($FormID===NOT_SPECIFIED || empty($FormID)) $FormID = null;
+        if ($FormID===Constants::NOT_SPECIFIED || empty($FormID)) $FormID = null;
 
-        if ($ProjectID===NOT_SPECIFIED || empty($ProjectID)) $ProjectID = null;
+        if ($ProjectID===Constants::NOT_SPECIFIED || empty($ProjectID)) $ProjectID = null;
 
         // insert the record
 
@@ -101,8 +102,8 @@ class TBLInsertLogs {
         return($InsertLogID);
     }
 
-    public static function Update($dbConn, $InsertLogID, $Name, $MetadataID = NOT_SPECIFIED) {
-        if ($MetadataID == NOT_SPECIFIED || empty($MetadataID))
+    public static function Update($dbConn, $InsertLogID, $Name, $MetadataID = Constants::NOT_SPECIFIED) {
+        if ($MetadataID == Constants::NOT_SPECIFIED || empty($MetadataID))
             $MetadataID = null;
 
         $UpdateString = "UPDATE \"TBL_InsertLogs\" ";
