@@ -32,6 +32,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 
 use Classes\Utilities\SQL;
+use API\Classes\Constants;
 
 class TBLSpatialLayerGroups {
 
@@ -364,7 +365,7 @@ class TBLSpatialLayerGroups {
 
         $UpdateString = "UPDATE TBL_SpatialLayers " .
                 "SET FolderPath='$LayerPath'," .
-                "GeometryType=" . GEOMETRY_TYPE_RASTER . ", " .
+                "GeometryType=" . Constants::GEOMETRY_TYPE_RASTER . ", " .
                 "CoordinateSystemID=" . $CoordinateSystemID . " " .
                 "WHERE ID=$SpatialLayerID";
 
@@ -452,7 +453,7 @@ class TBLSpatialLayerGroups {
         // (this is obsolete with GoogleMaps)
         // project the raster to Geographic
 
-        $GeographicRasterFilePath = TBL_SpatialLayerGroups::AddMapFile($Database, $UserID, $InsertLogID, $SpatialLayerGroupID, $Name, $DestinPath, COORDINATE_SYSTEM_WGS84_GEOGRAPHIC);
+        $GeographicRasterFilePath = TBL_SpatialLayerGroups::AddMapFile($Database, $UserID, $InsertLogID, $SpatialLayerGroupID, $Name, $DestinPath, Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC);
 
         // load the new raster to project it into the UTM zones it overlaps with
 

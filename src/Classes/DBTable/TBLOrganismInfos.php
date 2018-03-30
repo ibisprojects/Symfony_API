@@ -33,19 +33,6 @@ use Classes\TBLDBTables;
 // Definitions
 //**************************************************************************************
 
-define("ORGANISM_GROUP_PLANT", 1);
-define("ORGANISM_GROUP_ANIMAL", 2);
-define("ORGANISM_GROUP_DISEASE", 3);
-
-define("ORGANISM_TYPE_PLANT_TERRESTRIAL", 1);
-define("ORGANISM_TYPE_PLANT_AQUATIC", 2);
-define("ORGANISM_TYPE_ANIMAL_VERTIBRATE_TERRESTRIAL", 3);
-define("ORGANISM_TYPE_ANIMAL_INVERTIBRATE_TERRESTRIAL", 4);
-define("ORGANISM_TYPE_ANIMAL_VERTIBRATE_AQUATIC", 5);
-define("ORGANISM_TYPE_ANIMAL_INVERTIBRATE_AQUATIC", 6);
-define("ORGANISM_TYPE_DISEASE_ANIMAL", 7);
-define("ORGANISM_TYPE_DISEASE_PLANT", 8);
-
 $TBL_OrganismInfos_OrganismTypes = array("Unknown", "Terrestrial Plant", "Aquatic Plant",
     "Terrestrial Vertibrate Animal", "Terrestrial Invertibrate Animal",
     "Aquatic Vertibrate Animal", "Aquatic Invertibrate Animal",

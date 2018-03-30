@@ -44,36 +44,7 @@ use Classes\DBTable\TBLSpatialLayerTypes;
 use Classes\DBTable\TBLGISINSpeciesStatuses;
 use API\Classes\Constants;
 
-define("VALUE_TYPE_UNKNOWN", 0);
-define("VALUE_TYPE_LOOKUP", 1);
-define("VALUE_TYPE_FLOAT", 2);
-define("VALUE_TYPE_INTEGER", 3);
-define("VALUE_TYPE_BOOLEAN", 4);
-
 $ValueTypeStrings = array(" -- Select a Data Type -- ", "Categorical", "Numeric (Decimal)", "Numeric (Integer)", "Boolean");
-
-//$ValueTypeStrings=array("Unknown","Look Up","Floating point number","Integer number");
-// These definitions are specific to the GODM ("invasvie") database
-
-define("TBL_ORGANISMDATA", 1);
-define("TBL_PROJECTS", 2);
-define("TBL_AREAS", 3);
-define("TBL_VISITS", 4);
-define("TBL_ATTRIBUTEDATA", 5);
-define("TBL_ORGANISMINFO", 6);
-define("TBL_INDIVIDUALS", 7);
-define("TBL_CONTROLAGENT", 8);
-define("TBL_TAXONUNITS", 9);
-define("TSN", 10); // TBL_TaxonUnits.TSN // jjg - we should be able to remove this
-define("TBL_INSERTLOG", 11);
-define("TBL_METADATA", 12);
-define("TBL_ORGANIZATIONS", 13);
-define("TBL_TREATMENTS", 14);
-
-// These are portable definitions
-
-define("DEBUGGING_DBTABLE", false);
-define("TIMING_DBTABLE", false);
 
 //**************************************************************************************
 // Class Definition

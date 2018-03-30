@@ -292,7 +292,7 @@ class UploadController extends Controller {
 
         $InsertLogID = TBLInsertLogs::Insert(
             $dbConn,
-            INSERT_LOG_APP,
+            Constants::INSERT_LOG_APP,
             null,
             $PersonName,
             Constants::NOT_SPECIFIED,
@@ -318,7 +318,7 @@ class UploadController extends Controller {
             $CoordinateSystemID,
             $Accuracy,
             $FormID,
-            INSERT_LOG_APP,
+            Constants::INSERT_LOG_APP,
             $VisitComment,
             $InsertLogID,
             $PredefinedAreaID
@@ -424,7 +424,7 @@ class UploadController extends Controller {
 
                                     $InsertLogID = TBLInsertLogs::Insert(
                                         $dbConn,
-                                        INSERT_LOG_APP,
+                                        Constants::INSERT_LOG_APP,
                                         null,
                                         $PersonName,
                                         Constants::NOT_SPECIFIED,

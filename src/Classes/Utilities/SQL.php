@@ -64,7 +64,7 @@ class SQL
     {
       	if ($Value!==Constants::NOT_SPECIFIED)
     	{
-		   	$Value=SafeFloat($Value);
+		   	$Value=SQL::SafeFloat($Value);
 
 	     	if ($Value===null) $Value="NULL";
 	    	else $Value="'".$Value."'";
@@ -88,7 +88,7 @@ class SQL
     {
       	if ($Value!==Constants::NOT_SPECIFIED)
     	{
-	    	$Value=SafeDate($Value);
+	    	$Value=SQL::SafeDate($Value);
 
 	     	if ($Value===null) $Value="NULL";
 	    	else $Value="'".$Value."'";

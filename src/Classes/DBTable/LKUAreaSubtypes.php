@@ -28,24 +28,6 @@ namespace Classes\DBTable;
 // Definitions
 //**************************************************************************************
 
-define("GEOMETRY_TYPE_UNKNOWN", 0);
-define("GEOMETRY_TYPE_POINT", 1);
-define("GEOMETRY_TYPE_POLYLINE", 2);
-define("GEOMETRY_TYPE_POLYGON", 3);
-define("GEOMETRY_TYPE_RASTER", 4);
-
-define("AREA_SUBTYPE_NATION", 2);
-define("AREA_SUBTYPE_STATE", 3);
-define("AREA_SUBTYPE_COUNTY", 4);
-define("AREA_SUBTYPE_POINT", 11);
-define("AREA_SUBTYPE_POLYLINE", 12);
-define("AREA_SUBTYPE_POLYGON", 13);
-
-define("AREA_SUBTYPE_TRAILHEAD", 62);
-define("AREA_SUBTYPE_TRAILSEGMENT", 63);
-
-define("AREA_SUBTYPE_MICA_PLOT", 67);
-
 //**************************************************************************************
 // Class Definition
 //**************************************************************************************

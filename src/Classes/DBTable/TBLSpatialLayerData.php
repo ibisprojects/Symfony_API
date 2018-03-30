@@ -28,6 +28,8 @@ namespace Classes\DBTable;
 
 use Classes\TBLDBTables;
 use Classes\DBTable\LKUCoordinateSystems;
+use API\Classes\Constants;
+use Classes\Utilities\SQL;
 
 
 //**************************************************************************************
@@ -58,7 +60,7 @@ class TBLSpatialLayerData {
     //******************************************************************************
 
     public static function GetSetFromID($Database, $SpatialLayerDataID) {
-        $SpatialLayerDataID = SafeInt($SpatialLayerDataID);
+        $SpatialLayerDataID = SQL::SafeInt($SpatialLayerDataID);
 
         $SelectString = "SELECT * " .
                 "FROM TBL_SpatialLayerData " .
@@ -75,7 +77,7 @@ class TBLSpatialLayerData {
         // Make sure we have a SpatialLayerGridID and a CoordinateSystemID
 
         $CoordinateSystemID = (int)$CoordinateSystemID;
-        $AreaID = SafeInt($AreaID);
+        $AreaID = SQL::SafeInt($AreaID);
 
         if ($SpatialLayerGridID == 0) { // get a SpatialLayerGridID
             $AreaSet = TBLAreas::GetSetFromID($dbConn, $AreaID);
@@ -93,8 +95,8 @@ class TBLSpatialLayerData {
             $CoordinateSystemID = $SpatialLayerGridSet["CoordinateSystemID"];
         }
 
-        if ($CoordinateSystemID != COORDINATE_SYSTEM_WGS84_GEOGRAPHIC) { // make sure the coorindate is in geographic
-            $CoordinateSystemID = COORDINATE_SYSTEM_WGS84_GEOGRAPHIC;
+        if ($CoordinateSystemID != Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC) { // make sure the coorindate is in geographic
+            $CoordinateSystemID = Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC;
         }
 
         if ($AreaID > 0) {

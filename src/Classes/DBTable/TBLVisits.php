@@ -65,12 +65,12 @@ class TBLVisits {
                         "FROM TBL_OrganismData " .
                         "INNER JOIN TBL_AttributeData ON TBL_AttributeData.OrganismDataID=TBL_OrganismData.ID " .
                         "WHERE OrganismInfoID=$OrganismInfoID " .
-                        "AND AttributeTypeID=" . ATTRIBUTE_PRESENCE . " "; // can only do
+                        "AND AttributeTypeID=" . Constants::ATTRIBUTE_PRESENCE . " "; // can only do
 
                 if ($NumPresent > 0) {
-                    $TempString.="AND AttributeValueID=" . ATTRIBUTE_VALUE_PRESENT . " ";
+                    $TempString.="AND AttributeValueID=" . Constants::ATTRIBUTE_VALUE_PRESENT . " ";
                 } else if ($NumAbsent > 0) {
-                    $TempString.="AND AttributeValueID=" . ATTRIBUTE_VALUE_ABSENT . " ";
+                    $TempString.="AND AttributeValueID=" . Constants::ATTRIBUTE_VALUE_ABSENT . " ";
                 }
 //				DebugWriteln("TempString=$TempString");
             } else { // just do the organism info
@@ -335,7 +335,7 @@ class TBLVisits {
         }
     }
 
-    public static function InsertVisitOnly($dbConn, $UserID, $VisitDate, $X, $Y, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, $Accuracy, $FormID = Constants::NOT_SPECIFIED, $InsertLogType = INSERT_LOG_FORM, $VisitComments = null, $InsertLogID = Constants::NOT_SPECIFIED, $SelectedAreaID = Constants::NOT_SPECIFIED) {
+    public static function InsertVisitOnly($dbConn, $UserID, $VisitDate, $X, $Y, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, $Accuracy, $FormID = Constants::NOT_SPECIFIED, $InsertLogType = Constants::INSERT_LOG_FORM, $VisitComments = null, $InsertLogID = Constants::NOT_SPECIFIED, $SelectedAreaID = Constants::NOT_SPECIFIED) {
         // add an area and a visit because we do not have any organism form entries
 
         TBLInsertLogs::SetFieldValue($dbConn, "UploaderID", $InsertLogID, $UserID); // specified as current user for web pages but can be specified otherwise with PDA and Map Web Service
@@ -347,11 +347,11 @@ class TBLVisits {
         }
         else
         {
-            $AreaID = TBLAreas::GetIDFromCoordinate($dbConn, $X, $Y, COORDINATE_SYSTEM_WGS84_GEOGRAPHIC, 1, $ProjectID); // $CoordinateSystemID was hard coded to was STPROJECTION_GEOGRAPHIC
+            $AreaID = TBLAreas::GetIDFromCoordinate($dbConn, $X, $Y, Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC, 1, $ProjectID); // $CoordinateSystemID was hard coded to was STPROJECTION_GEOGRAPHIC
         }
 
         if ($AreaID <= 0) { // add a new point area
-            $AreaID = TBLAreas::InsertPoint($dbConn, $ProjectID, $InsertLogID, $AreaName, $SubplotID, $X, $Y, $CoordinateSystemID, $Accuracy, AREA_SUBTYPE_POINT); // we need to modify AddPoint to be able to add survey types for plot types other than point
+            $AreaID = TBLAreas::InsertPoint($dbConn, $ProjectID, $InsertLogID, $AreaName, $SubplotID, $X, $Y, $CoordinateSystemID, $Accuracy, Constants::AREA_SUBTYPE_POINT); // we need to modify AddPoint to be able to add survey types for plot types other than point
         }
 
         if ($VisitDate == null) { // not specified)

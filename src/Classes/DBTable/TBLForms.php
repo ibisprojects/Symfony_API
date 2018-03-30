@@ -35,9 +35,6 @@ namespace Classes\DBTable;
 //	Definitions
 //*********************************************************************************
 
-define("FORMS_LOCATION_DEFINITION_USER_DEFINED", 0);
-define("FORMS_LOCATION_DEFINITION_PRE_DEFINED", 1);
-
 use Classes\DBTable\LKUUnits;
 use Classes\DBTable\TBLOrganismInfos;
 use Classes\DBTable\RELAreaToForm;

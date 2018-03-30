@@ -29,6 +29,7 @@ namespace Classes\DBTable;
 // Definitions
 //**************************************************************************************
 
+use API\CLasses\Constants;
 
 define('DURATIONS', false);
 
@@ -150,7 +151,7 @@ class RELSpatialGriddedToOrganismInfo {
         // add or increment the relationships at each zoom level
 
         if ($OrganismInfoID != null) { // have an organism
-            for ($ZoomLevel = ZOOM_LEVEL_MIN; $ZoomLevel <= ZOOM_LEVEL_MAX; $ZoomLevel++) {
+            for ($ZoomLevel = Constants::ZOOM_LEVEL_MIN; $ZoomLevel <= Constants::ZOOM_LEVEL_MAX; $ZoomLevel++) {
                 $TBL_SpatialGridded = "TBL_SpatialGridded_" . $ZoomLevel;
                 $REL_SpatialGriddedToOrganismInfo = "REL_SpatialGriddedToOrganismInfo_" . $ZoomLevel;
                 $REL_SpatialGriddedToArea = "REL_SpatialGriddedToArea_" . $ZoomLevel;
@@ -269,7 +270,7 @@ class RELSpatialGriddedToOrganismInfo {
 //		DebugWriteln("REL_SpatialGriddedToOrganismInfo::RemoveSpatialGridRelationship() AreaID=$AreaID");
         // get the set of relationships
 
-        for ($ZoomLevel = ZOOM_LEVEL_MIN; $ZoomLevel <= ZOOM_LEVEL_MAX; $ZoomLevel++) {
+        for ($ZoomLevel = Constants::ZOOM_LEVEL_MIN; $ZoomLevel <= Constants::ZOOM_LEVEL_MAX; $ZoomLevel++) {
             $TBL_SpatialGridded = "TBL_SpatialGridded_" . $ZoomLevel;
             $REL_SpatialGriddedToOrganismInfo = "REL_SpatialGriddedToOrganismInfo_" . $ZoomLevel;
             $REL_SpatialGriddedToArea = "REL_SpatialGriddedToArea_" . $ZoomLevel;
@@ -329,7 +330,7 @@ class RELSpatialGriddedToOrganismInfo {
 
         $AttributeTypeID = $AttributeDataSet->Field("AttributeTypeID");
 
-        if ($AttributeTypeID == ATTRIBUTE_PRESENCE) { // only worry about presence values
+        if ($AttributeTypeID == Constants::ATTRIBUTE_PRESENCE) { // only worry about presence values
             $AttributeValueID = $AttributeDataSet->Field("AttributeValueID");
             $OrganismDataID = $AttributeDataSet->Field("OrganismDataID");
             if (DURATIONS)
@@ -345,7 +346,7 @@ class RELSpatialGriddedToOrganismInfo {
             // get the set of relationships
 
             if ($OrganismInfoID != null) {
-                for ($ZoomLevel = ZOOM_LEVEL_MIN; $ZoomLevel <= ZOOM_LEVEL_MAX; $ZoomLevel++) {
+                for ($ZoomLevel = Constants::ZOOM_LEVEL_MIN; $ZoomLevel <= Constants::ZOOM_LEVEL_MAX; $ZoomLevel++) {
 
                     $TBL_SpatialGridded = "TBL_SpatialGridded_" . $ZoomLevel;
                     $REL_SpatialGriddedToOrganismInfo = "REL_SpatialGriddedToOrganismInfo_" . $ZoomLevel;
@@ -378,13 +379,13 @@ class RELSpatialGriddedToOrganismInfo {
                             // get the appropriate SQL string to increment or decrement
 
                             if ($InsertFlag) { // inserting
-                                if ($AttributeValueID == ATTRIBUTE_VALUE_PRESENT) {
+                                if ($AttributeValueID == Constants::ATTRIBUTE_VALUE_PRESENT) {
                                     $UpdateString = "NumPresent=NumPresent+1 ";
                                 } else { // ATTRIBUTE_VALUE_ABSENT
                                     $UpdateString = "NumAbsent=NumAbsent+1 ";
                                 }
                             } else { // deleting
-                                if ($AttributeValueID == ATTRIBUTE_VALUE_PRESENT) {
+                                if ($AttributeValueID == Constants::ATTRIBUTE_VALUE_PRESENT) {
                                     $UpdateString = "NumPresent=NumPresent-1 ";
                                 } else { // ATTRIBUTE_VALUE_ABSENT
                                     $UpdateString = "NumAbsent=NumAbsent-1 ";

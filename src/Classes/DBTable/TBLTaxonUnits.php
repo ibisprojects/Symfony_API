@@ -30,23 +30,6 @@ namespace Classes\DBTable;
 // Definitions
 //**************************************************************************************
 
-define("KINGDOM_ANY", 0);
-define("KINGDOM_MONERA", 1);
-define("KINGDOM_PROTISTA", 2);
-define("KINGDOM_PLANTAE", 3);
-define("KINGDOM_FUNGI", 4);
-define("KINGDOM_ANIMALIA", 5);
-
-define("RANK_KINGDOM", 10);
-define("RANK_PHYLUM", 30);
-define("RANK_CLASS", 60);
-define("RANK_ORDER", 100);
-define("RANK_FAMILY", 140);
-define("RANK_GENUS", 180);
-define("RANK_SPECIES", 220);
-define("RANK_SUBSPECIES", 230);
-define("RANK_VARIETY", 240);
-define("RANK_INFRA_SPECIFIC", 900);
 // taxonomic rankings
 
 $NumRankIDs = 9;

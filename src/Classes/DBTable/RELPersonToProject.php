@@ -34,15 +34,6 @@ namespace Classes\DBTable;
 //**************************************************************************************
 use Classes\TBLDBTables;
 
-
-define("PROJECT_UNKNOWN", "0");
-define("PROJECT_UNDEFINED", "1"); // don't use!
-define("PROJECT_CONTRIBUTOR", "2");
-define("PROJECT_REVIEWER", "3");
-define("PROJECT_AUTHORITY", "4");
-define("PROJECT_MANAGER", "5");
-define("PROJECT_ADMIN", "6");
-
 class RELPersonToProject {
 
     //******************************************************************************

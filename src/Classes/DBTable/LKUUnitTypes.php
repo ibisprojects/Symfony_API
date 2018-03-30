@@ -26,27 +26,6 @@ namespace Classes\DBTable;
 // DEALINGS IN THE SOFTWARE.
 //**************************************************************************************
 
-define("UNIT_TYPE_DISTANCE", 1);
-define("UNIT_TYPE_AREA", 2);
-define("UNIT_TYPE_VOLUME", 3);
-define("UNIT_TYPE_MASS", 4);
-define("UNIT_TYPE_FLUID_FLOW", 5);
-define("UNIT_TYPE_VOLUME_PER_AREA", 6);
-define("UNIT_TYPE_MASS_PER_AREA", 7);
-define("UNIT_TYPE_TIME", 8);
-define("UNIT_TYPE_TEMPERATURE", 9);
-define("UNIT_TYPE_WEIGHT_RATIO", 10);
-define("UNIT_TYPE_CONCENTRATION", 11);
-define("UNIT_TYPE_PARTS_PER", 12); // gjn; how is this different from concentration?
-define("UNIT_TYPE_PERCENT", 13);
-define("UNIT_TYPE_AREA_SPREAD", 14);
-define("UNIT_TYPE_LINEAR_SPREAD", 15);
-define("UNIT_TYPE_COUNT_PER_AREA", 16);
-define("UNIT_TYPE_PH", 17);
-define("UNIT_TYPE_COUNT", 18);
-define("UNIT_TYPE_COUNT_PER_METER_SQUARED", 19); // gjn; same as count per area, delete?
-
-define("UNIT_TYPE_CENTIMETERS", 27); // gjn; this is used by SurveyAdd2_EcoNab.php but
 // there is no corresponding record in the database
 // for centimeters as a unit type.
 

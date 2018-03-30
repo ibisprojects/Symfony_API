@@ -33,14 +33,6 @@ namespace Classes\DBTable;
 //	Definitions
 //*********************************************************************************
 
-define("TBL_FORMENTRIES_HOW_SPECIFIED_ENTERED",1);
-define("TBL_FORMENTRIES_HOW_SPECIFIED_LIST",2);
-define("TBL_FORMENTRIES_HOW_SPECIFIED_SPECIFIED",3);
-define("TBL_FORMENTRIES_HOW_SPECIFIED_HIDDEN",4);
-
-
-define("TBL_SPECIRES_SORTBY_SCINAME",0);
-define("TBL_SPECIRES_SORTBY_COMMNAME",1);
 class TBL_FormEntries extends TBL_DBTables
 {		
 	//******************************************************************************

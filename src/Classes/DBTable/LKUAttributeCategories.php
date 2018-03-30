@@ -24,13 +24,6 @@
 // DEALINGS IN THE SOFTWARE.
 //**************************************************************************************
 
-define("ATTRIBUTE_CATEGORY_ORGANISM_DATA",1); // this is the ID of the category
-define("ATTRIBUTE_CATEGORY_ABIOTIC",2);
-define("ATTRIBUTE_CATEGORY_SOIL_CHEMISTRY",3);
-define("ATTRIBUTE_CATEGORY_SOIL_TYPE",4);
-define("ATTRIBUTE_CATEGORY_BIOTIC",5);
-define("ATTRIBUTE_CATEGORY_AREA",6);
-
 //**************************************************************************************
 // Class Definition
 //**************************************************************************************

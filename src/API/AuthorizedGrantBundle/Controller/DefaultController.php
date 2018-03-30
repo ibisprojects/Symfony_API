@@ -104,7 +104,7 @@ class DefaultController extends Controller {
                         if (is_numeric($projectID) && RELPersonToProject::HasRole($dbConn, $projectID, PERMISSION_CONTRIB, $userID)) {
 
                             $FormData = TBLForms::GetSetFormEntriesProjectID($dbConn, $projectID);
-                            $PersonSet = TBLPeople::GetPersonSetFromProjectID($dbConn, $projectID, PROJECT_CONTRIBUTOR);
+                            $PersonSet = TBLPeople::GetPersonSetFromProjectID($dbConn, $projectID, Constants::PROJECT_CONTRIBUTOR);
                             for ($index=0;$index<count($FormData);$index++) {
                                 $FormData[$index]["Authority"]=$PersonSet;
                             }

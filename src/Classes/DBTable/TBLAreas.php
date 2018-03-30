@@ -32,14 +32,9 @@ namespace Classes\DBTable;
 use Classes\DBTable\TBLSpatialLayerData;
 use Classes\Utilities\SQL;
 use Classes\TBLDBTables;
+use API\Classes\Constants;
 
-define("AREA_SUBTYPE_COUNTRIES", 2);
 define("AREA_SUBTYPE_COUNTIES", 4);
-define("AREA_SUBTYPE_HUC_8", 44);
-define("AREA_SUBTYPE_NATIONAL_PARKS", 6);
-define("AREA_SUBTYPE_WILDLIFE_REFUGES", 8);
-define("AREA_SUBTYPE_7_5_MINUTE_GRIDS", 38);
-define("AREA_SUBTYPE_TRAIL_SEGMENT", 63);
 
 $SensitiveStrings = array("Not Sensitive", "7.5 minute (>12km)");
 
@@ -427,8 +422,8 @@ class TBLAreas {
 
         // make sure the coorindate is in geographic
 
-        if ($CoordinateSystemID != COORDINATE_SYSTEM_WGS84_GEOGRAPHIC) {
-            $CoordinateSystemID = COORDINATE_SYSTEM_WGS84_GEOGRAPHIC;
+        if ($CoordinateSystemID != Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC) {
+            $CoordinateSystemID = Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC;
         }
 
         $SelectString = "SELECT \"TBL_Areas\".\"ID\" " .
@@ -693,7 +688,7 @@ class TBLAreas {
             if (($ProjectID > 0) && ($Sensitive > 0)) {
                 // if the user is not on the project, must blur the coordinates
 
-                if (REL_PersonToProject::HasRole($Database, $ProjectID, PROJECT_CONTRIBUTOR)) {
+                if (REL_PersonToProject::HasRole($Database, $ProjectID, Constants::PROJECT_CONTRIBUTOR)) {
                     $Factor = $SenstiveFactors[$Sensitive];
 
                     $RefX = (int) ($RefX * $Factor) / $Factor;
@@ -833,7 +828,7 @@ class TBLAreas {
 
     public static function InsertPoint($dbConn, $ProjectID, $InsertLogID, $AreaName, $SubplotID, $RefX, $RefY, $CoordinateSystemID, $Accuracy, $AreaSubTypeID = null, $AreaCode = "", $Comments = null) {
         if ($AreaSubTypeID === null) {
-            $AreaSubTypeID = AREA_SUBTYPE_POINT; // default to point?
+            $AreaSubTypeID = Constants::AREA_SUBTYPE_POINT; // default to point?
         }
 
         if ($SubplotID !== null) {
@@ -869,7 +864,7 @@ class TBLAreas {
 
     public static function InsertShape($dbConn, $ProjectID, $InsertLogID, $AreaName, $SubplotID, $GeometryString, $CoordinateSystemID, $Accuracy, $AreaSubTypeID = null, $AreaCode = "") {
         if ($AreaSubTypeID === null) {
-            $AreaSubTypeID = AREA_SUBTYPE_POINT; // default to point?
+            $AreaSubTypeID = Constants::AREA_SUBTYPE_POINT; // default to point?
         }
 
         if (($SubplotID !== null) && ($SubplotID != 0)) {

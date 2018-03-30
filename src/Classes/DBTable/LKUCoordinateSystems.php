@@ -29,18 +29,11 @@ namespace Classes\DBTable;
 // Definitions
 //**************************************************************************************
 
-define("COORDINATE_SYSTEM_WGS84_GEOGRAPHIC", 1);
-
-define("COORDINATE_SYSTEM_NAD27_GEOGRAPHIC", 340);
-define("COORDINATE_SYSTEM_NAD83_GEOGRAPHIC", 339);
-
-define("COORDINATE_SYSTEM_NAD83_UTM_3_North", 299); // add to get 3 thorugh 23
-define("COORDINATE_SYSTEM_NAD27_UTM_3_North", 319); // add to get 3 thorugh 23
+use API\Classes\Constants;
 
 define("COORDINATE_SYSTEM_WGS84_UTM_1_North", 136); // add offset to get zones 1 through 60
 define("COORDINATE_SYSTEM_WGS84_UTM_1_South", 196); // add offset to get zones 1 through 60
 
-define("COORDINATE_SYSTEM_GOOGLE_MAPS", 341); // mercator coordinate system used by google maps
 //
 
 //**************************************************************************************
@@ -138,7 +131,7 @@ class LKUCoordinateSystems {
 
         switch ($Projection) {
             case STPROJECTION_GEOGRAPHIC:
-                $ID = COORDINATE_SYSTEM_WGS84_GEOGRAPHIC;
+                $ID = Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC;
                 break;
             case STPROJECTION_UTM:
                 $ID = LKU_CoordinateSystems::GetIDFromUTMZone($dbConn, $UTMZone, $South);
@@ -161,7 +154,7 @@ class LKUCoordinateSystems {
     public static function GetProjectionFromID($dbConn, $ID) {
         $Projection = 0;
 
-        if ($ID == COORDINATE_SYSTEM_WGS84_GEOGRAPHIC) {
+        if ($ID == Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC) {
             $Projection = STPROJECTION_GEOGRAPHIC;
         } else {
             $Projection = STPROJECTION_UTM;

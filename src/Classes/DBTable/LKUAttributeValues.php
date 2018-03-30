@@ -26,27 +26,6 @@ namespace Classes\DBTable;
 // DEALINGS IN THE SOFTWARE.
 //**************************************************************************************
 
-define("ATTRIBUTE_VALUE_PRESENT", 32);
-define("ATTRIBUTE_VALUE_ABSENT", 33);
-
-define("ATTRIBUTE_VALUE_ACCESSABLE", 110);
-define("ATTRIBUTE_VALUE_INACCESSABLE", 111);
-define("ATTRIBUTE_VALUE_DOG", 112);
-define("ATTRIBUTE_VALUE_HORSE", 113);
-define("ATTRIBUTE_VALUE_BIKING", 114);
-define("ATTRIBUTE_VALUE_SINGLE_TRACK", 115);
-define("ATTRIBUTE_VALUE_ATV", 116);
-define("ATTRIBUTE_VALUE_SNOWMOBILE", 117);
-define("ATTRIBUTE_VALUE_X-COUNTRY_SKIING", 118);
-define("ATTRIBUTE_VALUE_HIKING", 119);
-
-define("ATTRIBUTE_VALUE_NATURAL", 120);
-define("ATTRIBUTE_VALUE_PAVED", 121);
-define("ATTRIBUTE_VALUE_GRAVEL", 122);
-define("ATTRIBUTE_VALUE_UNKNOWN", 123);
-define("ATTRIBUTE_VALUE_DOGS_ON_LEASH", 124);
-define("ATTRIBUTE_VALUE_WOOD", 125);
-
 //**************************************************************************************
 // Class Definition
 //**************************************************************************************

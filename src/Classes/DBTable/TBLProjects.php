@@ -37,6 +37,8 @@ use Classes\Utilities\SQL;
 define("TBL_PROJECTS_SEARCH_IN_NAME_ONLY", 1);
 define("TBL_PROJECTS_MATCH_START", 1);
 
+define("KINGDOM_ANY", 0);
+
 //******************************************************************************
 // Class
 //******************************************************************************
@@ -636,7 +638,7 @@ class TBLProjects  {
                     while ($AttributeTypeSet->FetchRow()) {
                         $AttributeTypeID = $AttributeTypeSet->Field("ID");
 
-                        if ($AttributeTypeID != ATTRIBUTE_PRESENCE) { // If NOT presence, add attribute data (15 is presnece on all servers)
+                        if ($AttributeTypeID != Constants::ATTRIBUTE_PRESENCE) { // If NOT presence, add attribute data (15 is presnece on all servers)
                             // create variable names for each one
 
                             $AttributeTypeName = $AttributeTypeSet->Field("Name");
@@ -670,7 +672,7 @@ class TBLProjects  {
                                     } else {  // Have a SciName value, couldn't get the TSN (ex. Unknown forb) so OrganismDataID=null
                                         // interesting problem here: if we have an organism only file, and a row cannot get the TSN ("unknown forb") the visit gets entered, with no organism info...What to do?
 
-                                        $VisitID = TBL_Visits::InsertVisitOnly($Database, $PersonID, $VisitDate, $RefX, $RefY, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, null, Constants::NOT_SPECIFIED, INSERT_LOG_FORM, $VisitComments);
+                                        $VisitID = TBL_Visits::InsertVisitOnly($Database, $PersonID, $VisitDate, $RefX, $RefY, $ProjectID, $AreaName, $SubplotID, $CoordinateSystemID, null, Constants::NOT_SPECIFIED, Constants::INSERT_LOG_FORM, $VisitComments);
                                         //InsertVisitOnly($Database,$UserID,$Date,$X,$Y,$ProjectID,$AreaName,$SubplotID,$CoordinateSystemID,$Accuracy,$FormID=NOT_SPECIFIED,$InsertLogType=INSERT_LOG_FORM,$VisitComments=null)
                                     }
                                 }
@@ -807,7 +809,7 @@ class TBLProjects  {
     //
     // Returns a record set with the project members with a speciific role//
 
-        $ProjectID = (int) SafeInt($ProjectID);
+        $ProjectID = (int) SQL::SafeInt($ProjectID);
 
         $SelectString = "SELECT *, TBL_Projects.ProjName AS ProjectName, TBL_Projects.ID AS ProjectID, " .
                 "REL_PersonToProject.PersonID AS PeopleID, TBL_People.FirstName AS FirstName, " .
@@ -829,7 +831,7 @@ class TBLProjects  {
     // these functions need to be checked if they are being used and if they should be being used jjg
 
     public static function GetNameForID($Database, $ProjectID) {
-        $ProjectID = SafeInt($ProjectID);
+        $ProjectID = SQL::SafeInt($ProjectID);
 
         $ProjectSet = TBL_Projects::GetSetFromID($Database, $ProjectID);
 
@@ -928,7 +930,7 @@ class TBLProjects  {
                 //DebugWriteln("PersonID=$PersonID");
                 //DebugWriteln("Role=$Role");
 
-                if (REL_PersonToProject::HasRole($Database, $ProjectID, PROJECT_MANAGER)) {
+                if (REL_PersonToProject::HasRole($Database, $ProjectID, Constants::PROJECT_MANAGER)) {
                     $Result = true;
                 } else {
 
@@ -985,7 +987,7 @@ class TBLProjects  {
                 break;
             case WEBSITE_USGS_RAM: $ShowProjectsFlag = true;
                 break;
-            case WEBSITE_CITSCI: $ShowProjectsFlag = true;
+            case Constants::WEBSITE_CITSCI: $ShowProjectsFlag = true;
                 break;
             case WEBSITE_GREG: $ShowProjectsFlag = true;
                 break;
@@ -1037,7 +1039,7 @@ class TBLProjects  {
                 break;
             case WEBSITE_USGS_RAM: $LimitProjectsFlag = false;
                 break;
-            case WEBSITE_CITSCI: $LimitProjectsFlag = true;
+            case Constants::WEBSITE_CITSCI: $LimitProjectsFlag = true;
                 break;
             case WEBSITE_GREG: $LimitProjectsFlag = true;
                 break;

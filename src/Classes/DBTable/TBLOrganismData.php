@@ -26,6 +26,7 @@ namespace Classes\DBTable;
 // DEALINGS IN THE SOFTWARE.
 //**************************************************************************************
 
+use API\Classes\Constants;
 use Classes\TBLDBTables;
 use Classes\Utilities\SQL;
 
@@ -41,9 +42,6 @@ $ConfidenceStrings = array("No reported uncertainty", "Certain", "Uncertain of v
     "Uncertain of species", "Uncertain of genus", "Uncertain of family");
 
 $OrganismDataStatusStrings = array("Not Reviewed", "Approved", "Rejected"); // 0,1,2 (GJN used by GLEDN) 1=APPROVED! 1 is VERIFIED!
-
-define("TBL_ORGANISMDATA_STATUS_NOT_REVIEWED", 0);
-define("TBL_ORGANISMDATA_STATUS_APPROVED", 1);
 
 //**************************************************************************************
 // Class Definition
@@ -168,14 +166,14 @@ class TBLOrganismData {
                 $dbConn,
                 $RefX,
                 $RefY,
-                COORDINATE_SYSTEM_WGS84_GEOGRAPHIC,
+                Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC,
                 1,
                 $ProjectID
             ); // $CoordinateSystemID was hard coded to was STPROJECTION_GEOGRAPHIC
         }
 
         if ($AreaSubTypeID === null) {
-            $AreaSubTypeID = AREA_SUBTYPE_POINT; // default to point?
+            $AreaSubTypeID = Constants::AREA_SUBTYPE_POINT; // default to point?
         }
 
         if ($AreaID <= 0) { // add a new point area
@@ -252,11 +250,11 @@ class TBLOrganismData {
         if ($Present !== null)
         {
             if ($Present)
-                $PresenceAbsence = ATTRIBUTE_VALUE_PRESENT; // per LKU table; should be same on all servers
+                $PresenceAbsence = Constants::ATTRIBUTE_VALUE_PRESENT; // per LKU table; should be same on all servers
             else
-                $PresenceAbsence = ATTRIBUTE_VALUE_ABSENT; // per LKU table; should be same on all servers
+                $PresenceAbsence = Constants::ATTRIBUTE_VALUE_ABSENT; // per LKU table; should be same on all servers
 
-            $Set = TBLAttributeData::GetSet($dbConn, null, $OrganismDataID, null, null, ATTRIBUTE_PRESENCE);
+            $Set = TBLAttributeData::GetSet($dbConn, null, $OrganismDataID, null, null, Constants::ATTRIBUTE_PRESENCE);
 
             if (!$Set)
             {
@@ -265,7 +263,7 @@ class TBLOrganismData {
                     null,
                     $OrganismDataID,
                     null,
-                    ATTRIBUTE_PRESENCE,
+                    Constants::ATTRIBUTE_PRESENCE,
                     $PresenceAbsence,
                     null
                 ); // null is subplotid and single sightings do not have a subplot - they are all points!

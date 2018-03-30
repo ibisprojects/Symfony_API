@@ -38,16 +38,6 @@ define("ATTRIBUTE_BOOLEAN", 4);
 define("ATTRIBUTE_STRING", 5);
 define("ATTRIBUTE_DATETIME", 6);
 
-/*
-  define("ASSOCIATED_TABLE_ORGANISM_DATA",1);
-  define("ASSOCIATED_TABLE_INDIVIDUALS",2);
-  define("ASSOCIATED_TABLE_TREATMENTS",3);
-  define("DATABASE_FIELD_TBL_VISITS_ID",4);
- */
-// these are the IDs in the database
-
-define("ATTRIBUTE_DOMINANCE_ID", 1);
-
 //**************************************************************************************
 // Class Definition
 //**************************************************************************************
@@ -382,12 +372,12 @@ class TBLAttributeData {
         //DebugWriteln("ValueType====$ValueType");
 
         switch ($ValueType) {
-            case ATTRIBUTE_TYPE_VALUETYPE_LOOKUP: {
+            case Constants::ATTRIBUTE_TYPE_VALUETYPE_LOOKUP: {
                     $IsSelect = true;
                     $AttributeValueID = $AttributeDataSet->Field("AttributeValueID");
                 }
                 break;
-            case ATTRIBUTE_TYPE_VALUETYPE_FLOAT: // 2
+            case Constants::ATTRIBUTE_TYPE_VALUETYPE_FLOAT: // 2
                 {
                     $AttributeValueID = null;
                     //DebugWriteln("ValueType------------------------------>$ValueType");
@@ -410,7 +400,7 @@ class TBLAttributeData {
                     }
                 }
                 break;
-            case ATTRIBUTE_TYPE_VALUETYPE_INTEGER: {
+            case Constants::ATTRIBUTE_TYPE_VALUETYPE_INTEGER: {
                     $AttributeValueID = null;
 
                     $AttributeValue = $AttributeDataSet->Field("IntValue");

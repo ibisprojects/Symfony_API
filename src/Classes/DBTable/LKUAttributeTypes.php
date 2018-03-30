@@ -34,28 +34,14 @@ use API\Classes\Constants;
 //**************************************************************************************
 // gjn; perhaps these should ahve been named "ATTRIBUTE_TYPE_XXX"
 
-define("ATTRIBUTE_HEIGHT", 2);
-define("ATTRIBUTE_PERCENT_COVER", 3);
-define("ATTRIBUTE_PRESENCE", 15);
-define("ATTRIBUTE_DERIVED_BIOMASS", 46);
-define("ATTRIBUTE_LINE_LENGTH", 67); // used for trail length thus far
-define("ATTRIBUTE_DIFFICULTY", 61); // trail difficulty
-define("ATTRIBUTE_ELEVATION_CHANGE", 65); // trail difficulty
-define("ATTRIBUTE_ALLOWED_USES", 62); // allowed uses
-define("ATTRIBUTE_ACCESSIBILITY", 68); // allowed uses
-define("ATTRIBUTE_SURFACE_TYPE", 69); // allowed uses
-
-define("ATTRIBUTE_TYPE_APPLIESTO_UNKNOWN", 0);
-define("ATTRIBUTE_TYPE_APPLIESTO_GROUP_OR_INDIVIDUAL", 1);
-define("ATTRIBUTE_TYPE_APPLIESTO_GROUP", 2);
-define("ATTRIBUTE_TYPE_APPLIESTO_INDIVIDUAL", 3);
-
-define("ATTRIBUTE_TYPE_VALUETYPE_LOOKUP", 1);
-define("ATTRIBUTE_TYPE_VALUETYPE_FLOAT", 2);
-define("ATTRIBUTE_TYPE_VALUETYPE_INTEGER", 3);
-define("ATTRIBUTE_TYPE_VALUETYPE_BOOLEAN", 4);
-
-$AttributeTypeAppliesToString = array(" -- Applies to --- ", "Group or individual", "Group", "Individual");
+define("ORGANISM_TYPE_PLANT_TERRESTRIAL", 1);
+define("ORGANISM_TYPE_PLANT_AQUATIC", 2);
+define("ORGANISM_TYPE_ANIMAL_VERTIBRATE_TERRESTRIAL", 3);
+define("ORGANISM_TYPE_ANIMAL_INVERTIBRATE_TERRESTRIAL", 4);
+define("ORGANISM_TYPE_ANIMAL_VERTIBRATE_AQUATIC", 5);
+define("ORGANISM_TYPE_ANIMAL_INVERTIBRATE_AQUATIC", 6);
+define("ORGANISM_TYPE_DISEASE_ANIMAL", 7);
+define("ORGANISM_TYPE_DISEASE_PLANT", 8);
 
 class LKUAttributeTypes {
 

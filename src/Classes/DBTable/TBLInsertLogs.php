@@ -6,20 +6,6 @@ use Classes\TBLDBTables;
 use Classes\Utilities\SQL;
 use API\Classes\Constants;
 
-define("INSERT_LOG_UNKNOWN", 0);
-define("INSERT_LOG_CLASSIFICATION", 1);
-define("INSERT_LOG_SURVEY_ADD", 2);
-define("INSERT_LOG_AREA_ADD", 3);
-define("INSERT_LOG_MEDIA", 4);
-define("INSERT_LOG_TSN", 5);
-define("INSERT_LOG_UPLOADED_RASTER", 6);
-define("INSERT_LOG_GENERATED_RASTER", 7);
-define("INSERT_LOG_IDSOURCE_FILE", 8);
-define("INSERT_LOG_GISIN_TO_IBIS_COPY", 9);
-define("INSERT_LOG_FILE", 10);
-define("INSERT_LOG_FORM", 11); // e.g., datasheets, data entry forms, etc.
-define("INSERT_LOG_APP", 12); // e.g., CitSciMobile
-
 //*********************************************************************************
 //	Definitions
 //*********************************************************************************

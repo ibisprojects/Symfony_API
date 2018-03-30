@@ -24,13 +24,13 @@ namespace Classes\DBTable;
 // DEALINGS IN THE SOFTWARE.
 //**************************************************************************************
 
+use API\Classes\Constants;
 
 //**************************************************************************************
 // Definitions
 //**************************************************************************************
 
 define("DEBUGGING_SPATIAL_DATA_TILED",false);
-//define("TABLE_POSTFIX","_GoogleMaps");
 
 //**************************************************************************************
 // Definitions
@@ -51,9 +51,6 @@ define("SPATIAL_Y_FACTOR",1); // COMPUTED: 0.995659, 1.0043599
 // the following are the cell widths when indexed by the zoom level (0 is first and not used)
 
 define("CELL_PIXEL_WIDTH",512);
-
-define("ZOOM_LEVEL_MIN",1);
-define("ZOOM_LEVEL_MAX",15);
 
 //**************************************************************************************
 // Class Definition
@@ -540,7 +537,7 @@ class TBLSpatialGridded
 		$Database_SpatialData=new DB_Connection();
 		$Database_SpatialData->Connect("SpatialData_GoogleMaps","sa","cheatgrass");
 
-		for ($ZoomLevel=ZOOM_LEVEL_MAX;$ZoomLevel>=ZOOM_LEVEL_MIN;$ZoomLevel--)
+		for ($ZoomLevel=Constants::ZOOM_LEVEL_MAX;$ZoomLevel>=Constants::ZOOM_LEVEL_MIN;$ZoomLevel--)
 		{
 			$TBL_SpatialGriddedName="TBL_SpatialGridded_".$ZoomLevel;
 			$REL_SpatialGriddedToAreaName="REL_SpatialGriddedToArea_".$ZoomLevel;
@@ -595,7 +592,7 @@ class TBLSpatialGridded
 
 		// get the gridIDs (these functions will add the grids as needed)
 
-		$GeographicGridID=TBL_SpatialLayerGrids::GetStandardID($Database,$AreaSubtypeID,COORDINATE_SYSTEM_WGS84_GEOGRAPHIC);
+		$GeographicGridID=TBL_SpatialLayerGrids::GetStandardID($Database,$AreaSubtypeID,Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC);
 
 //		DebugWriteln("AreaSubtypeID=$AreaSubtypeID, GeographicGridID=$GeographicGridID");
 
@@ -914,8 +911,8 @@ class TBLSpatialGridded
 
 				// add the tiles from the highest resolution zoom (15) to the lowest (1)
 
-				$ZoomLevelMin=ZOOM_LEVEL_MIN; // ZOOM_LEVEL_MIN
-				$ZoomLevelMax=ZOOM_LEVEL_MAX; //ZOOM_LEVEL_MAX
+				$ZoomLevelMin=Constants::ZOOM_LEVEL_MIN; // ZOOM_LEVEL_MIN
+				$ZoomLevelMax=Constants::ZOOM_LEVEL_MAX; //ZOOM_LEVEL_MAX
 
 				for ($ZoomLevel=$ZoomLevelMax;($ZoomLevel>=$ZoomLevelMin)&&($ErrorString==null);$ZoomLevel--)
 				{
@@ -982,7 +979,7 @@ class TBLSpatialGridded
 						{
 							$SpatialGriddedIDs=TBL_SpatialGridded::Insert($Database_SpatialData,$SpatialDataType,
 								$RefX,$RefY,$RefWidth,$RefHeight,
-								COORDINATE_SYSTEM_GOOGLE_MAPS,$ZoomLevel,$GeometryString2,$AreaID);
+                                Constants::COORDINATE_SYSTEM_GOOGLE_MAPS,$ZoomLevel,$GeometryString2,$AreaID);
 
 	//						DebugWriteln("-------------- SpatialGriddedIDs=$SpatialGriddedIDs");
 
@@ -1036,7 +1033,7 @@ class TBLSpatialGridded
 
 							$SpatialGriddedIDs=TBL_SpatialGridded::Insert($Database_SpatialData,
 								SPATIAL_INT_POINT,$CenterRefX,$CenterRefY,0,0,
-								COORDINATE_SYSTEM_GOOGLE_MAPS,$ZoomLevel,$PointString,$AreaID);
+                                Constants::COORDINATE_SYSTEM_GOOGLE_MAPS,$ZoomLevel,$PointString,$AreaID);
 							//DumpArray($SpatialGriddedIDs); ************** GJN
 
 							if (count($SpatialGriddedIDs)>0)
