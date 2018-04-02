@@ -120,7 +120,7 @@ class TBLSpatialLayerData {
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
 
-        $SpatialLayerDataID = $dbConn->lastInsertId('TBL_SpatialLayerData_ID_seq');
+        $SpatialLayerDataID = $dbConn->lastInsertId('"TBL_SpatialLayerData_ID_seq"');
 
         $UpdateString = "UPDATE \"TBL_SpatialLayerData\" ".
                 "SET \"AreaID\"=$AreaID, ".

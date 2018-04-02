@@ -346,10 +346,10 @@ class TBLAreas {
         $columns = rtrim($columns, ',');
         $columnsData = rtrim($columnsData, ',');
 
-        $stmt = $dbConn->prepare('INSERT INTO "TBL_Areas" ($columns) VALUES ($columnsData)');
+        $stmt = $dbConn->prepare("INSERT INTO \"TBL_Areas\" ($columns) VALUES ($columnsData)");
         $stmt->execute();
-        $ID = $dbConn->lastInsertId('TBL_Areas_ID_seq');
-
+        $ID = $dbConn->lastInsertId('"TBL_Areas_ID_seq"');
+        trigger_error(print_r($ID, 1));
         return($ID);
     }
 
@@ -837,7 +837,7 @@ class TBLAreas {
         }
 
         $AreaID = TBLAreas::Insert($dbConn, $AreaSubTypeID, $AreaName, $AreaCode, 1, $ProjectID, $InsertLogID, 0, $Accuracy, $Comments);
-
+trigger_error(print_r($AreaID, 1));
         // add all the spatial data projection layers; do we need to also do a check for existing area with same x,y coords?
         TBLSpatialLayerData::Insert($dbConn, $AreaID, $RefX, $RefY, 0, 0, $CoordinateSystemID);
 

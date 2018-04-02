@@ -277,7 +277,7 @@ class TBLVisits {
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
 
-        $VisitID = $dbConn->lastInsertId('TBL_Visits_ID_seq');
+        $VisitID = $dbConn->lastInsertId('"TBL_Visits_ID_seq"');
         $stmt = null;
 
         // update the rest of the fields
@@ -353,14 +353,14 @@ class TBLVisits {
         if ($AreaID <= 0) { // add a new point area
             $AreaID = TBLAreas::InsertPoint($dbConn, $ProjectID, $InsertLogID, $AreaName, $SubplotID, $X, $Y, $CoordinateSystemID, $Accuracy, Constants::AREA_SUBTYPE_POINT); // we need to modify AddPoint to be able to add survey types for plot types other than point
         }
-
+trigger_error(print_r($AreaID, 1));
         if ($VisitDate == null) { // not specified)
             $VisitDate = new Date; // set to today
         }
 
         $VisitDateString = $VisitDate->GetSQLString();
 
-        $Set = TBLVisits::GetSet($$dbConn, null, "VisitDate", null, $AreaID, $VisitDateString); // $VisitDate->GetSQLString()
+        $Set = TBLVisits::GetSet($dbConn, null, "VisitDate", null, $AreaID, $VisitDateString); // $VisitDate->GetSQLString()
 
         $VisitID = 0;
 

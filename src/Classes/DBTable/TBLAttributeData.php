@@ -166,7 +166,7 @@ class TBLAttributeData {
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
 
-        $ID = $dbConn->lastInsertId('TBL_AttributeData_ID_seq');
+        $ID = $dbConn->lastInsertId('"TBL_AttributeData_ID_seq"');
         $stmt = null;
 
         // add the appropriate ids
@@ -201,7 +201,7 @@ class TBLAttributeData {
 
         // Update Project's NumMeasurements
 
-        TBLProjects::IncrementNumMeasurements($Database,$ID);
+        TBLProjects::IncrementNumMeasurements($dbConn,$ID);
 
         return($ID);
     }

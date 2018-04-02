@@ -108,7 +108,7 @@ class TBLSpatialLayers {
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
 
-        return $dbConn->lastInsertId('TBL_SpatialLayers_ID_seq');
+        return $dbConn->lastInsertId('"TBL_SpatialLayers_ID_seq"');
     }
 
     public static function Update($dbConn, $ID, $Name, $GeometryType, $CoordinateSystemID, $RefX = null, $RefY = null, $RefWidth = null, $RefHeight = null, $FolderPath = null, $StartDate = null, $EndDate = null) {

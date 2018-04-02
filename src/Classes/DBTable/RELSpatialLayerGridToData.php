@@ -133,7 +133,7 @@ class RELSpatialLayerGridToData {
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
 
-        return $dbConn->lastInsertId('REL_SpatialLayerGridToData_ID_seq');
+        return $dbConn->lastInsertId('"REL_SpatialLayerGridToData_ID_seq"');
     }
 
     public static function Delete($Database, $ID) {

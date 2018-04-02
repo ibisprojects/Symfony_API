@@ -324,6 +324,8 @@ class UploadController extends Controller {
             $PredefinedAreaID
         );
 
+        trigger_error($VisitID);
+
         /////////////////////////////////////////////////////
         // Process Organism and Site Characteristic Data  ///
         /////////////////////////////////////////////////////

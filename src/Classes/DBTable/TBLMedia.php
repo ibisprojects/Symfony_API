@@ -80,7 +80,7 @@ class TBLMedia
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
 
-        return $dbConn->lastInsertId('TBL_Media_ID_seq');
+        return $dbConn->lastInsertId('"TBL_Media_ID_seq"');
     }
 
     public static function Delete($dbConn, $MediaID)

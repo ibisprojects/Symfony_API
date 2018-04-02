@@ -1258,21 +1258,25 @@ class TBLProjects  {
             $stmt = null;
         }
 
-        $SelectString = "SELECT \"NumMeasurements\" FROM \"TBL_Projects\" WHERE \"ID\"=$ProjectID";
+        $Measurements = $NumMeasurements = 0;
 
-        $stmt = $dbConn->prepare($SelectString);
-        $stmt->execute();
+        if (isset($ProjectID)) {
+            $SelectString = "SELECT \"NumMeasurements\" FROM \"TBL_Projects\" WHERE \"ID\"=$ProjectID";
 
-        $Measurements = $stmt->fetchColumn();
-        $stmt = null;
+            $stmt = $dbConn->prepare($SelectString);
+            $stmt->execute();
 
-        if (!is_numeric($Measurements)) {
-            $Measurements = 0;
+            $Measurements = $stmt->fetchColumn();
+            $stmt = null;
+
+            if (!is_numeric($Measurements)) {
+                $Measurements = 0;
+            }
+
+            $NumMeasurements = (int) $Measurements + 1;
+
+            TBLDBTables::SetFieldValue($dbConn, "TBL_Projects", "NumMeasurements", $ProjectID, $NumMeasurements);
         }
-
-        $NumMeasurements = (int) $Measurements + 1;
-
-        TBLDBTables::SetFieldValue($dbConn, "TBL_Projects", "NumMeasurements", $ProjectID, $NumMeasurements);
 
         return $NumMeasurements;
     }

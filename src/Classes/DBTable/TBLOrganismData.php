@@ -283,7 +283,7 @@ class TBLOrganismData {
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
 
-        $OrganismDataID = $dbConn->lastInsertId('TBL_OrganismData_ID_seq');
+        $OrganismDataID = $dbConn->lastInsertId('"TBL_OrganismData_ID_seq"');
         $stmt = null;
 
         $UpdateString = "UPDATE \"TBL_OrganismData\" ";

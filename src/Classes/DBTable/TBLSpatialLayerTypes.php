@@ -151,7 +151,7 @@ class TBLSpatialLayerTypes {
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
 
-        return $dbConn->lastInsertId('TBL_SpatialLayerTypes_ID_seq');
+        return $dbConn->lastInsertId('"TBL_SpatialLayerTypes_ID_seq"');
     }
 
     public static function Update($dbConn, $ID, $Name, $RefX, $RefY, $RefWidth, $RefHeight, $AreaSubtypeID = null, $PersonID = Constants::NOT_SPECIFIED, $StartDate = null, $EndDate = null, $AnalysisFlag = null, $MappingFlag = null, $Description = null) {

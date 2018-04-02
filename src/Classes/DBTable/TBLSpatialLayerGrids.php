@@ -139,7 +139,7 @@ class TBLSpatialLayerGrids {
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
 
-        return $dbConn->lastInsertId('TBL_SpatialLayerGrids_ID_seq');
+        return $dbConn->lastInsertId('"TBL_SpatialLayerGrids_ID_seq"');
     }
 
     public static function Update($dbConn, $ID, $Name, $RefX = null, $RefY = null, $RefColumnWidth = null, $RefRowHeight = null, $NumColumns = null, $NumRows = null, $MinZoom = null, $MaxZoom = null, $StartDate = null, $EndDate = null, $FolderPath = null) {

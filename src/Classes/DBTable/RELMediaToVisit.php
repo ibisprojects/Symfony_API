@@ -30,7 +30,7 @@ class RELMediaToVisit {
             $stmt = $dbConn->prepare($ExecString);
             $stmt->execute();
 
-            $ID = $dbConn->lastInsertId('REL_MediaToVisit_ID_seq');
+            $ID = $dbConn->lastInsertId('"REL_MediaToVisit_ID_seq"');
             $stmt = null;
 
             // find the next order number

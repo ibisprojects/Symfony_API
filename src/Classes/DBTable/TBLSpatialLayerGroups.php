@@ -144,7 +144,7 @@ class TBLSpatialLayerGroups {
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
 
-        return $dbConn->lastInsertId('TBL_SpatialLayerGroups_ID_seq');
+        return $dbConn->lastInsertId('"TBL_SpatialLayerGroups_ID_seq"');
     }
 
     public static function Update($dbConn, $ID, $Name, $RefX, $RefY, $RefWidth, $RefHeight, $StartDate = null, $EndDate = null, $FolderPath = null) {

@@ -17,7 +17,7 @@ class RELMediaToOrganismData {
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
 
-        $Set = $dbConn->fetch();
+        $Set = $stmt->fetch();
         $stmt = null;
 
         if ($Set) {
@@ -30,7 +30,7 @@ class RELMediaToOrganismData {
             $stmt = $dbConn->prepare($ExecString);
             $stmt->execute();
 
-            $ID = $dbConn->lastInsertId('REL_MediaToOrganismData_ID_seq');
+            $ID = $dbConn->lastInsertId('"REL_MediaToOrganismData_ID_seq"');
             $stmt = null;
 
             // find the next order number
@@ -43,7 +43,7 @@ class RELMediaToOrganismData {
             $stmt = $dbConn->prepare($SelectString);
             $stmt->execute();
 
-            $Set = $dbConn->fetch();
+            $Set = $stmt->fetch();
             $stmt = null;
 
             $OrderNumber = 1;
