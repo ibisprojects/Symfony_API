@@ -17,7 +17,7 @@ class RELMediaToVisit {
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
 
-        $Set = $dbConn->fetch();
+        $Set = $stmt->fetch();
         $stmt = null;
 
         if ($Set) {
@@ -43,7 +43,7 @@ class RELMediaToVisit {
             $stmt = $dbConn->prepare($SelectString);
             $stmt->execute();
 
-            $Set = $dbConn->fetch();
+            $Set = $stmt->fetch();
             $stmt = null;
 
             $OrderNumber = 1;
