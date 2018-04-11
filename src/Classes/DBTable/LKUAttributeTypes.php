@@ -81,7 +81,7 @@ class LKUAttributeTypes {
         $stmt->bindValue("ID", $ID);
         $stmt->execute();
 
-        return $stmt->Fetch();
+        return $stmt->fetch();
     }
 
     public static function GetNameForID($Database, $ID) {

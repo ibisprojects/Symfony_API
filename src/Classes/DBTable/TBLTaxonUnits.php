@@ -119,7 +119,7 @@ class TBLTaxonUnits {
         $stmt = $dbConn->prepare($SelectString);
         $stmt->bindValue("TSN", $TSN);
         $stmt->execute();
-        $Set = $stmt->Fetch();
+        $Set = $stmt->fetch();
 
         return($Set);
     }

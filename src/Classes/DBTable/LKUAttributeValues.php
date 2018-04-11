@@ -53,7 +53,7 @@ class LKUAttributeValues {
 
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
-        $Set = $stmt->Fetch();
+        $Set = $stmt->fetch();
 
         return($Set["ID"]);
     }

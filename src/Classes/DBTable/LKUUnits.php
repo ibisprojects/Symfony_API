@@ -45,7 +45,7 @@ class LKUUnits {
         $stmt = $dbConn->prepare($SelectString);
         $stmt->bindValue("ID", $ID);
         $stmt->execute();
-        $Set = $stmt->Fetch();
+        $Set = $stmt->fetch();
 
         return($Set);
     }

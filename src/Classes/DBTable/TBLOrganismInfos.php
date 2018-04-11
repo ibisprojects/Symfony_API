@@ -63,7 +63,7 @@ class TBLOrganismInfos {
         if ($ID != "")
             $stmt->bindValue("ID", $ID);
         $stmt->execute();
-        $Set = $stmt->Fetch();
+        $Set = $stmt->fetch();
 
         return($Set);
     }
@@ -90,11 +90,11 @@ class TBLOrganismInfos {
                     do {
                         if ($SciName != " (")
                             $SciName.=", ";
-                        $TSNRes = $TSNSet->Fetch();
+                        $TSNRes = $TSNSet->fetch();
                         $HTMLFlag= False;
                         $SciName.=TBLTaxonUnits::GetScientificNameFromTSN($Database, $TSNRes["TSN"], $HTMLFlag);
                     }
-                    while ($TSNSet->Fetch());
+                    while ($TSNSet->fetch());
 
                     $SciName.=")";
 
