@@ -91,7 +91,7 @@ class Upload  {
 
 
     //****************************************************************************
-    function MoveUploadedFiles($NumFiles,$DestinPath,$MaxSize,$FileArray=null)
+    static function MoveUploadedFiles($NumFiles,$DestinPath,$MaxSize,$FileArray=null)
     //
     //	Moves files from the upload temporary folder to the specified destination
     //	folder.

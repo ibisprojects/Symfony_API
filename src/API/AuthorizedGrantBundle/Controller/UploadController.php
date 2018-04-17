@@ -117,10 +117,10 @@ class UploadController extends Controller {
 
                             $loggerService->logger->info("IN PHOTO UPLOAD - before MOVE");
 
-                            // Move images to Observation folder
-                            Upload::MoveUploadedFiles($NumFiles,$ObservationPath,100000000,$FileArray);  //$Result=Upload::MoveUploadedFiles($NumFiles,$ObservationPath,100000000,$FileArray);
+                            $Directory = "/var/www/citsci/inetpub/UserUploads/$UserID/Media/$ObservationName/";
 
-							$Directory = "/var/www/citsci/inetpub/UserUploads/$UserID/MobileData/$ObservationName/";
+                            // Move images to Observation folder
+                            Upload::MoveUploadedFiles($NumFiles,$Directory,100000000,$FileArray);  //$Result=Upload::MoveUploadedFiles($NumFiles,$ObservationPath,100000000,$FileArray);
 
 							$handle=opendir($Directory);
 
