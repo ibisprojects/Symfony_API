@@ -141,13 +141,13 @@ class UploadController extends Controller {
 
 								if (($Extension=="jpg")||($Extension=="png")||($Extension=="gif")||($Extension=="jpeg")||($Extension=="tif")) // if the entries are images... (this excludes the . and .. subfolders)
 								{
-									if (!(file_exists($Directory."/_thumbnails"))) {mkdir($Directory."/_thumbnails",0777,TRUE);};
-									if (!(file_exists($Directory."/_display"))) {mkdir($Directory."/_display",0777,TRUE);};
-									if (!(file_exists($Directory."/_print"))) {mkdir($Directory."/_print",0777,TRUE);};
+									if (!(file_exists($Directory."_thumbnails"))) {mkdir($Directory."_thumbnails",0777,TRUE);};
+									if (!(file_exists($Directory."_display"))) {mkdir($Directory."_display",0777,TRUE);};
+									if (!(file_exists($Directory."_print"))) {mkdir($Directory."_print",0777,TRUE);};
 
-									copy("$Directory/$photofilename","$Directory/_thumbnails/$photofilename");
-									copy("$Directory/$photofilename","$Directory/_display/$photofilename");
-									copy("$Directory/$photofilename","$Directory/_print/$photofilename");
+									copy("$Directory$photofilename","{$Directory}_thumbnails/$photofilename");
+									copy("$Directory$photofilename","{$Directory}_display/$photofilename");
+									copy("$Directory$photofilename","{$Directory}_print/$photofilename");
 								}
 							}
 						}
