@@ -91,7 +91,7 @@ class Upload  {
 
 
     //****************************************************************************
-    function MoveUploadedFiles($NumFiles,$DestinPath,$MaxSize,$FileArray=null)
+    static function MoveUploadedFiles($NumFiles,$DestinPath,$MaxSize,$FileArray=null, $loggerService=null)
     //
     //	Moves files from the upload temporary folder to the specified destination
     //	folder.
@@ -105,7 +105,7 @@ class Upload  {
         $Result="RESULT_OKAY";
 
 		// Set up log file for debugging
-        $logger = $this->get('monolog.logger.fileupload');
+        $logger = $loggerService->logger;
 
         $logger->info("--- Upload File Image Processing Start (N=$NumFiles) ---");
 
