@@ -128,28 +128,18 @@ class UploadController extends Controller {
                             // Move images to Observation folder
                             $files = Upload::MoveUploadedFiles($NumFiles,$Directory,100000000,$FileArray, $loggerService);  //$Result=Upload::MoveUploadedFiles($NumFiles,$ObservationPath,100000000,$FileArray);
 
-							$handle=opendir($Directory);
-
                             $loggerService->logger->info("IN PHOTO UPLOAD - photo directory: $Directory");
 
-							while (false!==($photofilename=readdir($handle)))
-							{
-								//$Extension=GetFileExtensionFromFilePath($Directory.$photofilename);
-								$Extension=pathinfo($Directory.$photofilename, PATHINFO_EXTENSION);
+                            foreach ($files as $photofilename) {
+                                print_r($photofilename."\n");
+                                if (!(file_exists($Directory."_thumbnails"))) {mkdir($Directory."_thumbnails",0777,TRUE);};
+                                if (!(file_exists($Directory."_display"))) {mkdir($Directory."_display",0777,TRUE);};
+                                if (!(file_exists($Directory."_print"))) {mkdir($Directory."_print",0777,TRUE);};
 
-								$Extension=strtolower($Extension);
-
-								if (($Extension=="jpg")||($Extension=="png")||($Extension=="gif")||($Extension=="jpeg")||($Extension=="tif")) // if the entries are images... (this excludes the . and .. subfolders)
-								{
-									if (!(file_exists($Directory."_thumbnails"))) {mkdir($Directory."_thumbnails",0777,TRUE);};
-									if (!(file_exists($Directory."_display"))) {mkdir($Directory."_display",0777,TRUE);};
-									if (!(file_exists($Directory."_print"))) {mkdir($Directory."_print",0777,TRUE);};
-
-									copy("$Directory$photofilename","{$Directory}_thumbnails/$photofilename");
-									copy("$Directory$photofilename","{$Directory}_display/$photofilename");
-									copy("$Directory$photofilename","{$Directory}_print/$photofilename");
-								}
-							}
+                                copy("$Directory$photofilename","{$Directory}_thumbnails/$photofilename");
+                                copy("$Directory$photofilename","{$Directory}_display/$photofilename");
+                                copy("$Directory$photofilename","{$Directory}_print/$photofilename");
+                            }
 						}
 
                         $loggerService->logger->info("BEFORE EXECUTE:");
