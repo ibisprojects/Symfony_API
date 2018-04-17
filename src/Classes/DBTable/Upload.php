@@ -37,7 +37,7 @@ use Classes\TBLDBTables;
 //******************************************************************************
 
 class Upload  {
-    function FileOKToUpload($Index,$NumFiles,$MaxSize)
+    static function FileOKToUpload($Index,$NumFiles,$MaxSize)
     //
     // This function is only called by MoveUploadedFiles() below.
     //
@@ -185,7 +185,7 @@ class Upload  {
             }
             while (($FileName!="")&&($Result=="RESULT_OKAY")&&($Count<$NumFiles));
         }
-        return($Result);
+        return($FileArray);
     }
 }
 

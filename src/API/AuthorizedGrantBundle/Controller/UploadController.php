@@ -111,6 +111,8 @@ class UploadController extends Controller {
 
                         // MOVE IMAGE FILES if any
 
+                        $files = array();
+
                         if($NumFiles>0)
                         {
                             $FileArray=array();
@@ -124,7 +126,7 @@ class UploadController extends Controller {
                             }
 
                             // Move images to Observation folder
-                            Upload::MoveUploadedFiles($NumFiles,$Directory,100000000,$FileArray, $loggerService);  //$Result=Upload::MoveUploadedFiles($NumFiles,$ObservationPath,100000000,$FileArray);
+                            $files = Upload::MoveUploadedFiles($NumFiles,$Directory,100000000,$FileArray, $loggerService);  //$Result=Upload::MoveUploadedFiles($NumFiles,$ObservationPath,100000000,$FileArray);
 
 							$handle=opendir($Directory);
 
@@ -156,7 +158,7 @@ class UploadController extends Controller {
                         $loggerService->logger->info("USERID=$UserID");
                         $loggerService->logger->info("ObservationName=$ObservationName");
 
-                        $this->insertData($dbConn, $FullXMLPath, $UserID, $ObservationName, $NumFiles);
+                        $this->insertData($dbConn, $FullXMLPath, $UserID, $ObservationName, $files);
 
                         $returnArray = array('status' => Constants::SUCCESS_STATUS, 'message' => "","returnHTML" => $returnHTML);
                     } else {
@@ -196,14 +198,14 @@ class UploadController extends Controller {
      *
      * @return void
      */
-    protected function insertData($dbConn, $XMLPath, $UserID, $ObservationName, $NumFiles)
+    protected function insertData($dbConn, $XMLPath, $UserID, $ObservationName, $files)
     {
         $loggerService = $this->get('api.logger.insertdata');
 
         // Initial Debugs
         $loggerService->logger->info("**Begin InsertAppData.php***");
         $loggerService->logger->info("Received XMLPath=$XMLPath");
-        $loggerService->logger->info("NumFiles=$NumFiles");
+        $loggerService->logger->info("Files=".implode(', ', $files));
         $loggerService->logger->info("UserID=$UserID");
         $loggerService->logger->info("ObservationName=$ObservationName");
 
@@ -379,24 +381,15 @@ class UploadController extends Controller {
 
                     $PhotoForThisOrganism = 0;
 
-                    if ($NumFiles > 0) {
-                        $Directory = "/var/www/citsci/inetpub/UserUploads/$UserID/MobileData/$ObservationName/";
-                        $handle = opendir($Directory);
+                    if (!empty($files)) {
+                        foreach($files as $photofilename) {
+                            trigger_error($photofilename);
+                            preg_match('/(?P<name>\w+)_(?P<organism>\w+)_(?P<OrganismInfoID>\d+)_(?P<imagenumber>\w+)/', $photofilename, $matches);
 
-                        while (false !== ($photofilename = readdir($handle))) {
-                            if ($photofilename == "." || $photofilename == "..")
-                                continue;
-
-                            $Extension = pathinfo($Directory.$photofilename, PATHINFO_EXTENSION);
-                            $Extension = strtolower($Extension);
-
-                            if (in_array($Extension, array("jpg", "jpeg", "png", "gif", "tif"))) { // if the entries are images...
-                                preg_match('/(?P<name>\w+)_(?P<organism>\w+)_(?P<OrganismInfoID>\d+)_(?P<imagenumber>\w+)/', $photofilename, $matches);
-
-                                if (array_key_exists('OrganismInfoID', $matches)) {
-                                    if ($CurrentOrganismInfoID == $matches["OrganismInfoID"]) { // if there's a match
-                                        $PhotoForThisOrganism = 1;
-                                    }
+                            if (array_key_exists('OrganismInfoID', $matches)) {
+                                if ($CurrentOrganismInfoID == $matches["OrganismInfoID"]) { // if there's a match
+                                    $PhotoForThisOrganism = 1;
+                                    break;
                                 }
                             }
                         }
@@ -645,58 +638,47 @@ class UploadController extends Controller {
         // PHOTOS
         //-------------------------------------------------------------------------------------
 
-        if ($NumFiles > 0) { // if we were sent pictures...
+        if (!empty($files)) { // if we were sent pictures...
             // ------------------------------------------------------------------------------------
             // find photos here and process them by relating them to obs and /or organisminfoid...
             //-------------------------------------------------------------------------------------
 
-            $Directory = "/var/www/citsci/inetpub/UserUploads/$UserID/MobileData/$ObservationName/";
+            $Directory = "/var/www/citsci/inetpub/UserUploads/$UserID/Media/";
 
-            $handle = opendir($Directory);
+            foreach ($files as $photofilename) {
+                // Insert new media ID
+                $MediaID = TBLMedia::Insert($dbConn, $photofilename, $photofilename, $UserID); // db label path userid; $Database,"$XMLName",$MediaFileName,$ID
 
-            while (false !== ($photofilename = readdir($handle))) {
-                if ($photofilename == "." || $photofilename == "..")
-                    continue;
+                $loggerService->logger->info("***IMAGE Processing: FileName=$photofilename, MediaID=$MediaID, ImagePath=$Directory.$photofilename");
 
-                $Extension = pathinfo($Directory.$photofilename, PATHINFO_EXTENSION);
-                $Extension = strtolower($Extension);
-                $PhotoPath = $ObservationName."/".$photofilename;
+                preg_match('/(?P<name>\w+)_(?P<organism>\w+)_(?P<OrganismInfoID>\d+)_(?P<imagenumber>\w+)/', $photofilename, $matches);
 
-                if (in_array($Extension, array("jpg", "jpeg", "png", "gif", "tif"))) { // if the entries are images...
-                    // Insert new media ID
-                    $MediaID = TBLMedia::Insert($dbConn, $photofilename, $PhotoPath, $UserID); // db label path userid; $Database,"$XMLName",$MediaFileName,$ID
+                if (array_key_exists('OrganismInfoID', $matches)) {
+                    $OrganismInfoID = $matches["OrganismInfoID"];
 
-                    $loggerService->logger->info("***IMAGE Processing: FileName=$photofilename, MediaID=$MediaID, ImagePath=$Directory.$photofilename");
-
-                    preg_match('/(?P<name>\w+)_(?P<organism>\w+)_(?P<OrganismInfoID>\d+)_(?P<imagenumber>\w+)/', $photofilename, $matches);
-
-                    if (array_key_exists('OrganismInfoID', $matches)) {
-                        $OrganismInfoID = $matches["OrganismInfoID"];
-
-                        $SelectString="SELECT \"TBL_OrganismData\".\"ID\" AS \"OrganismDataID\"
+                    $SelectString="SELECT \"TBL_OrganismData\".\"ID\" AS \"OrganismDataID\"
 					                FROM \"TBL_Visits\"
 					                INNER JOIN \"TBL_OrganismData\" ON \"TBL_Visits\".\"ID\" = \"TBL_OrganismData\".\"VisitID\"
 					                WHERE (\"TBL_Visits\".\"ID\" = $VisitID) AND (\"TBL_OrganismData\".\"OrganismInfoID\" = $OrganismInfoID)
                                     ORDER BY \"TBL_Visits\".\"VisitDate\" DESC";
 
-                        $stmt = $dbConn->prepare($SelectString);
-                        $stmt->execute();
+                    $stmt = $dbConn->prepare($SelectString);
+                    $stmt->execute();
 
-                        $Set = $stmt->fetch();
-                        $stmt = null;
+                    $Set = $stmt->fetch();
+                    $stmt = null;
 
-                        $OrganismDataID = null;
+                    $OrganismDataID = null;
 
-                        if ($Set) {
-                            $OrganismDataID = $Set["OrganismDataID"];
-                        }
-
-                        RELMediaToOrganismData::Insert($dbConn, $MediaID, $OrganismDataID, $UserID);
-                        $loggerService->logger->info("Organism Image Processed for FileName=$photofilename, MediaID=$MediaID, OrgInfoID=$OrganismInfoID");
-                    } else {
-                        RELMediaToVisit::Insert($dbConn, $MediaID, $VisitID, $UserID);
-                        $loggerService->logger->info("VISIT Image Processed for FileName=$photofilename, MediaID=$MediaID");
+                    if ($Set) {
+                        $OrganismDataID = $Set["OrganismDataID"];
                     }
+
+                    RELMediaToOrganismData::Insert($dbConn, $MediaID, $OrganismDataID, $UserID);
+                    $loggerService->logger->info("Organism Image Processed for FileName=$photofilename, MediaID=$MediaID, OrgInfoID=$OrganismInfoID");
+                } else {
+                    RELMediaToVisit::Insert($dbConn, $MediaID, $VisitID, $UserID);
+                    $loggerService->logger->info("VISIT Image Processed for FileName=$photofilename, MediaID=$MediaID");
                 }
             }
         }
