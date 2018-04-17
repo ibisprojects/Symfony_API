@@ -119,8 +119,9 @@ class UploadController extends Controller {
 
                             $Directory = "/var/www/citsci/inetpub/UserUploads/$UserID/Media/$ObservationName/";
 
+                            $uploader = new Upload;
                             // Move images to Observation folder
-                            Upload::MoveUploadedFiles($NumFiles,$Directory,100000000,$FileArray);  //$Result=Upload::MoveUploadedFiles($NumFiles,$ObservationPath,100000000,$FileArray);
+                            $uploader->MoveUploadedFiles($NumFiles,$Directory,100000000,$FileArray);  //$Result=Upload::MoveUploadedFiles($NumFiles,$ObservationPath,100000000,$FileArray);
 
 							$handle=opendir($Directory);
 
