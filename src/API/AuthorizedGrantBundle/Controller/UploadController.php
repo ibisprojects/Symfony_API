@@ -131,7 +131,6 @@ class UploadController extends Controller {
                             $loggerService->logger->info("IN PHOTO UPLOAD - photo directory: $Directory");
 
                             foreach ($files as $photofilename) {
-                                print_r($photofilename."\n");
                                 if (!(file_exists($Directory."_thumbnails"))) {mkdir($Directory."_thumbnails",0777,TRUE);};
                                 if (!(file_exists($Directory."_display"))) {mkdir($Directory."_display",0777,TRUE);};
                                 if (!(file_exists($Directory."_print"))) {mkdir($Directory."_print",0777,TRUE);};
@@ -373,11 +372,10 @@ class UploadController extends Controller {
 
                     if (!empty($files)) {
                         foreach($files as $photofilename) {
-                            trigger_error($photofilename);
-                            preg_match('/(?P<name>\w+)_(?P<organism>\w+)_(?P<OrganismInfoID>\d+)_(?P<imagenumber>\w+)/', $photofilename, $matches);
+                            preg_match('/(?P<name>\w+)_organism_(?P<OrganismInfoID>\d+)_(?P<imagenumber>\w+)/', $photofilename, $matches);
 
                             if (array_key_exists('OrganismInfoID', $matches)) {
-                                if ($CurrentOrganismInfoID == $matches["OrganismInfoID"]) { // if there's a match
+                                if (isset($CurrentOrganismInfoID) && $CurrentOrganismInfoID == $matches["OrganismInfoID"]) { // if there's a match
                                     $PhotoForThisOrganism = 1;
                                     break;
                                 }
@@ -641,7 +639,7 @@ class UploadController extends Controller {
 
                 $loggerService->logger->info("***IMAGE Processing: FileName=$photofilename, MediaID=$MediaID, ImagePath=$Directory.$photofilename");
 
-                preg_match('/(?P<name>\w+)_(?P<organism>\w+)_(?P<OrganismInfoID>\d+)_(?P<imagenumber>\w+)/', $photofilename, $matches);
+                preg_match('/(?P<name>\w+)_organism_(?P<OrganismInfoID>\d+)_(?P<imagenumber>\w+)/', $photofilename, $matches);
 
                 if (array_key_exists('OrganismInfoID', $matches)) {
                     $OrganismInfoID = $matches["OrganismInfoID"];
