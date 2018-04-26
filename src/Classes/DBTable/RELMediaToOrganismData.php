@@ -38,7 +38,7 @@ class RELMediaToOrganismData {
             $SelectString="SELECT \"OrderNumber\" ".
                 "FROM \"REL_MediaToOrganismData\" ".
                 "WHERE \"OrganismDataID\"=$OrganismDataID ".
-                "ORDER BY \"OrderNumber\" DESC LIMIT 1";
+                "ORDER BY \"OrderNumber\" DESC NULLS LAST LIMIT 1";
 
             $stmt = $dbConn->prepare($SelectString);
             $stmt->execute();
@@ -50,7 +50,7 @@ class RELMediaToOrganismData {
 
             if (!empty($Set["OrderNumber"]))
                 $OrderNumber = (int) $Set["OrderNumber"] + 1;
-trigger_error(print_r($OrderNumber, 1));
+
             // set the order number in the new record
 
             $UpdateString = "UPDATE \"REL_MediaToOrganismData\" ".
