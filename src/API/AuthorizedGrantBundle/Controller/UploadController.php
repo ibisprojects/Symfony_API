@@ -370,12 +370,12 @@ class UploadController extends Controller {
 
                     $PhotoForThisOrganism = 0;
 
-                    if (!empty($files)) {
+                    if (!empty($files) && isset($CurrentOrganismInfoID)) {
                         foreach($files as $photofilename) {
                             preg_match('/(?P<name>\w+)_organism_(?P<OrganismInfoID>\d+)_(?P<imagenumber>\w+)/', $photofilename, $matches);
 
                             if (array_key_exists('OrganismInfoID', $matches)) {
-                                if (isset($CurrentOrganismInfoID) && $CurrentOrganismInfoID == $matches["OrganismInfoID"]) { // if there's a match
+                                if ($CurrentOrganismInfoID == $matches["OrganismInfoID"]) { // if there's a match
                                     $PhotoForThisOrganism = 1;
                                     break;
                                 }
@@ -639,7 +639,7 @@ class UploadController extends Controller {
 
                 $loggerService->logger->info("***IMAGE Processing: FileName=$photofilename, MediaID=$MediaID, ImagePath=$Directory.$photofilename");
 
-                preg_match('/(?P<name>\w+)_organism_(?P<OrganismInfoID>\d+)_(?P<imagenumber>\w+)/', $photofilename, $matches);
+                preg_match('/(?P<name>\w+)_organism_(?P<OrganismInfoID>\d+)_(?P<ordernumber>\w+)_(?P<imagenumber>\w+)/', $photofilename, $matches);
 
                 if (array_key_exists('OrganismInfoID', $matches)) {
                     $OrganismInfoID = $matches["OrganismInfoID"];
@@ -648,18 +648,18 @@ class UploadController extends Controller {
 					                FROM \"TBL_Visits\"
 					                INNER JOIN \"TBL_OrganismData\" ON \"TBL_Visits\".\"ID\" = \"TBL_OrganismData\".\"VisitID\"
 					                WHERE (\"TBL_Visits\".\"ID\" = $VisitID) AND (\"TBL_OrganismData\".\"OrganismInfoID\" = $OrganismInfoID)
-                                    ORDER BY \"TBL_Visits\".\"VisitDate\" DESC";
+                                    ORDER BY \"OrganismDataID\" ASC";
 
                     $stmt = $dbConn->prepare($SelectString);
                     $stmt->execute();
 
-                    $Set = $stmt->fetch();
+                    $Set = $stmt->fetchAll();
                     $stmt = null;
 
                     $OrganismDataID = null;
 
-                    if ($Set) {
-                        $OrganismDataID = $Set["OrganismDataID"];
+                    if (!empty($Set)) {
+                        $OrganismDataID = $Set[$matches['ordernumber']]["OrganismDataID"];
                     }
 
                     RELMediaToOrganismData::Insert($dbConn, $MediaID, $OrganismDataID, $UserID);

@@ -183,6 +183,7 @@ class Upload  {
                     }
                 }
             }
+
             while (($FileName!="")&&($Result=="RESULT_OKAY")&&($Count<$NumFiles));
         }
         return($FileArray);

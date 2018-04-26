@@ -20,7 +20,7 @@ class RELMediaToOrganismData {
         $Set = $stmt->fetch();
         $stmt = null;
 
-        if ($Set) {
+        if (!empty($Set["ID"])) {
             $ID = $Set["ID"];
         } else {
             // insert the new record and get it's ID
@@ -48,9 +48,9 @@ class RELMediaToOrganismData {
 
             $OrderNumber = 1;
 
-            if ($Set)
+            if (!empty($Set["OrderNumber"]))
                 $OrderNumber = (int) $Set["OrderNumber"] + 1;
-
+trigger_error(print_r($OrderNumber, 1));
             // set the order number in the new record
 
             $UpdateString = "UPDATE \"REL_MediaToOrganismData\" ".
