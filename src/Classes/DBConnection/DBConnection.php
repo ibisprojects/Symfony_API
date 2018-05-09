@@ -31,13 +31,19 @@ class DBConnection {
 
 			if ($ComputerName=="ibis-test1") {
                 $host = 'host=IBIS-TEST1';
-            } else if ($ComputerName == "do-dev" || $ComputerName == "aline") {
+            } else if ($ComputerName == "do-api1" || $ComputerName == "do-dev" || $ComputerName == "aline") {
                 $driver = "pgsql";
                 // $host = 'host=localhost';
                 $host = 'host=138.197.14.189'; // new dev
+                self::$password = "zsPi3GWIlo";
+
+                if($ComputerName == "do-api1") {
+                    $host = 'host=citscidb1';
+                    self::$password = "kRz6eN48";
+                }
+
                 $db = 'citsci';
                 self::$user = "postgres";
-                self::$password = "zsPi3GWIlo";
             }
 
             $dsn = "{$driver}:{$host};dbname={$db};user=".self::$user.";password=".self::$password;
