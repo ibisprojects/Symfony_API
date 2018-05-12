@@ -255,7 +255,7 @@ class TBLForms {
                 $test_array = $selectStmt2->fetch();
                 if (!is_array($test_array) || count($test_array) < 1) {
                     $HasAttributes .= $ErrNo.".";
-                    if (($IsPredefinedPicklist == "1")||($IsAllOrgPicklist == "1")) {
+                    if (($IsPredefinedPicklist == 1)||($IsAllOrgPicklist == 1)) {
                         $HasAttributes .= " Picklist Has";
                     }
                     $HasAttributes .= " No Attribute Selected \n";
@@ -291,7 +291,8 @@ class TBLForms {
         }
 
         $tempAttrArray["OrganismType"] = "0";
-        if (is_numeric($FormEntry["Picklist"]) && $FormEntry["Picklist"] == "1") {
+
+        if ($FormEntry["Picklist"] === true) {
             $tempAttrArray["OrganismType"] = "1";
         }
 		/*else if (is_numeric($FormEntry["AllOrganismPicklist"]) && $FormEntry["AllOrganismPicklist"] == "1") {
@@ -322,7 +323,7 @@ class TBLForms {
                 $tempAttrArray["AttributeValuesPossible"] = $AttributeValueSet;
             }
         }
-        if (is_numeric($FormEntry["Picklist"]) && $FormEntry["Picklist"] == "1") {
+        if ($FormEntry["Picklist"] === true) {
             $OrganismSet = RELOrganismInfoToFormEntry::GetPickListSetFromFormEntryID($dbConn, $FormEntry["EntryID"], $FormEntry["SortBy"]);
             $tempAttrArray["OrganismList"] = $OrganismSet;
         }
