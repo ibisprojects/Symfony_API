@@ -90,14 +90,7 @@ class TBLSpatialLayerData {
         }
         // reproject the data
 
-        if ($CoordinateSystemID == 0) {
-            $SpatialLayerGridSet = TBLSpatialLayerGrids::GetSetFromID($dbConn, $SpatialLayerGridID);
-            $CoordinateSystemID = $SpatialLayerGridSet["CoordinateSystemID"];
-        }
-
-        if ($CoordinateSystemID != Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC) { // make sure the coorindate is in geographic
-            $CoordinateSystemID = Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC;
-        }
+        $CoordinateSystemID = Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC;
 
         if ($AreaID > 0) {
             $SelectString="SELECT * ".
