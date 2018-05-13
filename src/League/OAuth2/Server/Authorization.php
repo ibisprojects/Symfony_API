@@ -469,7 +469,6 @@ class Authorization
             } elseif ($param === 'client_secret' && ! is_null($clientSecret = $this->getRequest()->server('PHP_AUTH_PW'))) {
                 return $clientSecret;
             } else {
-                trigger_error(print_r($this->getRequest()->post(), 1));
                 return $this->getRequest()->{$method}($param, $default);
             }
         } else {
