@@ -200,7 +200,7 @@ class TBLSpatialLayerTypes {
         $UserID = $SpatialLayerTypeSet["PersonID"];
 
         if ($UserID > 0) {
-            $DestinPath = "/var/www/citsci/inetpub/UserUploads/$UserID/GeoRasters/$SpatialLayerTypeID";
+            $DestinPath = "/var/www/citsci/web-app/current/inetpub/UserUploads/$UserID/GeoRasters/$SpatialLayerTypeID";
 
             FileUtil::DeleteFolder($DestinPath);
         }

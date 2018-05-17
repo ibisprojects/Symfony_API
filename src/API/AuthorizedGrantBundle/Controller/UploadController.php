@@ -85,7 +85,7 @@ class UploadController extends Controller {
 							$ObservationName = str_replace(' ', '', $ObservationName);
 
 							// create observation folder to put XML AND images into
-							$ObservationPath = "/var/www/citsci/inetpub/UserUploads/$UserID/MobileData/$ObservationName/";  // if on dev/LIVE
+							$ObservationPath = "/var/www/citsci/web-app/current/inetpub/UserUploads/$UserID/MobileData/$ObservationName/";  // if on dev/LIVE
 
 							if (!file_exists($ObservationPath))
 							{
@@ -119,7 +119,7 @@ class UploadController extends Controller {
 
                             $loggerService->logger->info("IN PHOTO UPLOAD - before MOVE");
 
-                            $Directory = "/var/www/citsci/inetpub/UserUploads/$UserID/Media/";
+                            $Directory = "/var/www/citsci/web-app/current/inetpub/UserUploads/$UserID/Media/";
 
                             if (!(file_exists($Directory))) {
                                 mkdir($Directory,0777,TRUE);
@@ -631,7 +631,7 @@ class UploadController extends Controller {
             // find photos here and process them by relating them to obs and /or organisminfoid...
             //-------------------------------------------------------------------------------------
 
-            $Directory = "/var/www/citsci/inetpub/UserUploads/$UserID/Media/";
+            $Directory = "/var/www/citsci/web-app/current/inetpub/UserUploads/$UserID/Media/";
 
             foreach ($files as $photofilename) {
                 // Insert new media ID

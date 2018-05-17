@@ -91,7 +91,7 @@ class TBLMedia
             $FilePath = $set["FilePath"];
             $PersonID = $set["PersonID"];
 
-            $FullPath = "/var/www/citsci/inetpub/UserUploads/$PersonID/Media/";
+            $FullPath = "/var/www/citsci/web-app/current/inetpub/UserUploads/$PersonID/Media/";
 
             // delete all versions
 
