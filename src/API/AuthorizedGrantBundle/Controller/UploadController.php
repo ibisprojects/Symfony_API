@@ -446,7 +446,8 @@ class UploadController extends Controller {
                                         $InsertLogID,
                                         null,
                                         $FormID,
-                                        $PredefinedAreaID
+                                        $PredefinedAreaID,
+                                        $VisitID
                                     );
 
                                     $OrganismDataSet = TBLOrganismData::GetSetFromID($dbConn, $OrganismDataID);

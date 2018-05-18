@@ -134,7 +134,8 @@ class TBLOrganismData {
         $InsertLogID = null,
         $Status = null,
         $FormID = null,
-        $SelectedAreaID = null
+        $SelectedAreaID = null,
+        $alreadyVisitID = null
     )
         //
         // Adds a single species occurrence to a project.  Adds a visit and area if
@@ -160,7 +161,7 @@ class TBLOrganismData {
         // see if the point already exists
 
         $AreaID = $SelectedAreaID;
-
+print_r(print_r($AreaID, 1));
         if ($SelectedAreaID == null) { // see if the point exists (jjg - can make this check for geometries that match in the future)
             $AreaID = TBLAreas::GetIDFromCoordinate(
                 $dbConn,
@@ -217,16 +218,20 @@ class TBLOrganismData {
 
         // query for an existing visit?
 
-        $Set = TBLVisits::GetSet($dbConn, null, "VisitDate", null, $AreaID, $VisitDateString);
+        if (!empty($alreadyVisitID)) {
+            $VisitID = $alreadyVisitID;
+        } else {
+            $Set = TBLVisits::GetSet($dbConn, $ProjectID, "VisitDate", null, $AreaID, $VisitDateString);
 
-        $VisitID = 0;
+            $VisitID = 0;
 
-        if ($Set) {
-            $VisitID = $Set["ID"]; // get the ID for the existing visit
-        }
+            if ($Set) {
+                $VisitID = $Set["ID"]; // get the ID for the existing visit
+            }
 
-        if ($VisitID == 0) { // insert a new visit
-            $VisitID = TBLVisits::Insert($dbConn, $ProjectID, $AreaID, $VisitDateString, $InsertLogID, 1, $VisitComments, $PersonID);
+            if ($VisitID == 0) { // insert a new visit
+                $VisitID = TBLVisits::Insert($dbConn, $ProjectID, $AreaID, $VisitDateString, $InsertLogID, 1, $VisitComments, $PersonID);
+            }
         }
 
         // insert the organism
