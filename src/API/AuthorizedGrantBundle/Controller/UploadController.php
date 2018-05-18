@@ -220,7 +220,6 @@ class UploadController extends Controller {
         $ProjectID = $ProjectElement['ID'];
         $LocationName = $ProjectElement->Area['AreaName'];
         $PredefinedAreaID = $ProjectElement->Area['AreaID'];
-        trigger_error($PredefinedAreaID);
         $RefX = $ProjectElement->Area['X'];
         $RefY = $ProjectElement->Area['Y'];
         $CoordinateSystemID = $ProjectElement->Area['CoordinateSystemID'];

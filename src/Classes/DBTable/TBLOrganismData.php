@@ -153,7 +153,6 @@ class TBLOrganismData {
         //  $SubplotID - optional SubplotID
         //  $SelectedAreaID - user selected predefined location from picklist
     {
-        trigger_error(print_r($SelectedAreaID, 1));
         $ErrorString = null;
         $OrganismDataID = 0;
 
