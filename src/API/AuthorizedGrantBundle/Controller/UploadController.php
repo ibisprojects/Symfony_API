@@ -220,6 +220,7 @@ class UploadController extends Controller {
         $ProjectID = $ProjectElement['ID'];
         $LocationName = $ProjectElement->Area['AreaName'];
         $PredefinedAreaID = $ProjectElement->Area['AreaID'];
+        trigger_error($PredefinedAreaID);
         $RefX = $ProjectElement->Area['X'];
         $RefY = $ProjectElement->Area['Y'];
         $CoordinateSystemID = $ProjectElement->Area['CoordinateSystemID'];
@@ -236,10 +237,9 @@ class UploadController extends Controller {
 
         $LocationName = html_entity_decode($LocationName);
         $VisitComment = html_entity_decode($VisitComment);
-        $PredefinedAreaID = null;
 
         // If predefined location, get AreaName
-        if ($PredefinedAreaID > 0)
+        if (!empty($PredefinedAreaID))
         {
             $PredefinedAreaName = TBLAreas::GetAreaName($dbConn, $PredefinedAreaID);
             $loggerService->logger->info("PredefinedAreaName=$PredefinedAreaName");

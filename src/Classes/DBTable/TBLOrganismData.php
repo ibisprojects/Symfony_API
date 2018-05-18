@@ -153,6 +153,7 @@ class TBLOrganismData {
         //  $SubplotID - optional SubplotID
         //  $SelectedAreaID - user selected predefined location from picklist
     {
+        trigger_error(print_r($SelectedAreaID, 1));
         $ErrorString = null;
         $OrganismDataID = 0;
 
@@ -161,7 +162,7 @@ class TBLOrganismData {
         // see if the point already exists
 
         $AreaID = $SelectedAreaID;
-print_r(print_r($AreaID, 1));
+
         if ($SelectedAreaID == null) { // see if the point exists (jjg - can make this check for geometries that match in the future)
             $AreaID = TBLAreas::GetIDFromCoordinate(
                 $dbConn,
