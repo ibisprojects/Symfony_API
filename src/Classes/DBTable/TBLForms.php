@@ -127,8 +127,8 @@ class TBLForms {
 
 				//Add common form details and site characteristics once to return output
 				if (!key_exists($FormID, $data)) {
-					$data[$FormID] = array("DataSheetID" => $OrganismFormEntry["FormID"], "Name" => $OrganismFormEntry["Name"], "AreaSubTypeID" => $OrganismFormEntry["AreaSubTypeID"], "Predefined" => $OrganismFormEntry["LocationDefinition"]);
-					if ($OrganismFormEntry["LocationDefinition"] == "1") {
+					$data[$FormID] = array("DataSheetID" => $OrganismFormEntry["FormID"], "Name" => $OrganismFormEntry["Name"], "AreaSubTypeID" => $OrganismFormEntry["AreaSubTypeID"], "Predefined" => $OrganismFormEntry["LocationDefinition"] ? '1' : '0');
+					if (!empty($OrganismFormEntry["LocationDefinition"])) {
 						$locations = RELAreaToForm::GetSet($dbConn, 0, $FormID);
 						$data[$FormID]["locations"] = $locations;
 					}
@@ -255,7 +255,7 @@ class TBLForms {
                 $test_array = $selectStmt2->fetch();
                 if (!is_array($test_array) || count($test_array) < 1) {
                     $HasAttributes .= $ErrNo.".";
-                    if (($IsPredefinedPicklist == 1)||($IsAllOrgPicklist == 1)) {
+                    if (!empty($IsPredefinedPicklist)|| !empty($IsAllOrgPicklist)) {
                         $HasAttributes .= " Picklist Has";
                     }
                     $HasAttributes .= " No Attribute Selected \n";
@@ -277,7 +277,7 @@ class TBLForms {
     private static function getEntryDetails($dbConn, $FormEntry) {
         $HowSpecifiedString = TBLForms::getHowSpecifiedString($FormEntry["HowSpecified"]);
         $tempAttrArray = array("ID" => $FormEntry["EntryID"], "AttributeTypeID" => $FormEntry["AttributeTypeID"], "AttributeValueID" => $FormEntry["AttributeValueID"], "ParentFormEntryID" => $FormEntry["ParentFormEntryID"], "HowSpecified" => $FormEntry["HowSpecified"], "HowSpecifiedString" => $HowSpecifiedString, "OrderNumber" => $FormEntry["OrderNumber"]
-            , "UnitID" => $FormEntry["UnitID"], "SubplotTypeID" => $FormEntry["SubPlotTypeID"], "OrganismInfoID" => $FormEntry["OrganismInfoID"], "Picklist" => $FormEntry["Picklist"]
+            , "UnitID" => $FormEntry["UnitID"], "SubplotTypeID" => $FormEntry["SubPlotTypeID"], "OrganismInfoID" => $FormEntry["OrganismInfoID"], "Picklist" => $FormEntry["Picklist"] ? '1' : '0'
             , "AttributeCategoryID" => NULL, "MinimumValue" => NULL, "MaximumValue" => NULL, "Description" => NULL, "Name" => "");
 
         if (is_numeric($FormEntry["UnitID"])) {
@@ -292,7 +292,7 @@ class TBLForms {
 
         $tempAttrArray["OrganismType"] = "0";
 
-        if ($FormEntry["Picklist"] === true) {
+        if (!empty($FormEntry["Picklist"])) {
             $tempAttrArray["OrganismType"] = "1";
         }
 		/*else if (is_numeric($FormEntry["AllOrganismPicklist"]) && $FormEntry["AllOrganismPicklist"] == "1") {
@@ -323,7 +323,7 @@ class TBLForms {
                 $tempAttrArray["AttributeValuesPossible"] = $AttributeValueSet;
             }
         }
-        if ($FormEntry["Picklist"] === true) {
+        if (!empty($FormEntry["Picklist"])) {
             $OrganismSet = RELOrganismInfoToFormEntry::GetPickListSetFromFormEntryID($dbConn, $FormEntry["EntryID"], $FormEntry["SortBy"]);
             $tempAttrArray["OrganismList"] = $OrganismSet;
         }
