@@ -213,6 +213,8 @@ class AuthController extends Controller {
                 return $this->redirect($this->generateUrl('o_auth_authorization_signin'));
             }
 
+            $params['state'] = $session->get('state');
+
             // Check if the client should be automatically approved
             $autoApprove = ($params['client_details']['auto_approve'] === '1') ? true : false;
             $approve = null;
