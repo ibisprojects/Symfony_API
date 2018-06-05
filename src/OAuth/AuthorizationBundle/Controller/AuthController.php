@@ -54,6 +54,11 @@ class AuthController extends Controller {
             $session->set('redirect_uri', $params['redirect_uri']);
             $session->set('response_type', $params['response_type']);
             $session->set('scopes', $params['scopes']);
+
+            if (!empty($params['state'])) {
+                $session->set('state', $params['state']);
+            }
+
             return $this->redirect($this->generateUrl('o_auth_authorization_signin'));
         } catch (ClientException $e) {
             return $this->render('OAuthAuthorizationBundle:Default:error.html.twig', array('error_message' => "Error Occured: Please check your authorization parameters"));
@@ -69,6 +74,7 @@ class AuthController extends Controller {
         $params['redirect_uri'] = $session->get('redirect_uri');
         $params['response_type'] = $session->get('response_type');
         $params['scopes'] = $session->get('scopes');
+        $params['state'] = $session->get('state');
         $params['error_message'] = "";
         try {
             foreach ($params as $key => $value) {

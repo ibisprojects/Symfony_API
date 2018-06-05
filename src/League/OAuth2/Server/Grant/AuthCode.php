@@ -77,7 +77,7 @@ class AuthCode extends GrantScopeValidator implements GrantTypeInterface {
      */
     public function checkAuthoriseParams($inputParams = array()) {
         // Auth params
-        $authParams = $this->authServer->getParam(array('client_id', 'redirect_uri', 'response_type', 'scope', 'state', 'client_secret'), 'get', $inputParams);
+        $authParams = $this->authServer->getParam(array('client_id', 'redirect_uri', 'response_type', 'scope', 'state', 'client_secret', 'state'), 'get', $inputParams);
 
         if (is_null($authParams['client_id'])) {
             throw new Exception\ClientException(sprintf($this->authServer->getExceptionMessage('invalid_request'), 'client_id'), 0);
