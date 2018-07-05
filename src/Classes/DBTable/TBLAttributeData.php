@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: TBL_AttributeData.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -26,6 +26,10 @@ namespace Classes\DBTable;
 // DEALINGS IN THE SOFTWARE.
 //**************************************************************************************
 
+use Classes\TBLDBTables;
+use Classes\Utilities\SQL;
+use API\Classes\Constants;
+
 define("ATTRIBUTE_UNKNOWN", 0);
 define("ATTRIBUTE_LOOKUP", 1);
 define("ATTRIBUTE_FLOAT", 2);
@@ -33,16 +37,6 @@ define("ATTRIBUTE_INTEGER", 3);
 define("ATTRIBUTE_BOOLEAN", 4);
 define("ATTRIBUTE_STRING", 5);
 define("ATTRIBUTE_DATETIME", 6);
-
-/*
-  define("ASSOCIATED_TABLE_ORGANISM_DATA",1);
-  define("ASSOCIATED_TABLE_INDIVIDUALS",2);
-  define("ASSOCIATED_TABLE_TREATMENTS",3);
-  define("DATABASE_FIELD_TBL_VISITS_ID",4);
- */
-// these are the IDs in the database
-
-define("ATTRIBUTE_DOMINANCE_ID", 1);
 
 //**************************************************************************************
 // Class Definition
@@ -62,50 +56,55 @@ class TBLAttributeData {
 
         // update
 
-        $UpdateString = "UPDATE TBL_AttributeData " .
-                "SET AttributeTypeID=$AttributeTypeID, ";
+        $UpdateString = "UPDATE \"TBL_AttributeData\" " .
+                "SET \"AttributeTypeID\"=$AttributeTypeID, ";
 
         switch ($AttributeTypeSet["ValueType"]) {
             case ATTRIBUTE_UNKNOWN:
                 break;
             case ATTRIBUTE_LOOKUP:
                 $AttributeValue = (int) $AttributeValue;
+
                 if ($AttributeValue === 0)
                     $AttributeValue = null;
-                $UpdateString.="AttributeValueID=$AttributeValue";
+
+                $UpdateString.="\"AttributeValueID\"=$AttributeValue";
                 break;
             case ATTRIBUTE_FLOAT:
                 $AttributeValue = (float) $AttributeValue;
-                $UpdateString.="FloatValue='$AttributeValue'";
+                $UpdateString.="\"FloatValue\"='$AttributeValue'";
                 break;
             case ATTRIBUTE_INTEGER:
                 $AttributeValue = (int) $AttributeValue;
-                $UpdateString.="IntValue='$AttributeValue'";
+                $UpdateString.="\"IntValue\"='$AttributeValue'";
                 break;
             case ATTRIBUTE_STRING:
                 $AttributeValue = (string) $AttributeValue;
-                $UpdateString.="StringValue='$AttributeValue'";
+                $UpdateString.="\"StringValue\"='$AttributeValue'";
                 break;
             case ATTRIBUTE_DATETIME:
                 $AttributeValue = $AttributeValue;
-                $UpdateString.="DateTime='$AttributeValue'";
+                $UpdateString.="\"DateTime\"='$AttributeValue'";
                 break;
         }
-        if ($SubplotID !== "")
-            $UpdateString.=",SubplotID=" . $SubplotID;
-        if ($Uncertainty !== "")
-            $UpdateString.=",Uncertainty=" . $Uncertainty;
 
-        $UpdateString.=" WHERE ID=$ID";
+        if ($SubplotID !== Constants::NOT_SPECIFIED)
+            $UpdateString.=",\"SubplotID\"=" . SQL::GetInt($SubplotID);
+        if ($Uncertainty !== Constants::NOT_SPECIFIED)
+            $UpdateString.=",\"Uncertainty\"=" . SQL::GetFloat($Uncertainty);
+
+        $UpdateString.=" WHERE \"ID\"=$ID";
+
         $stmt = $dbConn->prepare($UpdateString);
         $stmt->execute();
+        $stmt = null;
     }
 
     //**********************************************************************************
     // TBL_DBTables functions
     //**********************************************************************************
-    public static function GetFieldValue($Database, $FieldName, $ID, $Default = 0) {
-        $Result = TBL_DBTables::GetFieldValue($Database, "TBL_AttributeData", $FieldName, $ID, $Default);
+    public static function GetFieldValue($dbConn, $FieldName, $ID, $Default = 0) {
+        $Result = TBLDBTables::GetFieldValue($dbConn, "TBL_AttributeData", $FieldName, $ID, $Default);
 
         return($Result);
     }
@@ -117,28 +116,32 @@ class TBLAttributeData {
     //**********************************************************************************
     // Basic database functions
     //**********************************************************************************
-    public static function GetSet($Database, $VisitID = null, $OrganismDataID = null, $TreatmentID = null, $SubplotID = null, $AttributeTypeID = null, $AreaID = null) {
+    public static function GetSet($dbConn, $VisitID = null, $OrganismDataID = null, $TreatmentID = null, $SubplotID = null, $AttributeTypeID = null, $AreaID = null) {
         $SelectString = "SELECT * " .
-                "FROM TBL_AttributeData ";
+                "FROM \"TBL_AttributeData\" ";
 
         if ($VisitID > 0)
-            TBLDBTables::AddWhereClause($SelectString, "VisitID=$VisitID");
+            TBLDBTables::AddWhereClause($SelectString, "\"VisitID\"=$VisitID");
         if ($OrganismDataID > 0)
-            TBLDBTables::AddWhereClause($SelectString, "OrganismDataID=$OrganismDataID");
+            TBLDBTables::AddWhereClause($SelectString, "\"OrganismDataID\"=$OrganismDataID");
         if ($TreatmentID > 0)
-            TBLDBTables::AddWhereClause($SelectString, "TreatmentID=$TreatmentID");
+            TBLDBTables::AddWhereClause($SelectString, "\"TreatmentID\"=$TreatmentID");
         if ($SubplotID > 0)
-            TBLDBTables::AddWhereClause($SelectString, "SubplotID=$SubplotID");
+            TBLDBTables::AddWhereClause($SelectString, "\"SubplotID\"=$SubplotID");
         if ($AttributeTypeID > 0)
-            TBLDBTables::AddWhereClause($SelectString, "AttributeTypeID=$AttributeTypeID");
+            TBLDBTables::AddWhereClause($SelectString, "\"AttributeTypeID\"=$AttributeTypeID");
         if ($AreaID > 0)
-            TBLDBTables::AddWhereClause($SelectString, "AreaID=$AreaID");
+            TBLDBTables::AddWhereClause($SelectString, "\"AreaID\"=$AreaID");
+
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
+
         $Set = $stmt->fetch();
+
         if (!$Set) {
             return false;
         }
+
         return($Set);
     }
 
@@ -157,49 +160,53 @@ class TBLAttributeData {
         //
         // Attribute data is tied to one Visit, OrganismData, or Treatment so only one of these should
         // be provided.  Added AreaID at the end//
-        $ID = 0;
 
-        // insert 
+        $ExecString = "INSERT INTO \"TBL_AttributeData\" (\"VisitID\") VALUES (NULL)";
 
-        $ExecString = "EXEC insert_TBL_AttributeData NULL";
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
-        $ID = $dbConn->lastInsertId();
+
+        $ID = $dbConn->lastInsertId('"TBL_AttributeData_ID_seq"');
+        $stmt = null;
+
         // add the appropriate ids
 
-        $UpdateString = "UPDATE TBL_AttributeData " .
-                "SET AttributeTypeID=$AttributeTypeID";
+        $UpdateString = "UPDATE \"TBL_AttributeData\" " .
+                "SET \"AttributeTypeID\"=$AttributeTypeID";
 
         if ($VisitID > 0)
-            $UpdateString.=",VisitID=$VisitID";
+            $UpdateString.=",\"VisitID\"=$VisitID";
         if ($OrganismDataID > 0)
-            $UpdateString.=",OrganismDataID=$OrganismDataID";
+            $UpdateString.=",\"OrganismDataID\"=$OrganismDataID";
         if ($TreatmentID > 0)
-            $UpdateString.=",TreatmentID=$TreatmentID";
+            $UpdateString.=",\"TreatmentID\"=$TreatmentID";
         if ($AreaID > 0)
-            $UpdateString.=",AreaID=$AreaID";
+            $UpdateString.=",\"AreaID\"=$AreaID";
         if ($FormEntryID > 0)
-            $UpdateString.=",FormEntryID=$FormEntryID";
+            $UpdateString.=",\"FormEntryID\"=$FormEntryID";
         if ($NumDecimals > 0)
-            $UpdateString.=",NumDecimals=$NumDecimals";
+            $UpdateString.=",\"NumDecimals\"=$NumDecimals";
         if ($UnitID != null)
-            $UpdateString.=",UnitID=$UnitID";
+            $UpdateString.=",\"UnitID\"=$UnitID";
 
-        $UpdateString.=" WHERE ID=$ID";
+        $UpdateString.=" WHERE \"ID\"=$ID";
 
         $stmt = $dbConn->prepare($UpdateString);
         $stmt->execute();
+        $stmt = null;
 
         // update the value
 
         TBLAttributeData::DoUpdate($dbConn, $ID, $AttributeTypeID, $AttributeValue, $SubplotID, $Uncertainty);
-        //Required??
-        //RELSpatialGriddedToOrganismInfo::UpdateAttributeData($dbConn, null, $ID, true); 
+
+        // Update Project's NumMeasurements
+
+        TBLProjects::IncrementNumMeasurements($dbConn,$ID);
 
         return($ID);
     }
 
-    public static function Update($Database, $ID, $AttributeValue, $AttributeTypeID = NOT_SPECIFIED, $SubplotID = NOT_SPECIFIED, $Uncertainty = NOT_SPECIFIED) {
+    public static function Update($Database, $ID, $AttributeValue, $AttributeTypeID = Constants::NOT_SPECIFIED, $SubplotID = Constants::NOT_SPECIFIED, $Uncertainty = Constants::NOT_SPECIFIED) {
 //		DebugWriteln("TBL_AttributeData: Update");
         REL_SpatialGriddedToOrganismInfo::UpdateAttributeData($Database, null, $ID, false);
 
@@ -208,7 +215,7 @@ class TBLAttributeData {
         if ($SubplotID === 0)
             $SubplotID = null;
 
-        if ($AttributeTypeID === NOT_SPECIFIED) { // then do SQL::GetInt()
+        if ($AttributeTypeID === Constants::NOT_SPECIFIED) { // then do SQL::GetInt()
             $Set = TBL_AttributeData::GetSetFromID($Database, $ID);
 
             $AttributeTypeID = $Set->Field("AttributeTypeID");
@@ -222,13 +229,8 @@ class TBLAttributeData {
     }
 
     //**********************************************************************************
-    public static function Delete($Database, $ID) {
-        //
-//		DebugWriteln("Deleting AttributeData: $ID");
-
-        REL_SpatialGriddedToOrganismInfo::UpdateAttributeData($Database, null, $ID, false);
-
-        TBL_DBTables::Delete($Database, "TBL_AttributeData", $ID);
+    public static function Delete($dbConn, $ID) {
+        TBLDBTables::Delete($dbConn, "TBL_AttributeData", $ID);
     }
 
     //**********************************************************************************
@@ -370,12 +372,12 @@ class TBLAttributeData {
         //DebugWriteln("ValueType====$ValueType");
 
         switch ($ValueType) {
-            case ATTRIBUTE_TYPE_VALUETYPE_LOOKUP: {
+            case Constants::ATTRIBUTE_TYPE_VALUETYPE_LOOKUP: {
                     $IsSelect = true;
                     $AttributeValueID = $AttributeDataSet->Field("AttributeValueID");
                 }
                 break;
-            case ATTRIBUTE_TYPE_VALUETYPE_FLOAT: // 2
+            case Constants::ATTRIBUTE_TYPE_VALUETYPE_FLOAT: // 2
                 {
                     $AttributeValueID = null;
                     //DebugWriteln("ValueType------------------------------>$ValueType");
@@ -398,7 +400,7 @@ class TBLAttributeData {
                     }
                 }
                 break;
-            case ATTRIBUTE_TYPE_VALUETYPE_INTEGER: {
+            case Constants::ATTRIBUTE_TYPE_VALUETYPE_INTEGER: {
                     $AttributeValueID = null;
 
                     $AttributeValue = $AttributeDataSet->Field("IntValue");

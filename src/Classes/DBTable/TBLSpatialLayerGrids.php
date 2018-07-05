@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: TBL_SpatialLayerGrids.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -27,6 +27,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 
 use Classes\TBLDBTables;
+use Classes\Utilities\SQL;
 
 //**************************************************************************************
 // Definitions
@@ -42,15 +43,21 @@ class TBLSpatialLayerGrids {
     //******************************************************************************
 
     public static function GetSetFromID($dbConn, $ID) {
-        $SelectString = "SELECT * " .
-                "FROM TBL_SpatialLayerGrids " .
-                "WHERE ID='" . $ID . "'";
+        $ID = SQL::SafeInt($ID);
+
+        $SelectString = "SELECT * ".
+                "FROM \"TBL_SpatialLayerGrids\" ".
+                "WHERE \"ID\"='".$ID."'";
+
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
+
         $Set = $stmt->fetch();
+
         if (!$Set) {
             return false;
         }
+
         return($Set);
     }
 
@@ -99,7 +106,7 @@ class TBLSpatialLayerGrids {
 
 
 
-            
+
 //		DebugWriteln("SelectString=$SelectString");
 
         $Set = $Database->Execute($SelectString);
@@ -126,52 +133,48 @@ class TBLSpatialLayerGrids {
     public static function Insert($dbConn, $SpatialLayerID) {
         // insert the new record
 
-        $ExecString = "EXEC insert_TBL_SpatialLayerGrids $SpatialLayerID";
+        $ExecString="INSERT INTO \"TBL_SpatialLayerGrids\" (\"SpatialLayerID\", \"NumColumns\", \"NumRows\") 
+			VALUES ($SpatialLayerID, 1, 1)";
+
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
-        $ID = $dbConn->lastInsertId();
-        // we must have a start for the num columns and num rows
 
-        $UpdateString = "UPDATE TBL_SpatialLayerGrids " .
-                "SET NumColumns=1," .
-                "NumRows=1 " .
-                "WHERE ID=$ID";
-        $stmt = $dbConn->prepare($UpdateString);
-        $stmt->execute();
-        return($ID);
+        return $dbConn->lastInsertId('"TBL_SpatialLayerGrids_ID_seq"');
     }
 
     public static function Update($dbConn, $ID, $Name, $RefX = null, $RefY = null, $RefColumnWidth = null, $RefRowHeight = null, $NumColumns = null, $NumRows = null, $MinZoom = null, $MaxZoom = null, $StartDate = null, $EndDate = null, $FolderPath = null) {
-        $UpdateString = "UPDATE TBL_SpatialLayerGrids " .
-                "SET Name='$Name' ";
+        $UpdateString = "UPDATE \"TBL_SpatialLayerGrids\" ".
+                "SET \"Name\"='$Name' ";
 
         if ($RefX !== null)
-            $UpdateString.=",RefX='$RefX' ";
+            $UpdateString.=",\"RefX\"='$RefX' ";
         if ($RefY !== null)
-            $UpdateString.=",RefY='$RefY' ";
+            $UpdateString.=",\"RefY\"='$RefY' ";
         if ($RefColumnWidth !== null)
-            $UpdateString.=",RefColumnWidth='$RefColumnWidth' ";
+            $UpdateString.=",\"RefColumnWidth\"='$RefColumnWidth' ";
         if ($RefRowHeight !== null)
-            $UpdateString.=",RefRowHeight='$RefRowHeight' ";
+            $UpdateString.=",\"RefRowHeight\"='$RefRowHeight' ";
         if ($NumColumns !== null)
-            $UpdateString.=",NumColumns='$NumColumns' ";
+            $UpdateString.=",\"NumColumns\"='$NumColumns' ";
         if ($NumRows !== null)
-            $UpdateString.=",NumRows='$NumRows' ";
+            $UpdateString.=",\"NumRows\"='$NumRows' ";
 
         if ($MinZoom !== null)
-            $UpdateString.=",MinZoom='$MinZoom' ";
+            $UpdateString.=",\"MinZoom\"='$MinZoom' ";
         if ($MaxZoom !== null)
-            $UpdateString.=",MaxZoom='$MaxZoom' ";
+            $UpdateString.=",\"MaxZoom\"='$MaxZoom' ";
         if ($StartDate !== null)
-            $UpdateString.=",StartDate='" . $StartDate->GetSQLString() . "' ";
+            $UpdateString.=",\"StartDate\"='".$StartDate->GetSQLString()."' ";
         if ($EndDate !== null)
-            $UpdateString.=",EndDate='" . $EndDate->GetSQLString() . "' ";
+            $UpdateString.=",\"EndDate\"='".$EndDate->GetSQLString()."' ";
         if ($FolderPath !== null)
-            $UpdateString.=",FolderPath='$FolderPath' ";
+            $UpdateString.=",\"FolderPath\"='$FolderPath' ";
 
-        $UpdateString.="WHERE ID=$ID";
+        $UpdateString.="WHERE \"ID\"=$ID";
+
         $stmt = $dbConn->prepare($UpdateString);
         $stmt->execute();
+
         return($ID);
     }
 
@@ -188,22 +191,22 @@ class TBLSpatialLayerGrids {
         //	Creates the grid and any required parents if none is found.//
         // try to find an existing grid
 
-        $SelectString = "SELECT TBL_SpatialLayerGrids.ID " .
-                "FROM TBL_SpatialLayerGrids " .
-                "INNER JOIN TBL_SpatialLayers " .
-                "ON TBL_SpatialLayers.ID=TBL_SpatialLayerGrids.SpatialLayerID " .
-                "INNER JOIN TBL_SpatialLayerGroups " .
-                "ON TBL_SpatialLayerGroups.ID=TBL_SpatialLayers.SpatialLayerGroupID " .
-                "INNER JOIN TBL_SpatialLayerTypes " .
-                "ON TBL_SpatialLayerTypes.ID=TBL_SpatialLayerGroups.SpatialLayerTypeID " .
-                "WHERE AreaSubtypeID=$AreaSubtypeID " .
-                "AND CoordinateSystemID=$CoordinateSystemID " .
-                "AND PersonID IS NULL";
+        $SelectString = "SELECT \"TBL_SpatialLayerGrids\".\"ID\" ".
+                "FROM \"TBL_SpatialLayerGrids\" ".
+                "INNER JOIN \"TBL_SpatialLayers\" ".
+                "ON \"TBL_SpatialLayers\".\"ID\"=\"TBL_SpatialLayerGrids\".\"SpatialLayerID\" ".
+                "INNER JOIN \"TBL_SpatialLayerGroups\" ".
+                "ON \"TBL_SpatialLayerGroups\".\"ID\"=\"TBL_SpatialLayers\".\"SpatialLayerGroupID\" ".
+                "INNER JOIN \"TBL_SpatialLayerTypes\" ".
+                "ON \"TBL_SpatialLayerTypes\".\"ID\"=\"TBL_SpatialLayerGroups\".\"SpatialLayerTypeID\" ".
+                "WHERE \"AreaSubtypeID\"=$AreaSubtypeID ".
+                "AND \"CoordinateSystemID\"=$CoordinateSystemID ".
+                "AND \"PersonID\" IS NULL";
 
         if ($MinZoom != null)
-            TBLDBTables::AddWhereClause($SelectString, "MinZoom=$MinZoom");
+            TBLDBTables::AddWhereClause($SelectString, "\"MinZoom\"=$MinZoom");
         if ($MaxZoom != null)
-            TBLDBTables::AddWhereClause($SelectString, "MaxZoom=$MaxZoom");
+            TBLDBTables::AddWhereClause($SelectString, "\"MaxZoom\"=$MaxZoom");
 
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
@@ -220,6 +223,7 @@ class TBLSpatialLayerGrids {
 
             TBLSpatialLayerGrids::Update($dbConn, $SpatialLayerGridID, $Name, null, null, null, null, null, null, $MinZoom, $MaxZoom);
         }
+
         return($SpatialLayerGridID);
     }
 
@@ -502,7 +506,7 @@ class TBLSpatialLayerGrids {
         $LayerRefRight = $LayerRefX + $LayerRefColumnWidth * $LayerNumColumns;
         $LayerRefBottom = $LayerRefY + $LayerRefRowHeight * $LayerNumRows;
 
-        /* 		if ($ThePage!==null) 
+        /* 		if ($ThePage!==null)
           {
           //			$ThePage->BodyText("LayerRefLeft=$LayerRefLeft");
           //			$ThePage->BodyText("LayerRefTop=$LayerRefTop");

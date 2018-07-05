@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: TBL_SpatialLayerGroups.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -31,22 +31,30 @@ namespace Classes\DBTable;
 // Class Definition
 //**************************************************************************************
 
+use Classes\Utilities\SQL;
+use API\Classes\Constants;
+
 class TBLSpatialLayerGroups {
 
     //******************************************************************************
     // Basic database functions
     //******************************************************************************
 
-    public static function GetSetFromID($Database, $ID) {
-        $ID = SafeInt($ID);
+    public static function GetSetFromID($dbConn, $ID) {
+        $ID = SQL::SafeInt($ID);
 
-        $SelectString = "SELECT * " .
-                "FROM TBL_SpatialLayerGroups " .
-                "WHERE ID='" . $ID . "'";
+        $SelectString = "SELECT * ".
+                "FROM \"TBL_SpatialLayerGroups\" ".
+                "WHERE \"ID\"='".$ID."'";
 
-//		DebugWriteln("SelectString=$SelectString");
+        $stmt = $dbConn->prepare($SelectString);
+        $stmt->execute();
 
-        $Set = $Database->Execute($SelectString);
+        $set = $stmt->fetch();
+
+        if (!$set) {
+            return false;
+        }
 
         return($Set);
     }
@@ -63,8 +71,6 @@ class TBLSpatialLayerGroups {
         if ($OrderByField != null)
             TBL_DBTables::AddOrderByClause($SelectString, $OrderByField, $DescendingFlag); // query the rows in the opposite order of what the user wants
 
-
-            
 //		DebugWriteln("SelectString=$SelectString");
 
         $Set = $Database->Execute($SelectString);
@@ -72,13 +78,13 @@ class TBLSpatialLayerGroups {
         return($Set);
     }
 
-    public static function GetNameFromID($Database, $ID) {
+    public static function GetNameFromID($dbConn, $ID) {
         $Name = "";
 
-        $Set = TBL_SpatialLayerGroups::GetSetFromID($Database, $ID);
+        $Set = TBLSpatialLayerGroups::GetSetFromID($dbConn, $ID);
 
-        if ($Set->FetchRow())
-            $Name = $Set->Field("Name");
+        if ($Set)
+            $Name = $Set["Name"];
 
         return($Name);
     }
@@ -110,7 +116,7 @@ class TBLSpatialLayerGroups {
             $SelectString.="DESC "; // can't use order by function, finds previous order by
 
 
-            
+
 //		DebugWriteln("SelectString=$SelectString");
 
         $Set = $Database->Execute($SelectString);
@@ -133,38 +139,38 @@ class TBLSpatialLayerGroups {
     }
 
     public static function Insert($dbConn, $SpatialLayerTypeID, $Name = "Untitled") {
-        $ExecString = "EXEC insert_TBL_SpatialLayerGroups $SpatialLayerTypeID,'$Name'";
+        $ExecString = "INSERT INTO \"TBL_SpatialLayerGroups\" (\"SpatialLayerTypeID\", \"Name\") VALUES ($SpatialLayerTypeID,'$Name')";
+
         $stmt = $dbConn->prepare($ExecString);
         $stmt->execute();
-        $ID = $dbConn->lastInsertId();
-        return($ID);
+
+        return $dbConn->lastInsertId('"TBL_SpatialLayerGroups_ID_seq"');
     }
 
-    public static function Update($Database, $ID, $Name, $RefX, $RefY, $RefWidth, $RefHeight, $StartDate = null, $EndDate = null, $FolderPath = null) {
-        $UpdateString = "UPDATE TBL_SpatialLayerGroups " .
-                "SET Name='$Name' ";
+    public static function Update($dbConn, $ID, $Name, $RefX, $RefY, $RefWidth, $RefHeight, $StartDate = null, $EndDate = null, $FolderPath = null) {
+        $UpdateString = "UPDATE \"TBL_SpatialLayerGroups\" ".
+                "SET \"Name\"='$Name' ";
 
         if ($RefX !== null)
-            $UpdateString.=",RefX='$RefX' ";
+            $UpdateString.=",\"RefX\"='$RefX' ";
         if ($RefY !== null)
-            $UpdateString.=",RefY='$RefY' ";
+            $UpdateString.=",\"RefY\"='$RefY' ";
         if ($RefWidth !== null)
-            $UpdateString.=",RefWidth='$RefWidth' ";
+            $UpdateString.=",\"RefWidth\"='$RefWidth' ";
         if ($RefHeight !== null)
-            $UpdateString.=",RefHeight='$RefHeight' ";
+            $UpdateString.=",\"RefHeight\"='$RefHeight' ";
 
         if ($StartDate !== null)
-            $UpdateString.=",StartDate='" . $StartDate->GetSQLString() . "' ";
+            $UpdateString.=",\"StartDate\"='".$StartDate->GetSQLString()."' ";
         if ($EndDate !== null)
-            $UpdateString.=",EndDate='" . $EndDate->GetSQLString() . "' ";
+            $UpdateString.=",\"EndDate\"='".$EndDate->GetSQLString()."' ";
         if ($FolderPath !== null)
-            $UpdateString.=",FolderPath='$FolderPath' ";
+            $UpdateString.=",\"FolderPath\"='$FolderPath' ";
 
-        $UpdateString.="WHERE ID=$ID";
+        $UpdateString.="WHERE \"ID\"=$ID";
 
-//		DebugWriteln("UpdateString=".$UpdateString);
-
-        $ID = $Database->Execute($UpdateString);
+        $stmt = $dbConn->prepare($UpdateString);
+        $stmt->execute();
 
         return($ID);
     }
@@ -288,15 +294,17 @@ class TBLSpatialLayerGroups {
         //	Returns an ID to a spatial layer grid with PersonID=NULL (standard).
         //	Creates the grid and any required parents if none is found.//
 
-        $SelectString = "SELECT TBL_SpatialLayerGroups.ID " .
-                "FROM TBL_SpatialLayerGroups " .
-                "INNER JOIN TBL_SpatialLayerTypes " .
-                "ON TBL_SpatialLayerTypes.ID=TBL_SpatialLayerGroups.SpatialLayerTypeID " .
-                "WHERE AreaSubtypeID=$AreaSubtypeID " .
-                "AND PersonID IS NULL";
+        $SelectString = "SELECT \"TBL_SpatialLayerGroups\".\"ID\" ".
+                "FROM \"TBL_SpatialLayerGroups\" ".
+                "INNER JOIN \"TBL_SpatialLayerTypes\" ".
+                "ON \"TBL_SpatialLayerTypes\".\"ID\"=\"TBL_SpatialLayerGroups\".\"SpatialLayerTypeID\" ".
+                "WHERE \"AreaSubtypeID\"=$AreaSubtypeID ".
+                "AND \"PersonID\" IS NULL";
+
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
         $SpatialLayerGroupSet = $stmt->fetch();
+
         if ($SpatialLayerGroupSet) { // get it from the set
             $SpatialLayerGroupID = $SpatialLayerGroupSet["ID"];
         } else { // find a type and insert a new group
@@ -305,6 +313,7 @@ class TBLSpatialLayerGroups {
             $SpatialLayerGroupID = TBLSpatialLayerGroups::Insert($dbConn, $SpatialLayerTypeID);
             TBLSpatialLayerGroups::Update($dbConn, $SpatialLayerGroupID, $Name, -180, 90, 360, -180);
         }
+
         return($SpatialLayerGroupID);
     }
 
@@ -329,13 +338,13 @@ class TBLSpatialLayerGroups {
         // Note: this function does not work and used to access the DLL to project rasters and
         // nneds to be changed to use the Java BlueSpray to project rasters (and to use a file
         // format other than ECW!).
-        // 
+        //
         // This public static function will add a new raster file for the map into an existing SpatialLayerGroup as required
-        //	to display the raster on a map.  The file 
+        //	to display the raster on a map.  The file
         //	will be projected into the specified CoordinateSystemID.  This also includes:
         //	- Adding a new SpatialLayer if there is not one that matches the CoordinateSystemID
         //
-	// You will need to call TBL_SpatialLayerGroups::UpdateBounds() and 
+	// You will need to call TBL_SpatialLayerGroups::UpdateBounds() and
         //	TBL_SpatialLayerTypes::UpdateBounds() after calling this function
         // (obsolete)//
 
@@ -356,7 +365,7 @@ class TBLSpatialLayerGroups {
 
         $UpdateString = "UPDATE TBL_SpatialLayers " .
                 "SET FolderPath='$LayerPath'," .
-                "GeometryType=" . GEOMETRY_TYPE_RASTER . ", " .
+                "GeometryType=" . Constants::GEOMETRY_TYPE_RASTER . ", " .
                 "CoordinateSystemID=" . $CoordinateSystemID . " " .
                 "WHERE ID=$SpatialLayerID";
 
@@ -439,12 +448,12 @@ class TBLSpatialLayerGroups {
     public static function AddMapFiles($Database, $UserID, $InsertLogID, $SpatialLayerGroupID, $Name, $DestinPath) {
         //
         // called by GeoRaster_Update.php - not currently working because of GoogleMaps and BlueSpray Java roll
-        //  
+        //
         // Adds a raster file to an existing group.  Projects the raster into the various projectsion
         // (this is obsolete with GoogleMaps)
         // project the raster to Geographic
 
-        $GeographicRasterFilePath = TBL_SpatialLayerGroups::AddMapFile($Database, $UserID, $InsertLogID, $SpatialLayerGroupID, $Name, $DestinPath, COORDINATE_SYSTEM_WGS84_GEOGRAPHIC);
+        $GeographicRasterFilePath = TBL_SpatialLayerGroups::AddMapFile($Database, $UserID, $InsertLogID, $SpatialLayerGroupID, $Name, $DestinPath, Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC);
 
         // load the new raster to project it into the UTM zones it overlaps with
 
@@ -453,7 +462,7 @@ class TBLSpatialLayerGroups {
 
         // add the raster to the UTM zones it appears in
 
-        if ($Raster->GetRefPixelWidth() < 0.01) { // make sure we have a raster with pixels less than 1 kilometer 
+        if ($Raster->GetRefPixelWidth() < 0.01) { // make sure we have a raster with pixels less than 1 kilometer
             $RefX = $Raster->GetRefX();
             $RefY = $Raster->GetRefY();
             $RefWidth = $Raster->GetRefWidth();

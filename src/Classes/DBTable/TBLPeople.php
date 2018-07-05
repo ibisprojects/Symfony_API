@@ -22,17 +22,17 @@ class TBLPeople {
     public static function GetPersonSetFromProjectID($dbConn, $ProjectID, $Role = null) {
         //print_r($ProjectID." ".$Role);
         //die();
-        $SelectString = "SELECT TBL_People.ID as ID,FirstName,LastName " .
-                "FROM REL_PersonToProject,TBL_People " .
-                "WHERE ProjectID=$ProjectID " .
-                "AND TBL_People.ID=PersonID ";
+        $SelectString = "SELECT \"TBL_People\".\"ID\" as \"ID\",\"FirstName\",\"LastName\" " .
+                "FROM \"REL_PersonToProject\",\"TBL_People\" " .
+                "WHERE \"ProjectID\"=$ProjectID " .
+                "AND \"TBL_People\".\"ID\"=\"PersonID\" ";
 
         if ($Role !== null)
-            $SelectString.="AND Role=$Role ";
+            $SelectString.="AND \"Role\"=$Role ";
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
         $PeopleSet = array();
-       
+
         while ($PeopleEntry = $stmt->fetch()) {
             $PeopleSet[]= array("ID"=>$PeopleEntry["ID"],"FirstName"=>$PeopleEntry["FirstName"],"LastName"=>$PeopleEntry["LastName"]);
         }
@@ -40,23 +40,24 @@ class TBLPeople {
     }
 
     public static function verifyUser($dbConn, $UserID) {
-        $UpdateString = "UPDATE TBL_People " .
-                "SET ValidatedEmail = 1 " .
-                "WHERE ID = :UserID";
+        $UpdateString = "UPDATE \"TBL_People\" " .
+                "SET \"ValidatedEmail\" = 1 " .
+                "WHERE \"ID\" = :UserID";
         $stmt = $dbConn->prepare($UpdateString);
         $stmt->bindValue("UserID", $UserID);
         $stmt->execute();
     }
 
     public static function validateUsernamePassword($dbConn, $userName, $password) {
-        $sql = "SELECT Login FROM TBL_People
-                WHERE  Login = :username AND password = :password";
+        $sql = "SELECT \"Login\" FROM \"TBL_People\"
+                WHERE  \"Login\" = :username AND \"Password\" = :password";
         $stmt = $dbConn->prepare($sql);
         $stmt->bindValue("username", $userName);
         $stmt->bindValue("password", sha1($password));
 
         $stmt->execute();
         $user = $stmt->fetch();
+
         if (!$user) {
             return false;
         }
@@ -65,8 +66,8 @@ class TBLPeople {
 
     public static function GetSetFromID($dbConn, $Id) {
         $SelectString = "SELECT * " .
-                "FROM TBL_People " .
-                "WHERE ID='" . $Id . "'";
+                "FROM \"TBL_People\" " .
+                "WHERE \"ID\"='" . $Id . "'";
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
         $user = $stmt->fetch();
@@ -78,8 +79,8 @@ class TBLPeople {
 
     public static function GetSetFromEmail($dbConn, $Email) {
         $SelectString = "SELECT * " .
-                "FROM TBL_People " .
-                "WHERE Email='" . $Email . "'";
+                "FROM \"TBL_People\" " .
+                "WHERE \"Email\"='" . $Email . "'";
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
         $user = $stmt->fetch();
@@ -90,10 +91,9 @@ class TBLPeople {
     }
 
     public static function GetSetFromLogin($dbConn, $Login) {
-
         $SelectString = "SELECT * " .
-                "FROM TBL_People " .
-                "WHERE Login = :Login ";
+                "FROM \"TBL_People\" " .
+                "WHERE \"Login\" = :Login ";
 
         $stmt = $dbConn->prepare($SelectString);
         $stmt->bindValue("Login", $Login);
@@ -137,10 +137,10 @@ class TBLPeople {
 			$ServerName="ibis-test1.nrel.colostate.edu";
 		} else {
 			$ServerName = "www.citsci.org";
-		}	
-		
+		}
+
 		$Link  = "http://$ServerName/cwis438/UserManagement/EmailValidation.php?WebSiteID=7&Code=$randomString&UserID=$personID";
-      
+
 		$Message = "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 3.2 Final//EN'> ".
 		"<html> ".
 		"<head> ".
@@ -169,7 +169,7 @@ class TBLPeople {
                         "<br><br></td></tr></table></body></html>";
 
 		EmailUtil::SendHTMLMsg($Email, "Welcome to CitSci.org - Please complete your registration by verifying your email.", $Message, 7);
-       
+
         return $personID;
     }
 

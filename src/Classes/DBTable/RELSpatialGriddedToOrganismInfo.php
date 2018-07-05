@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: REL_SpatialGriddedToArea.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -29,6 +29,7 @@ namespace Classes\DBTable;
 // Definitions
 //**************************************************************************************
 
+use API\CLasses\Constants;
 
 define('DURATIONS', false);
 
@@ -77,7 +78,7 @@ class RELSpatialGriddedToOrganismInfo {
     private static function GetSetFromID($Database_SpatialData, $ID, $ZoomLevel) {
         $REL_SpatialGriddedToOrganismInfo = "REL_SpatialGriddedToOrganismInfo_" . $ZoomLevel;
 
-        $ID = SafeInt($ID);
+        $ID = SQL::SafeInt($ID);
 
         $SelectString = "SELECT * " .
                 "FROM $REL_SpatialGriddedToOrganismInfo " .
@@ -150,7 +151,7 @@ class RELSpatialGriddedToOrganismInfo {
         // add or increment the relationships at each zoom level
 
         if ($OrganismInfoID != null) { // have an organism
-            for ($ZoomLevel = ZOOM_LEVEL_MIN; $ZoomLevel <= ZOOM_LEVEL_MAX; $ZoomLevel++) {
+            for ($ZoomLevel = Constants::ZOOM_LEVEL_MIN; $ZoomLevel <= Constants::ZOOM_LEVEL_MAX; $ZoomLevel++) {
                 $TBL_SpatialGridded = "TBL_SpatialGridded_" . $ZoomLevel;
                 $REL_SpatialGriddedToOrganismInfo = "REL_SpatialGriddedToOrganismInfo_" . $ZoomLevel;
                 $REL_SpatialGriddedToArea = "REL_SpatialGriddedToArea_" . $ZoomLevel;
@@ -250,7 +251,7 @@ class RELSpatialGriddedToOrganismInfo {
     public static function RemoveSpatialGridRelationship($Database, $OrganismDataID) {
     //
     // Called by TBL_OrganismData//
-   	
+
         $Database_SpatialData = new DB_Connection();
         $Database_SpatialData->Connect("SpatialData_GoogleMaps", "sa", "cheatgrass");
 
@@ -269,7 +270,7 @@ class RELSpatialGriddedToOrganismInfo {
 //		DebugWriteln("REL_SpatialGriddedToOrganismInfo::RemoveSpatialGridRelationship() AreaID=$AreaID");
         // get the set of relationships
 
-        for ($ZoomLevel = ZOOM_LEVEL_MIN; $ZoomLevel <= ZOOM_LEVEL_MAX; $ZoomLevel++) {
+        for ($ZoomLevel = Constants::ZOOM_LEVEL_MIN; $ZoomLevel <= Constants::ZOOM_LEVEL_MAX; $ZoomLevel++) {
             $TBL_SpatialGridded = "TBL_SpatialGridded_" . $ZoomLevel;
             $REL_SpatialGriddedToOrganismInfo = "REL_SpatialGriddedToOrganismInfo_" . $ZoomLevel;
             $REL_SpatialGriddedToArea = "REL_SpatialGriddedToArea_" . $ZoomLevel;
@@ -309,7 +310,7 @@ class RELSpatialGriddedToOrganismInfo {
                         $Database_SpatialData->Execute($UpdateString);
                     }
 //DebugWriteln("4");
-                } else { // 
+                } else { //
                     Writeln("*********** Error: Missing REL_SpatialGriddedToOrganismInfo: AreaID=$AreaID, OrganismInfoID=$OrganismInfoID, ZoomLevel=$ZoomLevel");
                 }
             }
@@ -329,7 +330,7 @@ class RELSpatialGriddedToOrganismInfo {
 
         $AttributeTypeID = $AttributeDataSet->Field("AttributeTypeID");
 
-        if ($AttributeTypeID == ATTRIBUTE_PRESENCE) { // only worry about presence values
+        if ($AttributeTypeID == Constants::ATTRIBUTE_PRESENCE) { // only worry about presence values
             $AttributeValueID = $AttributeDataSet->Field("AttributeValueID");
             $OrganismDataID = $AttributeDataSet->Field("OrganismDataID");
             if (DURATIONS)
@@ -345,7 +346,7 @@ class RELSpatialGriddedToOrganismInfo {
             // get the set of relationships
 
             if ($OrganismInfoID != null) {
-                for ($ZoomLevel = ZOOM_LEVEL_MIN; $ZoomLevel <= ZOOM_LEVEL_MAX; $ZoomLevel++) {
+                for ($ZoomLevel = Constants::ZOOM_LEVEL_MIN; $ZoomLevel <= Constants::ZOOM_LEVEL_MAX; $ZoomLevel++) {
 
                     $TBL_SpatialGridded = "TBL_SpatialGridded_" . $ZoomLevel;
                     $REL_SpatialGriddedToOrganismInfo = "REL_SpatialGriddedToOrganismInfo_" . $ZoomLevel;
@@ -378,13 +379,13 @@ class RELSpatialGriddedToOrganismInfo {
                             // get the appropriate SQL string to increment or decrement
 
                             if ($InsertFlag) { // inserting
-                                if ($AttributeValueID == ATTRIBUTE_VALUE_PRESENT) {
+                                if ($AttributeValueID == Constants::ATTRIBUTE_VALUE_PRESENT) {
                                     $UpdateString = "NumPresent=NumPresent+1 ";
                                 } else { // ATTRIBUTE_VALUE_ABSENT
                                     $UpdateString = "NumAbsent=NumAbsent+1 ";
                                 }
                             } else { // deleting
-                                if ($AttributeValueID == ATTRIBUTE_VALUE_PRESENT) {
+                                if ($AttributeValueID == Constants::ATTRIBUTE_VALUE_PRESENT) {
                                     $UpdateString = "NumPresent=NumPresent-1 ";
                                 } else { // ATTRIBUTE_VALUE_ABSENT
                                     $UpdateString = "NumAbsent=NumAbsent-1 ";
@@ -413,7 +414,7 @@ class RELSpatialGriddedToOrganismInfo {
                             if (DURATIONS)
                                 DebugWriteln("UpdateAttributeData::DeleteTiles Duration=" . (GetMicrotime() - $StartTime));
                         }
-                        //			    	else // 
+                        //			    	else //
                         //			    	{
                         //		    			Writeln("*********** Error: Missing REL_SpatialGriddedToArea: AreaID=$AreaID, ZoomLevel=$ZoomLevel");
                         //		    		}

@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: REL_PersonToProject.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -34,19 +34,10 @@ namespace Classes\DBTable;
 //**************************************************************************************
 use Classes\TBLDBTables;
 
-
-define("PROJECT_UNKNOWN", "0");
-define("PROJECT_UNDEFINED", "1"); // don't use!
-define("PROJECT_CONTRIBUTOR", "2");
-define("PROJECT_REVIEWER", "3");
-define("PROJECT_AUTHORITY", "4");
-define("PROJECT_MANAGER", "5");
-define("PROJECT_ADMIN", "6");
-
 class RELPersonToProject {
 
     //******************************************************************************
-    // Private functions 
+    // Private functions
     //******************************************************************************
 
     public static function AddSearchWhereClause($Database, &$SelectString, $PersonID = null, $ProjectID = null, $WebsiteID = null) {
@@ -93,7 +84,7 @@ class RELPersonToProject {
     }
 
     public static function GetSetFromID($Database, $ID) {
-        $ID = SafeInt($ID);
+        $ID = SQL::SafeInt($ID);
 
         $SelectString = "SELECT * " .
                 "FROM REL_PersonToProject " .
@@ -166,7 +157,7 @@ class RELPersonToProject {
         RELPersonToProject::Update($dbConn, $ID, $PersonID, $ProjectID, $Role, $RequestedRole);
 
         return($ID);
-    }  
+    }
 
     public static function Update($dbConn, $ID, $PersonID, $ProjectID, $Role = null, $RequestedRole = null) {
         $UpdateString = "UPDATE REL_PersonToProject " .
@@ -185,7 +176,7 @@ class RELPersonToProject {
         $stmt->bindValue("PersonID", $PersonID);
         $stmt->bindValue("ProjectID", $ProjectID);
         $stmt->bindValue("ID", $ID);
-        $stmt->execute(); 
+        $stmt->execute();
 
         return($ID);
     }

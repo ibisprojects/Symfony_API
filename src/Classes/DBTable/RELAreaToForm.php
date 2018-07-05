@@ -6,7 +6,7 @@ namespace Classes\DBTable;
 // Owner: gjn
 // Basic static database interaction class
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -37,16 +37,15 @@ namespace Classes\DBTable;
 use Classes\TBLDBTables;
 
 class RELAreaToForm {
-
     public static function GetSet($dbConn, $AreaID = 0, $FormID = 0) {
-        $SelectString = "SELECT  REL_AreaToForm.ID, REL_AreaToForm.AreaID, REL_AreaToForm.FormID, TBL_Areas.AreaName 
-    		FROM REL_AreaToForm INNER JOIN
-                TBL_Areas ON REL_AreaToForm.AreaID = TBL_Areas.ID";
+        $SelectString = "SELECT \"REL_AreaToForm\".\"ID\", \"REL_AreaToForm\".\"AreaID\", \"REL_AreaToForm\".\"FormID\", \"TBL_Areas\".\"AreaName\"
+    		FROM \"REL_AreaToForm\" INNER JOIN
+                \"TBL_Areas\" ON \"REL_AreaToForm\".\"AreaID\" = \"TBL_Areas\".\"ID\"";
 
         if ($AreaID > 0)
-            TBLDBTables::AddWhereClause($SelectString, "AreaID= :AreaID");
+            TBLDBTables::AddWhereClause($SelectString, "\"AreaID\"= :AreaID");
         if ($FormID > 0)
-            TBLDBTables::AddWhereClause($SelectString, "FormID= :FormID");
+            TBLDBTables::AddWhereClause($SelectString, "\"FormID\"= :FormID");
 
         TBLDBTables::AddOrderByClause($SelectString, "AreaName", false);
 
@@ -62,51 +61,9 @@ class RELAreaToForm {
              $data[] = array("AreaID"=>$FormEntry["AreaID"],"AreaName"=>$FormEntry["AreaName"]);
              //print_r($FormID);
          }
-         
+
         return $data;
     }
-
-    public static function GetSetFromID($Database, $ID) {
-        $SelectString = "SELECT * FROM REL_AreaToForm 
-    		WHERE ID = $ID";
-
-        $Set = $Database->Execute($SelectString);
-
-        return($Set);
-    }
-
-    // *********************************************************************************
-
-    public static function Insert($Database, $AreaID, $FormID) {
-        $ID = -1;
-
-        $ExecString = "EXEC insert_REL_AreaToForm $AreaID, $FormID";
-
-        $ID = $Database->DoInsert($ExecString);
-
-        return($ID);
-    }
-
-    public static function Update($Database, $ID, $AreaID, $FormID) {
-        $UpdateString = "UPDATE REL_AreaToForm " .
-                "SET AreaID='$AreaID', " .
-                "SET FormID='$FormID'";
-
-        $UpdateString = $UpdateString . "WHERE ID=" . $ID;
-
-        $Database->Execute($UpdateString);
-
-        return($ID);
-    }
-
-    public static function Delete($Database, $ID = 0) {
-        TBL_DBTables::Delete($Database, "REL_AreaToForm", $ID);
-    }
-
-    //*******************************************************************
-    // Additional functions
-    //*******************************************************************
-//
 }
 
 ?>

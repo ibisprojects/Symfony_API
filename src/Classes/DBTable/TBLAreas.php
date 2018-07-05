@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: Area.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -30,14 +30,11 @@ namespace Classes\DBTable;
 // Definitions
 //**************************************************************************************
 use Classes\DBTable\TBLSpatialLayerData;
+use Classes\Utilities\SQL;
+use Classes\TBLDBTables;
+use API\Classes\Constants;
 
-define("AREA_SUBTYPE_COUNTRIES", 2);
 define("AREA_SUBTYPE_COUNTIES", 4);
-define("AREA_SUBTYPE_HUC_8", 44);
-define("AREA_SUBTYPE_NATIONAL_PARKS", 6);
-define("AREA_SUBTYPE_WILDLIFE_REFUGES", 8);
-define("AREA_SUBTYPE_7_5_MINUTE_GRIDS", 38);
-define("AREA_SUBTYPE_TRAIL_SEGMENT", 63);
 
 $SensitiveStrings = array("Not Sensitive", "7.5 minute (>12km)");
 
@@ -54,7 +51,7 @@ $SenstiveFactors = array(0, 8.0, 4.0, 2.0, 1.0);
 class TBLAreas {
 
     //******************************************************************************
-    // Private functions 
+    // Private functions
     //******************************************************************************
 
     public static function AddSearchWhereClause($Database, &$SelectString, $SearchString = null, $FirstLetter = null, $ProjectID = null, $AreaSubtypeID = null, $OrganismInfoID = null, $NationID = null, $StateID = null, $RefX = null, $RefY = null, $RefWidth = null, $RefHeight = null) {
@@ -103,13 +100,13 @@ class TBLAreas {
                     "FROM REL_AreaToArea " .
                     "WHERE Area2ID IN ($SelectLevel1) ";
 
-            $SelectLevel3 = // areas that are parents that contain an area that contains an area with the species 
+            $SelectLevel3 = // areas that are parents that contain an area that contains an area with the species
                     // (i.e. a state that contains a county with a national park with a plot)
                     "SELECT DISTINCT ParentID " .
                     "FROM TBL_Areas " .
                     "WHERE ID IN ($SelectLevel2) ";
 
-            $SelectLevel4 = // areas that are parents of areas that are parents of areas that contain an area that contains an area with the species 
+            $SelectLevel4 = // areas that are parents of areas that are parents of areas that contain an area that contains an area with the species
                     // (i.e. a nation that contains a state that contains a county with a national park with a plot)
                     "SELECT DISTINCT ParentID " .
                     "FROM TBL_Areas " .
@@ -205,16 +202,19 @@ class TBLAreas {
 
     public static function GetSetFromID($dbConn, $ID) {
         $SelectString = "SELECT * " .
-                "FROM TBL_Areas " .
-                "WHERE ID='$ID'";
+                "FROM \"TBL_Areas\" " .
+                "WHERE \"ID\"='$ID'";
 
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
-        $user = $stmt->fetch();
-        if (!$user) {
+
+        $set = $stmt->fetch();
+
+        if (!$set) {
             return false;
         }
-        return $user;
+
+        return $set;
     }
 
     public static function GetTotalRows($Database, $SearchString = null, $FirstNameLetter = null, $ProjectID = null, $AreaSubtypeID = null, $OrganismInfoID = null, $NationID = null, $StateID = null, $RefX = null, $RefY = null, $RefWidth = null, $RefHeight = null) {
@@ -223,7 +223,7 @@ class TBLAreas {
         //
 	// Parameters for all classes:
         //	SearchString - a string to search in text associted with the project
-        //	
+        //
         // Class specific fields:
         //	SearchIn - definition for which fields to search in (see definitions at top of the file)
         //	OrganizationID - just return this organizations projects
@@ -262,7 +262,7 @@ class TBLAreas {
         //
 	// Class specific search fields:
         //	SearchIn - definition for which fields to search in (see definitions at top of the file)
-        //	MatchTo - 
+        //	MatchTo -
         //	OrganizationID - just return this organizations projects
         //	$OrganismInfoID - just return projects containing visits with this taxon//
 
@@ -310,31 +310,46 @@ class TBLAreas {
     }
 
     public static function Insert($dbConn, $AreaSubtypeID, $AreaName = "", $AreaCode = "", $UniqueToVisit = 0, $ProjectID = 0, $InsertLogID = 0, $ParentID = 0, $Accuracy = null, $Comments = null) {
+        $data = array(
+            'AreaSubtypeID' => SQL::SafeInt($AreaSubtypeID),
+            'AreaName' => "'".SQL::SafeString($AreaName)."'",
+            'Code' => "'".SQL::SafeString($AreaCode)."'"
+        );
 
-        $ExecString = "EXEC insert_TBL_Areas " . $AreaSubtypeID;
-        $stmt = $dbConn->prepare($ExecString);
-        $stmt->execute();
-        $ID = $dbConn->lastInsertId();
-        $String = "UPDATE TBL_Areas " .
-                "SET AreaName='" . $AreaName . "', " .
-                "Code='" . $AreaCode . "' ";
-
-        if ($UniqueToVisit != 0)
-            $String.=", UniqueToVisit=" . $UniqueToVisit;
+        if (!empty($UniqueToVisit))
+            $data['UniqueToVisit'] = 'true';
         if ($ProjectID != 0)
-            $String.=", ProjectID=" . $ProjectID;
+            $data['ProjectID'] = $ProjectID;
         if ($InsertLogID != 0)
-            $String.=", InsertLogID=" . $InsertLogID;
+            $data['InsertLogID'] = $InsertLogID;
         if ($ParentID != 0)
-            $String.=", ParentID=" . $ParentID;
+            $data['ParentID'] = $ParentID;
         if ($Accuracy !== null)
-            $String.=", Uncertainty=" . $Accuracy;
+            $data['Uncertainty'] = $Accuracy;
         if ($Comments !== null)
-            $String.=", Comments='" . $Comments . "'";
+            $data['Comments'] = "'".SQL::SafeString($Comments)."'";
 
-        $String.=" WHERE ID=$ID";
-        $stmt = $dbConn->prepare($ExecString);
+        $columns = '';
+        $columnsData = '';
+
+        foreach ($data as $column => $columnData)
+        {
+            $column = trim($column);
+
+            if (empty($column))
+                continue;
+
+            $columns .= '"'.$column.'",';
+            $columnsData .= $columnData.',';
+        }
+
+        $columns = rtrim($columns, ',');
+        $columnsData = rtrim($columnsData, ',');
+
+        $stmt = $dbConn->prepare("INSERT INTO \"TBL_Areas\" ($columns) VALUES ($columnsData)");
         $stmt->execute();
+        $ID = $dbConn->lastInsertId('"TBL_Areas_ID_seq"');
+
         return($ID);
     }
 
@@ -358,23 +373,21 @@ class TBLAreas {
     }
 
     //**********************************************************************************
-    public static function Delete($Database, $AreaID) {
+    public static function Delete($dbConn, $AreaID) {
         //
         //	Deletes an area and its associated records:
         //		TBL_SpatialLayerData
         //		REL_AreaToArea.Area1ID or Area2ID
         //		REL_OrganismToArea
         //		Does not delete TBL_Visits.AreaID as these should be deleted after the area//
-//		DebugWriteln("TBL_AReas::Delete AreaID=$AreaID");
+
         // delete the assocaited spatial data
 
-        TBL_SpatialLayerData::DeleteFromAreaID($Database, $AreaID); // is this needed? should be called through relationships
-
-        TBL_SpatialGridded::DeleteFromAreaID($Database, $AreaID);
+        TBLSpatialLayerData::DeleteFromAreaID($dbConn, $AreaID); // is this needed? should be called through relationships
 
         // delete the area record
 
-        TBL_DBTables::Delete($Database, "TBL_Areas", $AreaID);
+        TBLDBTables::Delete($dbConn, "TBL_Areas", $AreaID);
     }
 
     //******************************************************************************
@@ -393,7 +406,7 @@ class TBLAreas {
 
     public static function GetIDFromCoordinate($dbConn, $X, $Y, $CoordinateSystemID = 1, $GeometryType = 1, $ProjectID = null) {
         //
-        // Queries for an existing area for a given project.  
+        // Queries for an existing area for a given project.
         //
 	// For typicaly GODM situations the only coordinate system ID supported is
         // Geographic, WGS84.  Works only for point areas.
@@ -409,24 +422,21 @@ class TBLAreas {
 
         // make sure the coorindate is in geographic
 
-        if ($CoordinateSystemID != COORDINATE_SYSTEM_WGS84_GEOGRAPHIC) {
-            $ErrorString = LKU_CoordinateSystems::CoordinateToGeographic($Database, $RefX, $RefY, $CoordinateSystemID);
-
-            $CoordinateSystemID = COORDINATE_SYSTEM_WGS84_GEOGRAPHIC;
+        if ($CoordinateSystemID != Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC) {
+            $CoordinateSystemID = Constants::COORDINATE_SYSTEM_WGS84_GEOGRAPHIC;
         }
 
-        $SelectString = "SELECT TBL_Areas.ID " .
-                "FROM TBL_Areas " .
-//             "INNER JOIN TBL_Visits ON TBL_Visits.AreaID=TBL_Areas.ID " .
-                "INNER JOIN TBL_SpatialLayerData ON TBL_SpatialLayerData.AreaID=TBL_Areas.ID " .
-                "INNER JOIN LKU_AreaSubtypes ON LKU_AreaSubtypes.ID=TBL_Areas.AreaSubtypeID " .
-                "WHERE CoordinateSystemID=$CoordinateSystemID " .
-                "AND GeometryType=$GeometryType " .
-                "AND RefX=$X " .
-                "AND RefY=$Y ";
+        $SelectString = "SELECT \"TBL_Areas\".\"ID\" " .
+            "FROM \"TBL_Areas\" " .
+            "INNER JOIN \"TBL_SpatialLayerData\" ON \"TBL_SpatialLayerData\".\"AreaID\"=\"TBL_Areas\".\"ID\" " .
+            "INNER JOIN \"LKU_AreaSubtypes\" ON \"LKU_AreaSubtypes\".\"ID\"=\"TBL_Areas\".\"AreaSubtypeID\" " .
+            "WHERE \"CoordinateSystemID\"=$CoordinateSystemID " .
+            "AND \"GeometryType\"=$GeometryType " .
+            "AND \"RefX\"=$X " .
+            "AND \"RefY\"=$Y ";
 
         if ($ProjectID != null)
-            $SelectString.="AND TBL_Areas.ProjectID=$ProjectID ";
+            $SelectString.="AND \"TBL_Areas\".\"ProjectID\"=$ProjectID ";
 
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
@@ -434,8 +444,6 @@ class TBLAreas {
 
         if ($area)
             $AreaID = $area["ID"];
-
-        //DebugWriteln("AreaID=$AreaID");
 
         return($AreaID);
     }
@@ -511,7 +519,7 @@ class TBLAreas {
                 "TBL_Areas.AreaName AS AreaName " .
                 "FROM TBL_SpatialLayerData INNER JOIN " .
                 "TBL_Areas ON TBL_SpatialLayerData.AreaID = TBL_Areas.ID " .
-                "WHERE (TBL_SpatialLayerData.AreaID = " . SafeInt($ID) . ") AND (TBL_SpatialLayerData.CoordinateSystemID = 1)";
+                "WHERE (TBL_SpatialLayerData.AreaID = " . SQL::SafeInt($ID) . ") AND (TBL_SpatialLayerData.CoordinateSystemID = 1)";
 
         //DebugWriteln("SelectString="+SelectString);
 
@@ -520,16 +528,16 @@ class TBLAreas {
         return($AreaSet);
     }
 
-    public static function GetAreaName($Database, $ID) {
-        $SelectString = "SELECT AreaName " .
-                "FROM TBL_Areas " .
-                "WHERE ID=" . SafeInt($ID);
+    public static function GetAreaName($dbConn, $ID) {
+        $SelectString = "SELECT \"AreaName\" " .
+            "FROM \"TBL_Areas\" " .
+            "WHERE \"ID\"=:ID";
 
-        $RecordSet = $Database->Execute($SelectString);
+        $stmt = $dbConn->prepare($SelectString);
+        $stmt->bindValue("ID", SQL::SafeInt($ID));
+        $stmt->execute();
 
-        //$RecordSet->FetchRow();
-
-        return($RecordSet->Field("AreaName"));
+        return $stmt->fetchColumn(); // area name
     }
 
     public static function GetAreaIDFromCodes($Database, $AreaSubtypeID, $AreaCode = 0, $ParentTypeID = 0, $ParentCode = null, $ParentID = 0, $ProjectID = 0) {
@@ -552,9 +560,9 @@ class TBLAreas {
         // Return a query to return a list of areas based on codes and other settings//
 
         if ($ParentCode !== 0)
-            $AreaCode = SafeString($AreaCode);
+            $AreaCode = SQL::SafeString($AreaCode);
         if ($ParentCode !== null)
-            $ParentCode = SafeString($ParentCode);
+            $ParentCode = SQL::SafeString($ParentCode);
 
 //		DebugWriteln("AreaCode=$AreaCode");
 //		DebugWriteln("Parent code is null=".is_null($ParentCode));
@@ -680,7 +688,7 @@ class TBLAreas {
             if (($ProjectID > 0) && ($Sensitive > 0)) {
                 // if the user is not on the project, must blur the coordinates
 
-                if (REL_PersonToProject::HasRole($Database, $ProjectID, PROJECT_CONTRIBUTOR)) {
+                if (REL_PersonToProject::HasRole($Database, $ProjectID, Constants::PROJECT_CONTRIBUTOR)) {
                     $Factor = $SenstiveFactors[$Sensitive];
 
                     $RefX = (int) ($RefX * $Factor) / $Factor;
@@ -791,17 +799,19 @@ class TBLAreas {
     // Additional functions
     //******************************************************************************
     public static function GetSetFromAreaName($dbConn, $AreaName) {
-
         $SelectString = "SELECT * " .
-                "FROM TBL_Areas " .
-                "WHERE LOWER(AreaName) ='" . strtolower($AreaName) . "'";
-       $stmt = $dbConn->prepare($SelectString);
+                "FROM \"TBL_Areas\" " .
+                "WHERE LOWER(\"AreaName\") ='" . strtolower($AreaName) . "'";
 
-        $stmt->execute();
+       $stmt = $dbConn->prepare($SelectString);
+       $stmt->execute();
+
         $AreaSet = $stmt->fetch();
+
         if (!$AreaSet) {
             return false;
         }
+
         return($AreaSet);
     }
 
@@ -817,20 +827,22 @@ class TBLAreas {
     }
 
     public static function InsertPoint($dbConn, $ProjectID, $InsertLogID, $AreaName, $SubplotID, $RefX, $RefY, $CoordinateSystemID, $Accuracy, $AreaSubTypeID = null, $AreaCode = "", $Comments = null) {
-
         if ($AreaSubTypeID === null) {
-            $AreaSubTypeID = AREA_SUBTYPE_POINT; // default to point?
+            $AreaSubTypeID = Constants::AREA_SUBTYPE_POINT; // default to point?
         }
 
         if ($SubplotID !== null) {
             $SubplotTypeSet = LKUSubplotTypes::GetSetFromID($dbConn, $SubplotID);
             $AreaSubTypeID = $SubplotTypeSet["AreaSubtypeID"];
         }
+
         $AreaID = TBLAreas::Insert($dbConn, $AreaSubTypeID, $AreaName, $AreaCode, 1, $ProjectID, $InsertLogID, 0, $Accuracy, $Comments);
+
         // add all the spatial data projection layers; do we need to also do a check for existing area with same x,y coords?
         TBLSpatialLayerData::Insert($dbConn, $AreaID, $RefX, $RefY, 0, 0, $CoordinateSystemID);
-        //RELAreaToArea::UpdateSurveyRelationships($dbConn, $AreaID, "C:/Inetpub/wwwroot/cwis438/temp/LogFile_" . TBL_UserSessions::GetID($Database, GetUserID()) . ".txt");
-        //TBLSpatialGridded::InsertForAreaID($dbConn, $AreaID);
+
+        RELAreaToArea::UpdateRelationships($dbConn, $AreaID, AREA_SUBTYPE_COUNTIES);
+
         return($AreaID);
     }
 
@@ -852,55 +864,45 @@ class TBLAreas {
 
     public static function InsertShape($dbConn, $ProjectID, $InsertLogID, $AreaName, $SubplotID, $GeometryString, $CoordinateSystemID, $Accuracy, $AreaSubTypeID = null, $AreaCode = "") {
         if ($AreaSubTypeID === null) {
-            $AreaSubTypeID = AREA_SUBTYPE_POINT; // jjg - default to point?
+            $AreaSubTypeID = Constants::AREA_SUBTYPE_POINT; // default to point?
         }
+
         if (($SubplotID !== null) && ($SubplotID != 0)) {
             $SubplotTypeSet = LKUSubplotTypes::GetSetFromID($dbConn, $SubplotID); //was $AreaSubTypeID
-
             $AreaSubTypeID = $SubplotTypeSet["AreaSubtypeID"];
         }
-        $i = 0;
+
         $AreaSet = TBLAreas::GetSetFromAreaName($dbConn, $AreaName);
+        $i = 0;
+
         while ($AreaSet) {
             $i++;
-            $AreaSet = TBLAreas::GetSetFromAreaName($dbConn, $AreaName . '_' . $i);
+            $AreaSet = TBLAreas::GetSetFromAreaName($dbConn, $AreaName.'_'.$i);
         }
+
         if ($i > 0) {
-            $AreaName .= '_' . $i;
+            $AreaName .= '_'.$i;
         }
+
         $AreaID = TBLAreas::Insert($dbConn, $AreaSubTypeID, $AreaName, $AreaCode, 1, $ProjectID, $InsertLogID, 0, $Accuracy);
+
         // add all the spatial data projection layers; do we need to also do a check for existing area with same x,y coords?
-        $ErrorString = TBLSpatialLayerData::Insert($dbConn, $AreaID, 0, 0, 0, 0, $CoordinateSystemID, 0, $GeometryString);
-        //REL_AreaToArea::UpdateSurveyRelationships($Database, $AreaID, "C:/Inetpub/wwwroot/cwis438/temp/LogFile_" . TBL_UserSessions::GetID($Database, GetUserID()) . ".txt");
-        //TBLSpatialGridded::InsertForAreaID($Database, $AreaID);
-       return($AreaID);
+
+        TBLSpatialLayerData::Insert($dbConn, $AreaID, 0, 0, 0, 0, $CoordinateSystemID, 0, $GeometryString);
+        RELAreaToArea::UpdateRelationships($dbConn, $AreaID, AREA_SUBTYPE_COUNTIES);
+
+        return $AreaID;
     }
 
     public static function UpdateShape($Database, $AreaID, $GeometryString) {
         // delete existing spatial data
 
         TBL_SpatialLayerData::DeleteFromAreaID($Database, $AreaID);
-//		DebugWriteln("Done with TBL_SpatialLayerData::DeleteFromAreaID");
-
         TBL_SpatialGridded::DeleteFromAreaID($Database, $AreaID);
-//		DebugWriteln("Done with TBL_SpatialGridded::DeleteFromAreaID");	
-//		$CurrentTime=GetMicroTime();
-
-        $ErrorString = TBL_SpatialLayerData::Insert($Database, $AreaID, 0, 0, 0, 0, 1, 0, $GeometryString);
-//		TBL_SpatialLayerData::Insert($Database,$Item,$AreaID);
-//		$this->Time_InsertShapeInAllProjections+=(GetMicroTime()-$CurrentTime);
-//		DebugWriteln("Done with the insert");
-//		$CurrentTime=GetMicroTime();
-
+        TBL_SpatialLayerData::Insert($Database, $AreaID, 0, 0, 0, 0, 1, 0, $GeometryString);
         REL_AreaToArea::UpdateSurveyRelationships($Database, $AreaID);
-//		$this->Time_UpdateSurveyRelationships+=(GetMicroTime()-$CurrentTime);
-//		DebugWriteln("1");
-//		DebugWriteln("Done with UpdateSurveyRelationships");	
-
         TBL_SpatialGridded::InsertForAreaID($Database, $AreaID);
-//		DebugWriteln("Done with InsertForAreaID");	
     }
-
 }
 
 ?>

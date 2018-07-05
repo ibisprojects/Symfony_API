@@ -2,6 +2,18 @@ parameters:
 #    api_authorized_grant.example.class: API\AuthorizedGrantBundle\Example
 
 services:
-#    api_authorized_grant.example:
-#        class: %api_authorized_grant.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+  api.logger.mobile:
+    class: API\AuthorizedGrantBundle\Monolog\MobileLogger
+    arguments: [@logger]
+    tags:
+      - { name: monolog.logger, channel: mobile }
+  api.logger.fileupload:
+      class: API\AuthorizedGrantBundle\Monolog\MobileLogger
+      arguments: [@logger]
+      tags:
+        - { name: monolog.logger, channel: fileupload }
+  api.logger.insertdata:
+      class: API\AuthorizedGrantBundle\Monolog\MobileLogger
+      arguments: [@logger]
+      tags:
+        - { name: monolog.logger, channel: insertdata }

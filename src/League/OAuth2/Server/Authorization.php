@@ -422,7 +422,7 @@ class Authorization
     public function issueAccessToken($inputParams = array())
     {
         $grantType = $this->getParam('grant_type', 'post', $inputParams);
-       
+
         if (is_null($grantType)) {
             throw new Exception\ClientException(sprintf(self::$exceptionMessages['invalid_request'], 'grant_type'), 0);
         }
@@ -433,6 +433,7 @@ class Authorization
         }
 
         // Complete the flow
+
         return $this->getGrantType($grantType)->completeFlow($inputParams);
     }
 
@@ -455,6 +456,7 @@ class Authorization
      * @param  string|array $param Required parameter
      * @param  string $method      Get/put/post/delete
      * @param  array  $inputParams Passed input parameters
+     * @param  mixed  $default     Default value
      * @return mixed               'Null' if parameter is missing
      */
     public function getParam($param = '', $method = 'get', $inputParams = array(), $default = null)

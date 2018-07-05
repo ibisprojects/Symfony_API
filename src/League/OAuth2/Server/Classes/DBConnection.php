@@ -11,6 +11,25 @@ class DBConnection {
     private static $password = 'cheatgrass';
 
     public static function connect() {
+        $ComputerName = '';
+
+        if (isset($_SERVER['COMPUTERNAME'])) {
+            $ComputerName=$_SERVER['COMPUTERNAME'];
+        }
+
+        if (isset($_ENV['COMPUTERNAME'])) {
+            $ComputerName=$_ENV['COMPUTERNAME'];
+        }
+
+        $ComputerName=strtolower($ComputerName);
+
+        if ($ComputerName == 'do-api1') {
+            DBConnection::$dsn = 'mysql:dbname=oauth_db;host=citscidb1';
+            DBConnection::$password = 'avqXxCs4jm';
+        } else if ($ComputerName == 'aline') {
+            DBConnection::$password = '@linr33@!';
+        }
+
         try {
             $dbConn = new PDO(DBConnection::$dsn, DBConnection::$user, DBConnection::$password);
         } catch (PDOException $e) {

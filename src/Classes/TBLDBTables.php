@@ -5,10 +5,10 @@ namespace Classes;
 //**************************************************************************************
 // FileName: TBL_DBTables.php
 //
-// Represents a table in the database.  
+// Represents a table in the database.
 // This is the parent class for all other database table classes.
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -34,38 +34,18 @@ namespace Classes;
 //$RelationshipStrings=array("Unknown","Inside","Overlap");
 // These definitions are for ValueTypes used generically throughout the system
 
-define("VALUE_TYPE_UNKNOWN", 0);
-define("VALUE_TYPE_LOOKUP", 1);
-define("VALUE_TYPE_FLOAT", 2);
-define("VALUE_TYPE_INTEGER", 3);
-define("VALUE_TYPE_BOOLEAN", 4);
+use Classes\DBTable\TBLAreas;
+use Classes\DBTable\TBLAttributeData;
+use Classes\DBTable\TBLMedia;
+use Classes\DBTable\TBLOrganismData;
+use Classes\DBTable\TBLScriptSteps;
+use Classes\DBTable\TBLVisits;
+use Classes\DBTable\TBLSpatialLayerTypes;
+use Classes\DBTable\TBLGISINSpeciesStatuses;
+use API\Classes\Constants;
 
 $ValueTypeStrings = array(" -- Select a Data Type -- ", "Categorical", "Numeric (Decimal)", "Numeric (Integer)", "Boolean");
 
-//$ValueTypeStrings=array("Unknown","Look Up","Floating point number","Integer number");
-// These definitions are specific to the GODM ("invasvie") database
-
-define("TBL_ORGANISMDATA", 1);
-define("TBL_PROJECTS", 2);
-define("TBL_AREAS", 3);
-define("TBL_VISITS", 4);
-define("TBL_ATTRIBUTEDATA", 5);
-define("TBL_ORGANISMINFO", 6);
-define("TBL_INDIVIDUALS", 7);
-define("TBL_CONTROLAGENT", 8);
-define("TBL_TAXONUNITS", 9);
-define("TSN", 10); // TBL_TaxonUnits.TSN // jjg - we should be able to remove this
-define("TBL_INSERTLOG", 11);
-define("TBL_METADATA", 12);
-define("TBL_ORGANIZATIONS", 13);
-define("TBL_TREATMENTS", 14);
-
-// These are portable definitions
-
-define("DEBUGGING_DBTABLE", false);
-define("TIMING_DBTABLE", false);
-
-//define("NOT_SPECIFIED","");
 //**************************************************************************************
 // Class Definition
 //**************************************************************************************
@@ -80,9 +60,9 @@ class TBLDBTables {
     public static function GetFieldValue($dbConn, $TableName, $FieldName, $ID, $Default = 0) {
         $Result = $Default;
 
-        $SelectString = "SELECT $FieldName " .
-                "FROM $TableName " .
-                "WHERE ID=$ID";
+        $SelectString = "SELECT \"$FieldName\" ".
+                "FROM \"$TableName\" ".
+                "WHERE \"ID\"=$ID";
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
         $Set = $stmt->fetch();
@@ -100,19 +80,24 @@ class TBLDBTables {
         //	TableName - String, Name of the table containing the record to set a field in
         //	FieldName - String, Name of the field in the table to set
         //	ID - Integer, "ID" of the record to be set
-        //	
+        //
 
 
         if ($Value === null)
             $Value = "NULL"; // gjn; to support nulls; use is_null PHP function instead?
 
-        else if (is_string($Value)) { //is a string or date add the single quotes? gjn. Yikes. 
+        else if (is_string($Value)) //is a string or date add the single quotes? gjn. Yikes.
+        {
             $Value = "'$Value'";
         }
+        else if (is_bool($Value))
+        {
+            $Value=$Value === true ? 'true' : 'false';
+        }
 
-        $UpdateString = "UPDATE $TableName " .
-                "SET $FieldName=$Value " . // gjn; Note: Very important to check this! It was: SET $FieldName='$Value' but this was causing PHP Warnings to appear on hurricane which has a setting to display warnings. I have tested it setting to NULL for both INT and varchar db fields and it seems to be good and not generate PHP warnings.
-                "WHERE ID=$ID";
+        $UpdateString = "UPDATE \"$TableName\" " .
+                "SET \"$FieldName\"=$Value " . // gjn; Note: Very important to check this! It was: SET $FieldName='$Value' but this was causing PHP Warnings to appear on hurricane which has a setting to display warnings. I have tested it setting to NULL for both INT and varchar db fields and it seems to be good and not generate PHP warnings.
+                "WHERE \"ID\"=$ID";
 
         $stmt = $dbConn->prepare($UpdateString);
         $stmt->execute();
@@ -134,7 +119,7 @@ class TBLDBTables {
     //**********************************************************************************
     // Static database functions
     //**********************************************************************************
-    public static function Delete($Database, $ForeignTableName, $ForeignRecordID, $ModifyDatabase = true) {
+    public static function Delete($dbConn, $ForeignTableName, $ForeignRecordID) {
         //
         // Deletes the specified ForeignRecord based on the specified table name and ID.
         // jjg - we should change the $ForeignTableName to $ForeignTableID
@@ -146,238 +131,141 @@ class TBLDBTables {
         //	$DeleteRecords=true to have records actually be deleted, false is for debugging
         // 	$DeleteForeignRecord = true to have the ForeignRecord deleted (DeleteRecords and this flag must be true)//
 
-        $StartTime = GetMicrotime();
-        if (TIMING_DBTABLE)
-            DebugWriteln("ForeignTableName=$ForeignTableName");
-
-        if (DEBUGGING_DBTABLE)
-            DebugWriteln("************* Entered ***************");
-        if (DEBUGGING_DBTABLE)
-            DebugWriteln("ForeignTableName=$ForeignTableName");
-        if (DEBUGGING_DBTABLE)
-            DebugWriteln("ForeignRecordID=$ForeignRecordID");
-        if (DEBUGGING_DBTABLE)
-            DebugWriteln("ModifyDatabase=$ModifyDatabase");
-
-
         //**************************************************************************
         // get the foreign database table ID
 
-        $SelectString = "SELECT ID " .
-                "FROM LKU_DatabaseTables " .
-                "WHERE Name='$ForeignTableName'";
+        $SelectString = "SELECT \"ID\" ".
+                "FROM \"LKU_DatabaseTables\" ".
+                "WHERE \"Name\"='$ForeignTableName'";
 
-        if (DEBUGGING_DBTABLE)
-            DebugWriteln("SelectString=$SelectString");
+        $stmt = $dbConn->prepare($SelectString);
+        $stmt->execute();
 
-        $Set = $Database->Execute($SelectString);
-
-        $ForeignTableID = $Set->Field(1);
+        $ForeignTableID = $stmt->fetchColumn();
+        $stmt = null;
 
         //**************************************************************************
         // get a record set with all the field vlues in the foreign record that is about to be deleted
         // (ID or TSN could be foreign keys)
 
-        $SelectString = "SELECT * " .
-                "FROM $ForeignTableName " .
-                "WHERE ID=$ForeignRecordID ";
+        $SelectString = "SELECT * ".
+                "FROM \"$ForeignTableName\" ".
+                "WHERE \"ID\"=$ForeignRecordID ";
 
-        if (DEBUGGING_DBTABLE)
-            DebugWriteln("SelectString=$SelectString");
+        $stmt = $dbConn->prepare($SelectString);
+        $stmt->execute();
 
-        $ForeignRecordSet = $Database->Execute($SelectString);
+        $ForeignRecordSet = $stmt->fetch();
+        $stmt = null;
 
         //**************************************************************************
         // get the set of fields that are lookups to the foreign table
         // (the one we are deleting a record from)
 
-        $SelectString = "SELECT CanBeZero,CanBeNULL,DeleteOnForeignDelete,DatabaseTableID, " .
-                "ForeignDatabaseFieldID,Name " .
-                "FROM LKU_DatabaseFields " .
-                "WHERE ForeignDatabaseTableID=$ForeignTableID ";
+        $SelectString = "SELECT \"CanBeZero\",\"CanBeNULL\",\"DeleteOnForeignDelete\",\"DatabaseTableID\", ".
+                "\"ForeignDatabaseFieldID\",\"Name\" ".
+                "FROM \"LKU_DatabaseFields\" ".
+                "WHERE \"ForeignDatabaseTableID\"=$ForeignTableID ";
 
-        if (DEBUGGING_DBTABLE)
-            DebugWriteln("SelectString=$SelectString");
-
-        $FieldSet = $Database->Execute($SelectString);
+        $stmt = $dbConn->prepare($SelectString);
+        $stmt->execute();
 
         //**************************************************************************
         // loop through each field that could be linked to the record being deleted
         // either setting the fields to NULL, 0 or deleting the referencing record
 
-        $StartTime1 = GetMicrotime();
-        while ($FieldSet->FetchRow()) {
-            $StartTime2 = GetMicrotime();
-
-            $FieldName = $FieldSet->Field("Name");
-            $ForeignFieldID = (int) $FieldSet->Field("ForeignDatabaseFieldID"); // id of the field referencing the foreign record
-            $CanBeZero = (int) $FieldSet->Field("CanBeZero");
-            $CanBeNULL = (int) $FieldSet->Field("CanBeNULL");
-            $DeleteOnForeignDelete = (int) $FieldSet->Field("DeleteOnForeignDelete");
-
-            $DatabaseTableID = $FieldSet->Field("DatabaseTableID"); // referencing table id
-            if (DEBUGGING_DBTABLE)
-                DebugWriteln("DatabaseTableID=$DatabaseTableID");
-
-            if (TIMING_DBTABLE)
-                DebugWriteln("Duration2.1=" . (GetMicrotime() - $StartTime2));
-            $StartTime2 = GetMicrotime();
+        while ($row = $stmt->fetch()) {
+            $FieldName = $row["Name"];
+            $ForeignFieldID = (int) $row["ForeignDatabaseFieldID"]; // id of the field referencing the foreign record
+            $CanBeZero = (int) $row["CanBeZero"];
+            $DeleteOnForeignDelete = (int) $row["DeleteOnForeignDelete"];
+            $DatabaseTableID = $row["DatabaseTableID"]; // referencing table id
 
             // get the name of the table containing the foreign key
 
-            $TableName = TBL_DBTables::GetFieldValue($Database, "LKU_DatabaseTables", "Name", $DatabaseTableID);
-
-            if (DEBUGGING_DBTABLE)
-                DebugWriteln("TableName=$TableName");
-            if (DEBUGGING_DBTABLE)
-                DebugWriteln("FieldName=$FieldName");
-            if (DEBUGGING_DBTABLE)
-                DebugWriteln("ForeignFieldID=$ForeignFieldID");
-            if (DEBUGGING_DBTABLE)
-                DebugWriteln("CanBeZero=$CanBeZero");
-            if (DEBUGGING_DBTABLE)
-                DebugWriteln("CanBeNULL=$CanBeNULL");
-            if (DEBUGGING_DBTABLE)
-                DebugWriteln("DeleteOnForeignDelete=$DeleteOnForeignDelete");
+            $TableName = TBLDBTables::GetFieldValue($dbConn, "LKU_DatabaseTables", "Name", $DatabaseTableID);
 
             // get the name of the foreign key field and the value of the foreign key
 
-            $ForeignFieldName = TBL_DBTables::GetFieldValue($Database, "LKU_DatabaseFields", "Name", $ForeignFieldID);
+            $ForeignFieldName = TBLDBTables::GetFieldValue($dbConn, "LKU_DatabaseFields", "Name", $ForeignFieldID);
 
-            if (TIMING_DBTABLE)
-                DebugWriteln("Duration2.2=" . (GetMicrotime() - $StartTime2));
-            $StartTime2 = GetMicrotime();
+            // get the value of the foreign key in the foreign record (that is being deleted)
 
-            if (DEBUGGING_DBTABLE)
-                DebugWriteln("ForeignFieldName=$ForeignFieldName");
+            $ForeignKey = (int) $ForeignRecordSet[$ForeignFieldName]; // this is a primary key in the foreign table (ID or TSN)
 
-// 			if ($ForeignRecordSet->FetchRow()) // jjg - not sure why this is needed (record will always be there because it's the one were deleteing)
-            {
-                // get the value of the foreign key in the foreign record (that is being deleted)
+            // take the appropriate action on foreign keys
 
-                $ForeignKey = (int) $ForeignRecordSet->Field($ForeignFieldName); // this is a primary key in the foreign table (ID or TSN)
-                // take the appropriate action on foreign keys
+            if ($DeleteOnForeignDelete) { // must delete the table with the foreign key
+                $SelectString = "SELECT \"ID\" ".
+                        "FROM \"$TableName\" ".
+                        "WHERE \"$FieldName\"=$ForeignKey ";
 
-                if ($DeleteOnForeignDelete) { // must delete the table with the foreign key
-                    if (TIMING_DBTABLE)
-                        DebugWriteln("Duration2.3=" . (GetMicrotime() - $StartTime2));
-                    $StartTime2 = GetMicrotime();
+                $stmtw = $dbConn->prepare($SelectString);
+                $stmtw->execute();
 
-                    $SelectString = "SELECT ID " .
-                            "FROM $TableName " .
-                            "WHERE $FieldName=$ForeignKey ";
+                while ($tableRow = $stmtw->fetch()) {
+                    $ID = $tableRow["ID"];
 
-                    if (DEBUGGING_DBTABLE)
-                        DebugWriteln("SelectString=$SelectString");
-
-                    $RecordSet = $Database->Execute($SelectString);
-
-                    if (TIMING_DBTABLE)
-                        DebugWriteln("Duration2.4=" . (GetMicrotime() - $StartTime2));
-                    $StartTime2 = GetMicrotime();
-// DebugWriteln("TableName=$TableName");
-                    while ($RecordSet->FetchRow()) {
-                        $ID = $RecordSet->Field("ID");
-//DebugWriteln("TableName=$TableName, ID=$ID");
-                        switch ($TableName) {
-                            //   					case "REL_SpatialGriddedToOrganismInfo_GoogleMaps":
-                            //   						REL_SpatialGriddedToOrganismInfo::Delete($Database,$ID);
-                            //   						break;
-                            //   					case "REL_SpatialGriddedToArea_GoogleMaps":
-                            //   						REL_SpatialGriddedToArea::Delete($Database,$ID);
-                            //   						break;
-                            case "TBL_Areas":
-                                TBL_Areas::Delete($Database, $ID);
-                                break;
-                            case "TBL_AttributeData":
-                                TBL_AttributeData::Delete($Database, $ID);
-                                break;
-                            case "TBL_Media":
-                                TBL_Media::Delete($Database, $ID);
-                                break;
-                            case "TBL_OrganismData":
-                                TBL_OrganismData::Delete($Database, $ID);
-                                break;
-                            case "TBL_ScriptSteps":
-                                TBL_ScriptSteps::Delete($Database, $ID);
-                                break;
-                            //   					case "TBL_SpatialGridded_GoogleMaps":
-                            //   						TBL_SpatialGridded::Delete($Database,$ID);
-                            //   						break;
-                            case "TBL_Visits":
-                                TBL_Visits::Delete($Database, $ID);
-                                break;
-                            case "TBL_SpatialLayerTypes":
-                                TBL_SpatialLayerTypes::Delete($Database, $ID);
-                                break;
-                            case "TBL_GISIN_SpeciesStatuses":
-                                TBL_GISIN_SpeciesStatuses::Delete($Database, $ID);
-                                break;
-                            default:
-                                TBL_DBTables::Delete($Database, $TableName, $ID, $ModifyDatabase);
-                                break;
-                        }
-
-
-                        if (TIMING_DBTABLE)
-                            DebugWriteln("Duration2.5=" . (GetMicrotime() - $StartTime2));
-                        $StartTime2 = GetMicrotime();
+                    switch ($TableName) {
+                        case "TBL_Areas":
+                            TBLAreas::Delete($dbConn, $ID);
+                            break;
+                        case "TBL_AttributeData":
+                            TBLAttributeData::Delete($dbConn, $ID);
+                            break;
+                        case "TBL_Media":
+                            TBLMedia::Delete($dbConn, $ID);
+                            break;
+                        case "TBL_OrganismData":
+                            TBLOrganismData::Delete($dbConn, $ID);
+                            break;
+                        case "TBL_ScriptSteps":
+                            TBLScriptSteps::Delete($dbConn, $ID);
+                            break;
+                        case "TBL_Visits":
+                            TBLVisits::Delete($dbConn, $ID);
+                            break;
+                        case "TBL_SpatialLayerTypes":
+                            TBLSpatialLayerTypes::Delete($dbConn, $ID);
+                            break;
+                        case "TBL_GISIN_SpeciesStatuses":
+                            TBLGISINSpeciesStatuses::Delete($dbConn, $ID);
+                            break;
+                        default:
+                            TBLDBTables::Delete($dbConn, $TableName, $ID);
+                            break;
                     }
                 }
-                else if ($CanBeZero == 1) { // set the field to 0, "unknown"
-                    $UpdateString = "UPDATE $TableName " .
-                            "SET $FieldName=0 " .
-                            "WHERE $FieldName=$ForeignKey";
+            } else if ($CanBeZero == 1) { // set the field to 0, "unknown"
+                $UpdateString = "UPDATE \"$TableName\" ".
+                        "SET \"$FieldName\"=0 ".
+                        "WHERE \"$FieldName\"=$ForeignKey";
 
-                    if (DEBUGGING_DBTABLE)
-                        DebugWriteln("UpdateString=$UpdateString");
+                $stmtw = $dbConn->prepare($UpdateString);
+                $stmtw->execute();
+            } else { // set the field to null (this is the only remaining option)
+                $UpdateString = "UPDATE \"$TableName\" ".
+                        "SET \"$FieldName\"=NULL ".
+                        "WHERE \"$FieldName\"=$ForeignKey";
 
-                    if ($ModifyDatabase)
-                        $Database->Execute($UpdateString);
-                    else
-                        DebugWriteln("Setting $FieldName=0 in $TableName where $FieldName=$ForeignKey");
-                }
-                else { // if ($CanBeNULL==1) // set the field to null (this is the only remaining option)
-                    $UpdateString = "UPDATE $TableName " .
-                            "SET $FieldName=NULL " .
-                            "WHERE $FieldName=$ForeignKey";
-
-                    if (DEBUGGING_DBTABLE)
-                        DebugWriteln("UpdateString=$UpdateString");
-
-                    if ($ModifyDatabase)
-                        $Database->Execute($UpdateString);
-                    else
-                        DebugWriteln("Setting $FieldName=NULL in $TableName where $FieldName=$ForeignKey");
-                }
+                $stmtw = $dbConn->prepare($UpdateString);
+                $stmtw->execute();
             }
 
-            if (TIMING_DBTABLE)
-                DebugWriteln("Duration2.6=" . (GetMicrotime() - $StartTime2));
+            $stmtw = null;
         }
-        if (TIMING_DBTABLE)
-            DebugWriteln("Duration1=" . (GetMicrotime() - $StartTime1));
 
+        $stmt = null;
 
         //**************************************************************************
         // now delete the specified record if desired
 
-        $DeleteString = "DELETE FROM $ForeignTableName " .
-                "WHERE ID=$ForeignRecordID";
+        $DeleteString = "DELETE FROM \"$ForeignTableName\" ".
+                "WHERE \"ID\"=$ForeignRecordID";
 
-        if (DEBUGGING_DBTABLE)
-            DebugWriteln("DeleteString=$DeleteString");
-
-        if ($ModifyDatabase)
-            $Database->Execute($DeleteString);
-        else
-            DebugWriteln("Deleting record in $ForeignTableName where ID=$ForeignRecordID");
-
-        if (DEBUGGING_DBTABLE)
-            DebugWriteln("************* Returned ***************");
-
-        if (TIMING_DBTABLE)
-            DebugWriteln("Duration=" . (GetMicrotime() - $StartTime));
+        $stmt = $dbConn->prepare($DeleteString);
+        $stmt->execute();
+        $stmt = null;
     }
 
     //**********************************************************************************
@@ -472,13 +360,13 @@ class TBLDBTables {
     }
 
     //**********************************************************************************
-    // These functions aid in the creation of SQL queries 
+    // These functions aid in the creation of SQL queries
     //**********************************************************************************
     public static function GetSelectClause($FirstRow = 0, $NumRows = null, $Fields = null) {
         //
         //	Returns a select clause of a T-SQL string.
         //	- FirstRow = Used to increase the number of row queried, if used it must
-        //		be used in conjunction with 
+        //		be used in conjunction with
         $SelectString = "SELECT ";
 
         if ($NumRows != null) {
@@ -539,7 +427,7 @@ class TBLDBTables {
     }
 
     public static function AddUpdateClause(&$SelectString, $Field, $Value) {
-        if ($Value !== NOT_SPECIFIED) {
+        if ($Value !== Constants::NOT_SPECIFIED) {
             $EqualIndex = strpos($SelectString, "UPDATE");
 
             if ($EqualIndex !== FALSE) { // if we are not building a middle string (there is an UPDATE), make sure there is a SET
@@ -551,11 +439,11 @@ class TBLDBTables {
 
             $EqualIndex = strpos($SelectString, "=");
 
-            if ($EqualIndex !== FALSE) { // have and equals sign  
+            if ($EqualIndex !== FALSE) { // have and equals sign
                 $SelectString.=","; // add a comma because we already have an equals
             }
 
-            $SelectString.=" $Field=$Value ";
+            $SelectString.=" \"$Field\"=$Value ";
         }
 //		DebugWriteln("SelectString=$SelectString");
     }
@@ -635,7 +523,7 @@ class TBLDBTables {
           {
           $SelectString.=", ";
           }
-         */ $SelectString.=$OrderByField . " " . $SortOrder;
+         */ $SelectString.='"'.$OrderByField.'"' . " " . $SortOrder;
     }
 
 }

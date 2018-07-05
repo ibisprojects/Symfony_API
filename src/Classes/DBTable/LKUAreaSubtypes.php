@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: LKU_AreaSubtypes.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -27,24 +27,6 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // Definitions
 //**************************************************************************************
-
-define("GEOMETRY_TYPE_UNKNOWN", 0);
-define("GEOMETRY_TYPE_POINT", 1);
-define("GEOMETRY_TYPE_POLYLINE", 2);
-define("GEOMETRY_TYPE_POLYGON", 3);
-define("GEOMETRY_TYPE_RASTER", 4);
-
-define("AREA_SUBTYPE_NATION", 2);
-define("AREA_SUBTYPE_STATE", 3);
-define("AREA_SUBTYPE_COUNTY", 4);
-define("AREA_SUBTYPE_POINT", 11);
-define("AREA_SUBTYPE_POLYLINE", 12);
-define("AREA_SUBTYPE_POLYGON", 13);
-
-define("AREA_SUBTYPE_TRAILHEAD", 62);
-define("AREA_SUBTYPE_TRAILSEGMENT", 63);
-
-define("AREA_SUBTYPE_MICA_PLOT", 67);
 
 //**************************************************************************************
 // Class Definition
@@ -88,15 +70,15 @@ class LKUAreaSubtypes {
     }
 
     public static function GetSetFromID($dbConn, $ID) {
-        $SelectString = "SELECT * " .
-                "FROM LKU_AreaSubtypes " .
-                "WHERE ID='" . $ID . "' " .
-                "ORDER BY Name";
+        $SelectString = "SELECT * ".
+                "FROM \"LKU_AreaSubtypes\" ".
+                "WHERE \"ID\"='".$ID."' ".
+                "ORDER BY \"Name\"";
 
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
-        $Set = $stmt->fetch();
-        return($Set);
+
+        return $stmt->fetch();
     }
 
     public static function Delete($Database, $AreaSubtypeID) {
@@ -108,6 +90,10 @@ class LKUAreaSubtypes {
     //******************************************************************************
     public static function GetNameFromID($dbConn, $ID) {
         $Set = LKUAreaSubtypes::GetSetFromID($dbConn, $ID);
+
+        if ($Set) {
+            return "";
+        }
 
         return($Set["Name"]);
     }

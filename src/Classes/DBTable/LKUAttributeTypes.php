@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: LKU_AttributeTypes.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -27,34 +27,21 @@ namespace Classes\DBTable;
 //**************************************************************************************
 //require_once("C:/Inetpub/wwwroot/cwis438/Classes/DBTable/TBL_OrganismInfos.php");
 use Classes\TBLDBTables;
+use API\Classes\Constants;
 
 //**************************************************************************************
 // Class Definition
 //**************************************************************************************
 // gjn; perhaps these should ahve been named "ATTRIBUTE_TYPE_XXX"
 
-define("ATTRIBUTE_HEIGHT", 2);
-define("ATTRIBUTE_PERCENT_COVER", 3);
-define("ATTRIBUTE_PRESENCE", 15);
-define("ATTRIBUTE_DERIVED_BIOMASS", 46);
-define("ATTRIBUTE_LINE_LENGTH", 67); // used for trail length thus far
-define("ATTRIBUTE_DIFFICULTY", 61); // trail difficulty
-define("ATTRIBUTE_ELEVATION_CHANGE", 65); // trail difficulty
-define("ATTRIBUTE_ALLOWED_USES", 62); // allowed uses
-define("ATTRIBUTE_ACCESSIBILITY", 68); // allowed uses
-define("ATTRIBUTE_SURFACE_TYPE", 69); // allowed uses
-
-define("ATTRIBUTE_TYPE_APPLIESTO_UNKNOWN", 0);
-define("ATTRIBUTE_TYPE_APPLIESTO_GROUP_OR_INDIVIDUAL", 1);
-define("ATTRIBUTE_TYPE_APPLIESTO_GROUP", 2);
-define("ATTRIBUTE_TYPE_APPLIESTO_INDIVIDUAL", 3);
-
-define("ATTRIBUTE_TYPE_VALUETYPE_LOOKUP", 1);
-define("ATTRIBUTE_TYPE_VALUETYPE_FLOAT", 2);
-define("ATTRIBUTE_TYPE_VALUETYPE_INTEGER", 3);
-define("ATTRIBUTE_TYPE_VALUETYPE_BOOLEAN", 4);
-
-$AttributeTypeAppliesToString = array(" -- Applies to --- ", "Group or individual", "Group", "Individual");
+define("ORGANISM_TYPE_PLANT_TERRESTRIAL", 1);
+define("ORGANISM_TYPE_PLANT_AQUATIC", 2);
+define("ORGANISM_TYPE_ANIMAL_VERTIBRATE_TERRESTRIAL", 3);
+define("ORGANISM_TYPE_ANIMAL_INVERTIBRATE_TERRESTRIAL", 4);
+define("ORGANISM_TYPE_ANIMAL_VERTIBRATE_AQUATIC", 5);
+define("ORGANISM_TYPE_ANIMAL_INVERTIBRATE_AQUATIC", 6);
+define("ORGANISM_TYPE_DISEASE_ANIMAL", 7);
+define("ORGANISM_TYPE_DISEASE_PLANT", 8);
 
 class LKUAttributeTypes {
 
@@ -65,7 +52,7 @@ class LKUAttributeTypes {
     public static function GetSet($Database, $AttributeCategoryID = null, $OrderByField = null) {
     //
     // type is required (we never put up types from different categories//
-    
+
         $SelectString = "SELECT * " .
                 "FROM LKU_AttributeTypes ";
 
@@ -85,15 +72,16 @@ class LKUAttributeTypes {
     }
 
     public static function GetSetFromID($dbConn, $ID) {
-        $SelectString = "SELECT * " .
-                "FROM LKU_AttributeTypes " .
-                "WHERE ID=:ID";		
+        $SelectString = "SELECT * ".
+                "FROM \"LKU_AttributeTypes\" ".
+                "WHERE \"ID\"=:ID";
+
         $stmt = $dbConn->prepare($SelectString);
+
         $stmt->bindValue("ID", $ID);
         $stmt->execute();
-        $Set = $stmt->Fetch();
 
-        return($Set);
+        return $stmt->fetch();
     }
 
     public static function GetNameForID($Database, $ID) {
@@ -133,7 +121,7 @@ class LKUAttributeTypes {
     // Insert, Update, Delete
     //**********************************************************************************
 
-    public static function Insert($Database, $AttributeCategoryID = 1) { // default to organism data attributes ???? 
+    public static function Insert($Database, $AttributeCategoryID = 1) { // default to organism data attributes ????
         $AttributeTypeID = -1;
 
         $ExecString = "EXEC insert_LKU_AttributeTypes '$AttributeCategoryID'";
@@ -155,7 +143,7 @@ class LKUAttributeTypes {
         return($AttributeTypeID);
     }
 
-    public static function Update($Database, $AttributeCategoryID, $AttributeTypeID, $Name, $Description, $AppliesTo, $ValueType, $UnitTypeID, $MinimumValue = NOT_SPECIFIED, $MaximumValue = NOT_SPECIFIED, $ZeroIndicatesAbsent = NOT_SPECIFIED) {
+    public static function Update($Database, $AttributeCategoryID, $AttributeTypeID, $Name, $Description, $AppliesTo, $ValueType, $UnitTypeID, $MinimumValue = Constants::NOT_SPECIFIED, $MaximumValue = Constants::NOT_SPECIFIED, $ZeroIndicatesAbsent = Constants::NOT_SPECIFIED) {
         $UpdateString = "UPDATE LKU_AttributeTypes " .
                 "SET AttributeCategoryID='$AttributeCategoryID', " .
                 "Name='$Name', " .
@@ -208,8 +196,8 @@ class LKUAttributeTypes {
         return($Set);
     }
 
-    public static function GetSetFromOrganismType($Database, $OrganismType, $ParentFormEntryID = NOT_SPECIFIED) {
-        if ($ParentFormEntryID !== NOT_SPECIFIED) {
+    public static function GetSetFromOrganismType($Database, $OrganismType, $ParentFormEntryID = Constants::NOT_SPECIFIED) {
+        if ($ParentFormEntryID !== Constants::NOT_SPECIFIED) {
             // DebugWriteln("ParentFormEntryID=$ParentFormEntryID");
             // loop through all form entries with this parentformentryid
             // check for existing entries with attributetypeid in unique set of sttribute types for this organism group
