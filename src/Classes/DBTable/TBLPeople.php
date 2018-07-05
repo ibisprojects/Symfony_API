@@ -50,7 +50,7 @@ class TBLPeople {
 
     public static function validateUsernamePassword($dbConn, $userName, $password) {
         $sql = "SELECT \"Login\" FROM \"TBL_People\"
-                WHERE  \"Login\" = :username AND \"Password\" = :password";
+                WHERE  \"Login\" ilike(:username) AND \"Password\" = :password";
         $stmt = $dbConn->prepare($sql);
         $stmt->bindValue("username", $userName);
         $stmt->bindValue("password", sha1($password));
@@ -80,7 +80,7 @@ class TBLPeople {
     public static function GetSetFromEmail($dbConn, $Email) {
         $SelectString = "SELECT * " .
                 "FROM \"TBL_People\" " .
-                "WHERE \"Email\"='" . $Email . "'";
+                "WHERE \"Email\" ilike('" . $Email . "')";
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
         $user = $stmt->fetch();
@@ -93,7 +93,7 @@ class TBLPeople {
     public static function GetSetFromLogin($dbConn, $Login) {
         $SelectString = "SELECT * " .
                 "FROM \"TBL_People\" " .
-                "WHERE \"Login\" = :Login ";
+                "WHERE \"Login\" ilike(:Login) ";
 
         $stmt = $dbConn->prepare($SelectString);
         $stmt->bindValue("Login", $Login);
@@ -106,6 +106,8 @@ class TBLPeople {
     }
 
     public static function Register($dbConn, $FirstName, $LastName, $Email, $Login, $Password) {
+        // FIX THIS: it doesn't verify if other account with the same login or email already exists
+
         $execString = "EXEC insert_TBL_People :LastName";
         $stmt = $dbConn->prepare($execString);
         $stmt->bindValue("LastName", $LastName);
