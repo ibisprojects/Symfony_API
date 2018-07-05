@@ -13,10 +13,7 @@ class GrantScopeValidator{
         $stmt->bindValue("clientID", $clientID);
         $stmt->execute();
         $grantRes = $stmt->fetch();
-        if (!$grantRes) {
-            return FALSE;
-        }
-        return TRUE;
+        return !empty($grantRes);
     }
 
     public function validateScope($dbConn, $clientID, $scopeID) {

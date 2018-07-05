@@ -68,8 +68,6 @@ class AuthCode extends GrantScopeValidator implements GrantTypeInterface {
         $this->authTokenTTL = $authTokenTTL;
     }
 
-   
-
     /**
      * Check authorise parameters
      *
@@ -79,7 +77,7 @@ class AuthCode extends GrantScopeValidator implements GrantTypeInterface {
      */
     public function checkAuthoriseParams($inputParams = array()) {
         // Auth params
-        $authParams = $this->authServer->getParam(array('client_id', 'redirect_uri', 'response_type', 'scope', 'state', 'client_secret'), 'get', $inputParams);
+        $authParams = $this->authServer->getParam(array('client_id', 'redirect_uri', 'response_type', 'scope', 'state', 'client_secret', 'state'), 'get', $inputParams);
 
         if (is_null($authParams['client_id'])) {
             throw new Exception\ClientException(sprintf($this->authServer->getExceptionMessage('invalid_request'), 'client_id'), 0);
@@ -96,7 +94,8 @@ class AuthCode extends GrantScopeValidator implements GrantTypeInterface {
         if ($this->authServer->stateParamRequired() === true && is_null($authParams['state'])) {
             throw new Exception\ClientException(sprintf($this->authServer->getExceptionMessage('invalid_request'), 'state'), 0);
         }
-        // Validate client ID and redirect URI        
+
+        // Validate client ID and redirect URI
         $clientDetails = $this->authServer->getStorage('client')->getClient($authParams['client_id'], $authParams['client_secret'], $authParams['redirect_uri'], $this->identifier);
 
         if ($clientDetails === false) {
@@ -104,6 +103,7 @@ class AuthCode extends GrantScopeValidator implements GrantTypeInterface {
         }
 
         $authParams['client_details'] = $clientDetails;
+
         if (is_null($authParams['response_type'])) {
             throw new Exception\ClientException(sprintf($this->authServer->getExceptionMessage('invalid_request'), 'response_type'), 0);
         }
@@ -261,8 +261,7 @@ class AuthCode extends GrantScopeValidator implements GrantTypeInterface {
                 $response['refresh_token'] = $refreshToken;
             }
         }
-        
+
         return $response;
     }
-
 }

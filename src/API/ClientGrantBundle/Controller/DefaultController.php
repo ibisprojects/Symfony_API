@@ -32,7 +32,7 @@ class DefaultController extends Controller {
                 $citScitDB = new DBConnection();
                 $dbConn = $citScitDB->connect();
                 $peopleSet = TBLPeople::GetSetFromLogin($dbConn, $login);
-                if ($peopleSet) { 
+                if ($peopleSet) {
                     if ($peopleSet["VerificationCode"] == $verificationCode) {
                         TBLPeople::verifyUser($dbConn, $peopleSet["ID"]);
                         $returnArray["status"] = Constants::SUCCESS_STATUS;
@@ -132,7 +132,7 @@ class DefaultController extends Controller {
                             }
                             else{
                                 $returnArray["status"] = Constants::SUCCESS_STATUS;
-                                $returnArray["message"] = "User Registration Successful"; 
+                                $returnArray["message"] = "User Registration Successful";
                             }
                         } else {
                             $returnArray["message"] = Constants::EMAIL_EXISTS_MESSAGE;

@@ -1,5 +1,5 @@
 imports:
-    - { resource: config.yml }
+  - { resource: config.yml }
 
 #framework:
 #    validation:
@@ -12,14 +12,30 @@ imports:
 #        query_cache_driver: apc
 
 monolog:
-    handlers:
-        main:
-            type:         fingers_crossed
-            action_level: error
-            handler:      nested
-        nested:
-            type:  stream
-            path:  "%kernel.logs_dir%/%kernel.environment%.log"
-            level: debug
-        console:
-            type:  console
+  channels: ['mobile', 'fileupload', 'insertdata']
+  handlers:
+    main:
+      type:         fingers_crossed
+      action_level: error
+      handler:      nested
+    nested:
+      type:  stream
+      path:  "%kernel.logs_dir%/%kernel.environment%.log"
+      level: debug
+    console:
+      type:  console
+    mobile:
+      type: stream
+      path: "%kernel.logs_dir%/mobile_app_%kernel.environment%.log"
+      level: info
+      channels: [mobile]
+    fileupload:
+      type: stream
+      path: "%kernel.logs_dir%/image_upload_%kernel.environment%.log"
+      level: info
+      channels: [fileupload]
+    insertdata:
+      type: stream
+      path: "%kernel.logs_dir%/insert_data_%kernel.environment%.log"
+      level: info
+      channels: [insertdata]

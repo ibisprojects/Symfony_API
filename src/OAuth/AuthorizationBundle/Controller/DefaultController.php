@@ -13,12 +13,12 @@ class DefaultController extends Controller {
         $authCode = "";
         $accesstoken = "";
         if ($request->getMethod() == 'GET') {
-
             $authCode = $request->get("code", "");
             $accesstoken = $request->get("access_token", "");
             $refresh_token = $request->get("refresh_token", "");
             $expires_in = $request->get("expires_in", "");
         }
+
         $response = array(
             'access_token' => $accesstoken,
             'refresh_token' => $refresh_token,

@@ -6,8 +6,6 @@ define("MODERATOR", "newmang@nrel.colostate.edu");
 define("UTILHTMLHEADER", "MIME-Version: 1.0\r\nContent-type: text/html; charset=iso-8859-1\r\n");
 define("UTILTEXTHEADER", "MIME-Version: 1.0\r\nContent-type: text/plain; charset=iso-8859-1\r\n");
 define("UTIL_CITSCI_HEADER", "From: CitSci.org <webmaster@citsci.org>\r\n");
-define("WEBSITE_CITSCI",7);
-
 
 define("CITSCI_EMAIL_BODYSTART","<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 3.2 Final//EN'>
 		<html>
@@ -30,15 +28,7 @@ class EmailUtil {
         $Headers = UTILHTMLHEADER;
         // additional headers 
         // $headers.="To: ".$addr."\r\n";
-
-        switch ($WebsiteID) {
-            case WEBSITE_CITSCI:
-                $Headers.=UTIL_CITSCI_HEADER;
-                break;
-            default:
-                $Headers.=UTIL_CITSCI_HEADER;
-                break;
-        }
+        $Headers.=UTIL_CITSCI_HEADER;
 
         $Mailsent = mail($Email, $Subject, $Message, $Headers);
         return $Mailsent;

@@ -5,7 +5,7 @@ namespace Classes\DBTable;
 //**************************************************************************************
 // FileName: TBL_SpatialLayers.php
 //
-// Copyright (c) 2006, 
+// Copyright (c) 2006,
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -32,6 +32,8 @@ namespace Classes\DBTable;
 // Class Definition
 //**************************************************************************************
 
+use Classes\Utilities\SQL;
+
 class TBLSpatialLayers {
 
     //**********************************************************************************
@@ -52,16 +54,21 @@ class TBLSpatialLayers {
     //******************************************************************************
 
     public static function GetSetFromID($dbConn, $ID) {
-        $SelectString = "SELECT * " .
-                "FROM TBL_SpatialLayers " .
-                "WHERE ID='" . $ID . "'";
+        $ID = SQL::SafeInt($ID);
+
+        $SelectString = "SELECT * ".
+                "FROM \"TBL_SpatialLayers\" ".
+                "WHERE \"ID\"='".$ID."'";
 
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
+
         $Set = $stmt->fetch();
+
         if (!$Set) {
             return false;
         }
+
         return($Set);
     }
 
@@ -95,43 +102,41 @@ class TBLSpatialLayers {
         return($Name);
     }
 
-    public static function Insert($Database, $SpatialLayerGroupID) {
-        $ExecString = "EXEC insert_TBL_SpatialLayers $SpatialLayerGroupID";
+    public static function Insert($dbConn, $SpatialLayerGroupID) {
+        $ExecString="INSERT INTO \"TBL_SpatialLayers\" (\"SpatialLayerGroupID\") VALUES ($SpatialLayerGroupID)";
 
-//		DebugWriteln("ExecString=".$ExecString);
+        $stmt = $dbConn->prepare($ExecString);
+        $stmt->execute();
 
-        $ID = $Database->DoInsert($ExecString);
-
-        return($ID);
+        return $dbConn->lastInsertId('"TBL_SpatialLayers_ID_seq"');
     }
 
-    public static function Update($Database, $ID, $Name, $GeometryType, $CoordinateSystemID, $RefX = null, $RefY = null, $RefWidth = null, $RefHeight = null, $FolderPath = null, $StartDate = null, $EndDate = null) {
-        $UpdateString = "UPDATE TBL_SpatialLayers " .
-                "SET Name='$Name', " .
-                "GeometryType=$GeometryType, " .
-                "CoordinateSystemID=$CoordinateSystemID ";
+    public static function Update($dbConn, $ID, $Name, $GeometryType, $CoordinateSystemID, $RefX = null, $RefY = null, $RefWidth = null, $RefHeight = null, $FolderPath = null, $StartDate = null, $EndDate = null) {
+        $UpdateString = "UPDATE \"TBL_SpatialLayers\" ".
+                "SET \"Name\"='$Name', ".
+                "\"GeometryType\"=$GeometryType, ".
+                "\"CoordinateSystemID\"=$CoordinateSystemID ";
 
         if ($RefX !== null)
-            $UpdateString.=",RefX='$RefX' ";
+            $UpdateString.=",\"RefX\"='$RefX' ";
         if ($RefY !== null)
-            $UpdateString.=",RefY='$RefY' ";
+            $UpdateString.=",\"RefY\"='$RefY' ";
         if ($RefWidth !== null)
-            $UpdateString.=",RefWidth='$RefWidth' ";
+            $UpdateString.=",\"RefWidth\"='$RefWidth' ";
         if ($RefHeight !== null)
-            $UpdateString.=",RefHeight='$RefHeight' ";
+            $UpdateString.=",\"RefHeight\"='$RefHeight' ";
 
         if ($StartDate !== null)
-            $UpdateString.=",StartDate='" . $StartDate->GetSQLString() . "' ";
+            $UpdateString.=",\"StartDate\"='".$StartDate->GetSQLString()."' ";
         if ($EndDate !== null)
-            $UpdateString.=",EndDate='" . $EndDate->GetSQLString() . "' ";
+            $UpdateString.=",\"EndDate\"='".$EndDate->GetSQLString()."' ";
         if ($FolderPath !== null)
-            $UpdateString.=",FolderPath='$FolderPath' ";
+            $UpdateString.=",\"FolderPath\"='$FolderPath' ";
 
-        $UpdateString.="WHERE ID=$ID";
+        $UpdateString.="WHERE \"ID\"=$ID";
 
-//		DebugWriteln("UpdateString=".$UpdateString);
-
-        $ID = $Database->Execute($UpdateString);
+        $stmt = $dbConn->prepare($UpdateString);
+        $stmt->execute();
 
         return($ID);
     }
@@ -182,34 +187,35 @@ class TBLSpatialLayers {
     //
     //	Returns an ID to a spatial layer grid with PersonID=NULL (standard).
     //	Creates the grid and any required parents if none is found.//
-	
+
         // try to find an existing grid
 
-        $SelectString = "SELECT TBL_SpatialLayers.ID " .
-                "FROM TBL_SpatialLayers " .
-                "INNER JOIN TBL_SpatialLayerGroups " .
-                "ON TBL_SpatialLayerGroups.ID=TBL_SpatialLayers.SpatialLayerGroupID " .
-                "INNER JOIN TBL_SpatialLayerTypes " .
-                "ON TBL_SpatialLayerTypes.ID=TBL_SpatialLayerGroups.SpatialLayerTypeID " .
-                "WHERE AreaSubtypeID=$AreaSubtypeID " .
-                "AND CoordinateSystemID=$CoordinateSystemID " .
-                "AND PersonID IS NULL";
+        $SelectString = "SELECT \"TBL_SpatialLayers\".\"ID\" ".
+                "FROM \"TBL_SpatialLayers\" ".
+                "INNER JOIN \"TBL_SpatialLayerGroups\" ".
+                "ON \"TBL_SpatialLayerGroups\".\"ID\"=\"TBL_SpatialLayers\".\"SpatialLayerGroupID\" ".
+                "INNER JOIN \"TBL_SpatialLayerTypes\" ".
+                "ON \"TBL_SpatialLayerTypes\".\"ID\"=\"TBL_SpatialLayerGroups\".\"SpatialLayerTypeID\" ".
+                "WHERE \"AreaSubtypeID\"=$AreaSubtypeID ".
+                "AND \"CoordinateSystemID\"=$CoordinateSystemID ".
+                "AND \"PersonID\" IS NULL";
 
         $stmt = $dbConn->prepare($SelectString);
         $stmt->execute();
         $SpatialLayerSet = $stmt->fetch();
+
         if ($SpatialLayerSet) { // get it from the set
             $SpatialLayerID = $SpatialLayerSet["ID"];
         } else { // find a layer and insert a new grid
             $SpatialLayerGroupID = TBLSpatialLayerGroups::GetStandardID($dbConn, $AreaSubtypeID);
-            $Name = TBLSpatialLayerGroups::GetNameFromID($Database, $SpatialLayerGroupID);
-            $Name.=" " . LKUCoordinateSystems::GetNameForID($Database, $CoordinateSystemID);
-            $SpatialLayerID = TBLSpatialLayers::Insert($Database, $SpatialLayerGroupID);
-            TBLSpatialLayers::Update($Database, $SpatialLayerID, $Name, 0, $CoordinateSystemID);
+            $Name = TBLSpatialLayerGroups::GetNameFromID($dbConn, $SpatialLayerGroupID);
+            $Name .= " ".LKUCoordinateSystems::GetNameForID($dbConn, $CoordinateSystemID);
+            $SpatialLayerID = TBLSpatialLayers::Insert($dbConn, $SpatialLayerGroupID);
+            TBLSpatialLayers::Update($dbConn, $SpatialLayerID, $Name, 0, $CoordinateSystemID);
         }
+
         return($SpatialLayerID);
     }
-
 }
 
 ?>
