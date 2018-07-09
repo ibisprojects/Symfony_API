@@ -76,9 +76,10 @@ class AuthController extends Controller {
         $params['scopes'] = $session->get('scopes');
         $params['state'] = $session->get('state');
         $params['error_message'] = "";
+
         try {
             foreach ($params as $key => $value) {
-                if ($value === null) {
+                if ($key != 'state' && $value === null) {
                     throw new Exception('Authorization parameters not found.');
                 }
             }
